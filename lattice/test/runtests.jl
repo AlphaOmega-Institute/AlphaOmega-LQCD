@@ -165,7 +165,7 @@ end
 end
 
 @testset "4D twist: corner plaquettes equal the bulk" begin
-    # The inconsistent twist in the original check_pi_4.jl fails this badly.
+    # A twist that gives both orientations of a plaquette the same phase fails this badly.
     lat = Lattice((4, 4, 4, 4); twist = SYM_TWIST)
     series, _ = run_chain(lat, 5.7, HB_OR, 200, 2000, 50;
                           f = g -> (corner_and_bulk(g, 1, 2)..., corner_and_bulk(g, 3, 4)...))
