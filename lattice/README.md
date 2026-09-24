@@ -66,7 +66,33 @@ To check the tests would catch real mistakes, each of these bugs was planted by 
 
 ## Results
 
-Reproduce with `lattice/examples/beta_scan.jl`; a table of reference runs will be added here.
+Produced with `examples/beta_scan.jl`: hot start, seed 1, and 200 thermalization plus 2000 measured sweeps unless noted. One sweep is one heatbath pass and three overrelaxation passes. The last column is the value reported in `docs/formalism/main.tex`.
+
+| β | Lattice | ⟨S⟩ = 1 − ⟨P⟩ | In `main.tex` |
+|---|---|---|---|
+| 3.10 | 8⁴ | 0.786983(41) | |
+| 3.12 | 8⁴ | 0.785252(41) | |
+| 3.14 | 8⁴ | 0.783620(43) | |
+| 3.90 | 8⁴ | 0.718664(53) | 0.7913 |
+| 3.95 | 8⁴ | 0.714142(49) | 0.7882 |
+| 3.98 | 8⁴ | 0.711328(51) | 0.7863 |
+| 3.98 | 8⁴, twisted | 0.711431(55) | |
+| 4.00 | 8⁴ | 0.709587(54) | 0.7834 |
+
+- **The paper's values are about 0.073 too high** at every β it lists.
+- **⟨S⟩ = π/4 ≈ 0.785398 falls at β ≈ 3.118** (linear interpolation between 3.10 and 3.12). ⟨S⟩ decreases smoothly with β, so some β always gives π/4; that crossing is not by itself evidence for anything.
+- **The twist leaves the bulk action unchanged.** Twisted and periodic runs at β = 3.98 differ by 0.00010(8).
+- **An independent NumPy implementation agrees.** It was written separately during the review and matches these values within errors.
+
+Check against the literature at β = 6.0, where the commonly quoted large-volume plaquette is ≈ 0.59368:
+
+| Lattice | Sweeps (therm + measured) | ⟨P⟩ |
+|---|---|---|
+| 8⁴ | 200 + 2000 | 0.594374(88) |
+| 12⁴ | 200 + 1000 | 0.593673(56) |
+| 16⁴ | 150 + 400 | 0.593653(55) |
+
+The 8⁴ box is too small at this coupling and sits about 0.0007 high. From 12⁴ upward the result agrees with the literature.
 
 ## Not yet included
 
