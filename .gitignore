@@ -1,51 +1,22 @@
-# --- A|Ω INSTITUTE DATA PROTOCOL ---
-# Ignore all heavy data/logs. 
-# We do NOT push gigabytes of lattice configs to GitHub.
+# Git only treats # as a comment at the start of a line, so comments go on their own lines.
+
+# Simulation output
 data/
 logs/
 *.log
-*.jld2       # Julia binary data files (like Python pickles)
-*.csv        # Unless they are tiny reference tables
-*.h5         # HDF5 files (Standard for large scientific data)
+*.jld2
+*.h5
+*.csv
 
-# --- JULIA ---
-# Keep Project.toml and Manifest.toml (for reproducibility)
-# But ignore local artifacts and precompiled binaries.
+# Julia
 *.ji
 *.cov
 *.mem
-/pluto_state_cache
 LocalPreferences.toml
+lattice/Manifest.toml
 
-# --- PYTHON (Legacy/Prototypes) ---
-__pycache__/
-*.pyc
-.ipynb_checkpoints/
-.venv/
-env/
-dist/
-build/
-
-# --- LATEX (Formalism Docs) ---
-# Don't commit the messy build files, just the source .tex
-*.aux
-*.out
-*.toc
-*.fls
-*.fdb_latexmk
-*.synctex.gz
-
-# --- MACOS & IDE JUNK ---
-.DS_Store    # The ghost of Mac Finder
-.vscode/     # Ignore local workspace settings (use Sync instead)
-.idea/       # If any PyCharm ghosts remain
+# OS and editors
+.DS_Store
+.vscode/
+.idea/
 *.swp
-
-# .gitignore
-*.pdf
-*.aux
-*.log
-*.out
-*.synctex.gz
-*.fls
-*.fdb_latexmk.DS_Store
