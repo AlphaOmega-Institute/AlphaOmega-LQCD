@@ -21,7 +21,7 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 1692 tests
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 1712 tests
     julia docs/notes/check_spectral_transfer.jl                        # 4260 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
     gunzip -k lattice/data/glueball_b570_L8T16.txt.gz
@@ -47,8 +47,22 @@ The 3000-configuration run is in progress. Its data file and these results will 
   δ/Δ ~ (am)^p with p > 0. Runs at β = 5.85 and 6.0 are planned. Optimized single-operator overlaps are
   usually close to constant in β, so a flat trend is the expected outcome. That would say single smeared
   operators are too crude a family of presentations, not that the criterion fails.
-- The two ground-state-fraction estimators disagree by several standard errors (see Results). The
-  defect bounds are quoted as ranges for that reason.
+- The two ground-state-fraction estimators (variational, and from the correlator decay) differ
+  systematically. Neither is a bound, and their spread is not an uncertainty interval.
+- Which gap goes where. In Proposition 1(ii), η = δ/(Λ − λ): for a one-state window ψ ≈ glueball,
+  Λ − λ ≈ E₁ − E₀, the spacing to the next scalar level. In Proposition 2 the tolerance κ < Δ_c compares
+  the defect with the coarse gap, which for the window {vacuum, ψ} is the vacuum-to-glueball gap. Since
+  ε ≥ δ, κ ≥ 2√2·δ.
+- The transfer-matrix residual δ_T = ‖(I − P_ψ)Tψ‖ with T = exp(−aH), from c(2)/c(0) − (c(1)/c(0))²,
+  is the defect of the window {vacuum, ψ} with respect to T. It needs no fitted E₁. Proposition 2
+  applied to −T compares it with the window gap 1 − c(1)/c(0). This comparison is necessary but not
+  sufficient: Proposition 2 also needs the top of T on the window's complement (through η), which three
+  correlator values do not determine. A poorly overlapping operator can show a small ratio while the
+  glueball itself lies mostly in the complement, and then Proposition 2 does not apply. It is a
+  one-lattice residual, not a test of a map between lattice spacings.
+- Euclidean time damps excited states, so a defect measured with T is much smaller than the same
+  admixture measured with H. A transfer-matrix form of Corollary 3 (maps intertwining T_k² with
+  T_{k+1}) is the natural next statement to write down.
 
 ## Points for review, most important first
 
@@ -56,7 +70,8 @@ The 3000-configuration run is in progress. Its data file and these results will 
 2. Corollary 3 and Remark 4: whether the reduction of the gap to summable windowed defects and omitted
    energies at the cutoff is stated correctly, and whether anything essential is missing.
 3. Remark 5 and `lattice/examples/glueball_analysis.jl`: the identification of the ground-state fraction
-   of a smeared operator with ‖Pφ₀‖² for a one-dimensional window, and the defect bound built from it.
+   of a smeared operator with ‖Pφ₀‖² for a one-dimensional window, the defect bound built from it, and
+   the transfer-matrix residual (`transfer_residual`) with its use in Proposition 2 for −T.
 4. `lattice/src/smearing.jl` and `lattice/src/spectroscopy.jl`: gauge covariance of the stout step, the
    correlator estimators, and the GEVP normalization.
 5. `hamiltonian/`: the 6j matrix elements of the spin-network ladder (validated against brute force) and

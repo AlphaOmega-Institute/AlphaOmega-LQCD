@@ -41,7 +41,8 @@ julia --project=lattice lattice/examples/glueball_analysis.jl data.txt --bin 10 
 The first script writes, per configuration, the mean plaquette, the 0⁺⁺ slice operators at each smearing
 level and smeared R×T Wilson loops. The second reports effective masses per level, the variational
 (GEVP) energies, ground-state fractions by two estimators, the defect bound of
-`docs/notes/spectral_transfer.tex`, the static potential and the string tension.
+`docs/notes/spectral_transfer.tex`, the transfer-matrix residual of each trial state, the static potential
+and the string tension.
 
 ## Conventions
 
@@ -70,7 +71,7 @@ level and smeared R×T Wilson loops. The second reports effective masses per lev
 | Stout smearing | Links stay in SU(3); time links unchanged; unit and pure-gauge fields stay so; ρ = 0 is the identity; smearing commutes with random gauge transformations to 1e-12; spatial plaquettes increase |
 | Glueball operators | Slice average equals the spatial plane plaquettes; each smearing level matches direct smearing; gauge invariant |
 | Smeared Wilson loops | `wilson_loops_rt` equals `wilson_loop` averaged over spatial directions; W(1,1) equals the space-time plaquettes; gauge invariant |
-| Correlator analysis | Effective masses of exact cosh correlators; GEVP recovers both energies of an exact two-state correlator at several (t₀, t); `correlator_matrix` against a direct implementation; binned products reproduce it; the jackknife error of a mean equals the standard error |
+| Correlator analysis | Effective masses of exact cosh correlators; GEVP recovers both energies of an exact two-state correlator at several (t₀, t); `correlator_matrix` against a direct implementation; binned products reproduce it; the jackknife error of a mean equals the standard error; `transfer_residual` equals ‖(I − P_ψ)Tψ‖ for random positive transfer matrices |
 
 The statistical tests allow 4.5 standard errors, with errors that include autocorrelation.
 

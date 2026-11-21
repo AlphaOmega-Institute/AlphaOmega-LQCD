@@ -285,6 +285,15 @@ end
     Pm = dropdims(sum(P; dims = 1); dims = 1) ./ 5
     Mm = vec(sum(M; dims = 1)) ./ 5
     @test correlator_from_means(Pm, Mm) ≈ Cm atol = 1e-12
+    # transfer residual: exact for a finite positive transfer matrix and a trial vector
+    for _ in 1:20
+        Q = Matrix(qr(randn(rng, 6, 6)).Q)
+        Tm = Q * Diagonal(rand(rng, 6)) * Q'                  # positive, norm < 1
+        ψ = randn(rng, 6); ψ /= norm(ψ)
+        c = [ψ' * Tm^t * ψ for t in 0:3] .* 2.7              # arbitrary normalization
+        exact = norm((I - ψ * ψ') * Tm * ψ)
+        @test transfer_residual(c) ≈ exact atol = 1e-12
+    end
     # jackknife error of a mean equals the standard error; binning averages blocks
     x = randn(rng, 50)
     est, err = jackknife(v -> sum(v) / length(v), x)

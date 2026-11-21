@@ -186,6 +186,21 @@ function correlator_from_means(P::AbstractArray{<:Real,3}, M::AbstractVector{<:R
 end
 
 """
+    transfer_residual(c) -> δ_T
+
+For the normalized trial state ψ that an operator creates from the vacuum, and
+the transfer matrix T = exp(−aH), the residual ‖(I − P_ψ) T ψ‖ of one time step
+out of the line of ψ, from the connected correlator c (index t+1):
+δ_T² = c(2)/c(0) − (c(1)/c(0))². It is the defect of the window {vacuum, ψ}
+with respect to T, whose compression to the window is diag(1, c(1)/c(0)).
+Periodic images are neglected (c(t) ≈ ⟨ψ|T^t|ψ⟩ c(0) for t ≪ T/2).
+"""
+function transfer_residual(c::AbstractVector{<:Real})
+    r1, r2 = c[2] / c[1], c[3] / c[1]
+    return sqrt(max(r2 - r1^2, 0.0))
+end
+
+"""
     cosh_mass(r, t, T)
 
 Solve r = cosh(m (t − T/2)) / cosh(m (t + 1 − T/2)) for m ≥ 0, the effective

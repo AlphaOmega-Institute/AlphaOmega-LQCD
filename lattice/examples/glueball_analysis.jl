@@ -102,6 +102,14 @@ function main(args)
         for t in (1, 2), k in 1:nlev
             push!(out, C[k, k, t+1] * cosh(E0 * T / 2) / (C[k, k, 1] * cosh(E0 * (t - T / 2))))
         end
+        # transfer-matrix residual of each level and of the GEVP combination: the defect δ_T of
+        # the window {vacuum, ψ} with respect to T = exp(−aH), its window gap 1 − c(1)/c(0), and
+        # their ratio to the Proposition 2 scale: δ_T / ((1 − c(1)/c(0)) / 2√2)
+        for cv in vcat([C[k, k, :] for k in 1:nlev], [c0])
+            δT = transfer_residual(cv)
+            gapT = 1 - cv[2] / cv[1]
+            append!(out, [δT, gapT, δT / (gapT / (2 * sqrt(2)))])
+        end
         # static potential and Cornell fits
         Vr = [log(Wm[R, τ] / Wm[R, τ+1]) for R in 1:rmax]
         append!(out, Vr)
@@ -140,6 +148,13 @@ function main(args)
         println("ground-state fraction from the decay at t = $t (overestimate)")
         println("  ", join([@sprintf("%d: %s", levels[k], fmt(est[p+k], err[p+k])) for k in 1:nlev], "   "))
         p += nlev
+    end
+    println("\ntransfer-matrix residual δ_T = ‖(I−P_ψ)Tψ‖, window gap 1 − c(1)/c(0), and δ_T / [(1 − c)/2√2]")
+    println("  (Proposition 2 applied to −T on the window {vacuum, ψ} needs the last column below 1)")
+    for k in 1:nlev+1
+        name = k <= nlev ? @sprintf("level %3d", levels[k]) : "GEVP     "
+        println("  ", name, ": ", join([fmt(est[p+j], err[p+j]) for j in 1:3], "   "))
+        p += 3
     end
     println("\nstatic potential a·V(R) from τ = $τ → $(τ+1), R = 1 … $rmax")
     println("  ", join([fmt(est[p+R], err[p+R]) for R in 1:rmax], "  "))

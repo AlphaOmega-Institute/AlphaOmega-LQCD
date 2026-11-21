@@ -21,7 +21,7 @@ export Metropolis, Heatbath, Overrelaxation, sweep!
 export mean_err, single_plaquette_average
 export stout_spatial, slice_plaquettes, glueball_operators, wilson_loops_rt
 export bin_means, jackknife, correlator_matrix, correlator_products, correlator_from_means
-export cosh_mass, effective_masses, gevp
+export cosh_mass, effective_masses, gevp, transfer_residual
 
 include("su3.jl")
 include("geometry.jl")
