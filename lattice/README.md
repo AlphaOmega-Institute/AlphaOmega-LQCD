@@ -7,6 +7,7 @@ A small, tested engine for pure SU(3) Yang–Mills theory on the lattice, in Jul
 - Cabibbo–Marinari heatbath (Kennedy–Pendleton) with overrelaxation, and multi-hit Metropolis
 - Plaquette (total, per plane), Polyakov loop, R×T Wilson loops
 - Error bars that account for autocorrelation (Madras–Sokal windowing)
+- Glueball spectroscopy: spatial stout smearing, 0⁺⁺ operators per time slice at several smearing levels, smeared R×T Wilson loops for the static potential, and a correlator analysis (binning, jackknife, periodic effective masses, generalized eigenvalue problem)
 
 This is standard lattice gauge theory, not new physics. It is meant as a foundation whose results can be trusted, because every piece is checked against something exact.
 
@@ -28,6 +29,19 @@ for _ in 1:500
 end
 mean_plaquette(g)
 ```
+
+### Glueball spectroscopy
+
+```sh
+julia --project=lattice -t auto lattice/examples/glueball.jl --beta 5.7 --L 8 --T 16 --confs 3000 \
+      --levels 0,4,8,16,24,32 --wlevel 16 > data.txt
+julia --project=lattice lattice/examples/glueball_analysis.jl data.txt --bin 10 --ops 2,3,4,5
+```
+
+The first script writes, per configuration, the mean plaquette, the 0⁺⁺ slice operators at each smearing
+level and smeared R×T Wilson loops. The second reports effective masses per level, the variational
+(GEVP) energies, ground-state fractions by two estimators, the defect bound of
+`docs/notes/spectral_transfer.tex`, the static potential and the string tension.
 
 ## Conventions
 
@@ -52,6 +66,11 @@ mean_plaquette(g)
 | 4D at β = 5.7 | Heatbath and Metropolis agree |
 | 4D with twist | Twisted corner plaquettes average the same as the rest of their plane, as they must, because a change of variables moves the twist |
 | Reproducibility | Same seed gives identical results |
+| Matrix exponential | `expm3` against the dense exponential to 1e-12, for norms from 0.01 to 12; result in SU(3) |
+| Stout smearing | Links stay in SU(3); time links unchanged; unit and pure-gauge fields stay so; ρ = 0 is the identity; smearing commutes with random gauge transformations to 1e-12; spatial plaquettes increase |
+| Glueball operators | Slice average equals the spatial plane plaquettes; each smearing level matches direct smearing; gauge invariant |
+| Smeared Wilson loops | `wilson_loops_rt` equals `wilson_loop` averaged over spatial directions; W(1,1) equals the space-time plaquettes; gauge invariant |
+| Correlator analysis | Effective masses of exact cosh correlators; GEVP recovers both energies of an exact two-state correlator at several (t₀, t); `correlator_matrix` against a direct implementation; binned products reproduce it; the jackknife error of a mean equals the standard error |
 
 The statistical tests allow 4.5 standard errors, with errors that include autocorrelation.
 
@@ -94,5 +113,6 @@ The 8⁴ box is too small at this coupling and sits about 0.0007 high. From 12�
 ## Not yet included
 
 - Gauge groups other than SU(3), and the Twisted Eguchi–Kawai (single-site, large-N) model
-- Gradient flow, smearing, topological charge, scale setting
+- Gradient flow, topological charge, scale setting beyond the string tension
+- Glueball channels other than A₁⁺⁺, and operators other than smeared plaquettes
 - Performance work beyond avoiding allocations: about 1 µs per link update on one core (heatbath plus staple)

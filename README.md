@@ -10,9 +10,15 @@ The repository currently contains one package, [**LatticeYM**](lattice/README.md
 - Wilson plaquette action on a periodic lattice in any number of dimensions, with optional 't Hooft twisted boundary conditions
 - Heatbath with overrelaxation, and Metropolis
 - Plaquettes, Polyakov loops, Wilson loops, and error bars that account for autocorrelation
+- Glueball spectroscopy: stout smearing, 0⁺⁺ correlators, the static potential and the string tension
 - A test suite that checks the code against exact results: the 2D plaquette, 4D strong coupling, gauge invariance, a full recomputation of the action, and the published β = 6.0 plaquette
 
 This is standard lattice gauge theory, meant as a tested foundation for later work.
+
+Also in this repository:
+
+- [`hamiltonian/`](hamiltonian/README.md): exact SU(2) Hamiltonian models on one and two plaquettes (Python)
+- [`docs/notes/`](docs/notes/README.md): working notes, currently on spectral transfer along block-spin maps
 
 ## Quick start
 

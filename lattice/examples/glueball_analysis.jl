@@ -96,6 +96,12 @@ function main(args)
             E1 = cosh_mass(c1[t0+1] / c1[t0+2], t0, T)
         end
         append!(out, [(E1 - E0) * sqrt(max(1 / fk - 1, 0.0)) for fk in f])
+        # second estimator, from the decay of each diagonal correlator at t = 1 and 2:
+        # f_k(t) = C_kk(t) cosh(E0 T/2) / (C_kk(0) cosh(E0 (t − T/2))); excited states make it
+        # an overestimate that decreases with t
+        for t in (1, 2), k in 1:nlev
+            push!(out, C[k, k, t+1] * cosh(E0 * T / 2) / (C[k, k, 1] * cosh(E0 * (t - T / 2))))
+        end
         # static potential and Cornell fits
         Vr = [log(Wm[R, τ] / Wm[R, τ+1]) for R in 1:rmax]
         append!(out, Vr)
@@ -130,6 +136,11 @@ function main(args)
     println("defect bound a·δ_k ≥ a(E₁ − E₀)·√(1/f_k − 1) per level (Proposition 1(ii), Λ ≈ E₁)")
     println("  ", join([@sprintf("%d: %s", levels[k], fmt(est[p+k], err[p+k])) for k in 1:nlev], "   "))
     p += nlev
+    for t in (1, 2)
+        println("ground-state fraction from the decay at t = $t (overestimate)")
+        println("  ", join([@sprintf("%d: %s", levels[k], fmt(est[p+k], err[p+k])) for k in 1:nlev], "   "))
+        p += nlev
+    end
     println("\nstatic potential a·V(R) from τ = $τ → $(τ+1), R = 1 … $rmax")
     println("  ", join([fmt(est[p+R], err[p+R]) for R in 1:rmax], "  "))
     p += rmax
