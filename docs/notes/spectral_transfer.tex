@@ -1,0 +1,116 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}[proposition]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[proposition]{Remark}
+\newcommand{\K}{\mathcal K}
+\newcommand{\Ran}{\operatorname{Ran}}
+\newcommand{\spec}{\operatorname{spec}}
+\newcommand{\dist}{\operatorname{dist}}
+\title{Spectral transfer along block-spin maps}
+\author{Working note}
+\date{}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+A block-spin map from a coarse lattice Hamiltonian to a fine one can be written as a partial isometry, a presentation in the sense of the polar formalism. How far it fails to intertwine the two Hamiltonians is measured by a defect $\delta$. We show that coarse levels shadow fine levels within $\delta$. Below the energy $\Lambda$ of the states that the map leaves out, fine levels shadow coarse levels within $\delta\sqrt{1+\eta^2}$, where $\eta=\delta/(\Lambda-\lambda)$. A simple coarse ground with gap $\Delta_c$ then forces a fine gap of at least $\Delta_c$ minus terms of order $\delta$. Iterated along a renormalization-group trajectory, starting at strong coupling where a lattice gap is known, the criterion reduces a gap in physical units to the construction of block-spin maps whose defects, restricted to low energies, are summable in physical units and whose omitted states lie at the cutoff. The criterion does not supply those maps. It moves the difficulty of the mass-gap problem into their construction, which is the content of the renormalization group.
+\end{abstract}
+
+\section{Setting}
+
+Let $\K_f$ and $\K_c$ be Hilbert spaces with bounded self-adjoint Hamiltonians $H_f$ and $H_c$, for instance on finite lattices with truncated link spaces. Let $W:\K_c\to\K_f$ be a partial isometry with initial projection $Q=W^*W$, which we assume commutes with $H_c$, and final projection $P=WW^*$. The \emph{defect} of $W$ is
+\[
+ \Delta=H_fW-WH_c,\qquad \delta=\|\Delta\| .
+\]
+When $W$ is the polar part of a preparation, $\delta=0$ exactly when $W$ intertwines the two dynamics, the condition of the BRST working notes. The \emph{omitted energy} $\Lambda$ is the bottom of the compression of $H_f$ to $\Ran(I-P)$:
+\[
+ (I-P)H_f(I-P)\ \ge\ \Lambda\,(I-P).
+\]
+In the language of the polar formalism, $\Ran(I-P)$ is the defect space of the presentation. Here it must be energetically expensive, the mirror image of the reading in which the unpaired directions are what survives.
+
+Typically $Q$ is a spectral projection of $H_c$ onto a low-energy window, so that $W$ only has to represent the low-lying coarse states. For a block-spin isometry $W_0$ and $W=W_0Q$, the defect is the windowed quantity
+\[
+ \delta=\|(H_fW_0-W_0H_c)\,Q\| .
+\]
+
+\section{Shadowing and gap transfer}
+
+\begin{proposition}\label{prop:shadow}
+\begin{enumerate}
+\item[(i)] Every eigenvalue of $H_c$ that has an eigenvector in $\Ran Q$ lies within $\delta$ of the spectrum of $H_f$.
+\item[(ii)] Every eigenvalue $\lambda<\Lambda$ of $H_f$ with unit eigenvector $\varphi$ satisfies
+\[
+ \|(I-P)\varphi\|\le\eta\,\|P\varphi\|,\qquad \eta=\frac{\delta}{\Lambda-\lambda},
+\]
+and
+\[
+ \dist\bigl(\lambda,\spec(H_c|_{\Ran Q})\bigr)\le\delta\sqrt{1+\eta^2}.
+\]
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) For a unit $\psi\in\Ran Q$ with $H_c\psi=\mu\psi$, the vector $W\psi$ is a unit vector and $(H_f-\mu)W\psi=\Delta\psi$, so $\dist(\mu,\spec H_f)\le\|\Delta\psi\|\le\delta$.
+
+(ii) Since $(I-P)W=0$, we have $(I-P)H_fP=(I-P)(WH_c+\Delta)W^*=(I-P)\Delta W^*$, of norm at most $\delta$. Taking the inner product of $H_f\varphi=\lambda\varphi$ with $(I-P)\varphi$ gives
+\[
+ \begin{aligned}
+ \lambda\|(I-P)\varphi\|^2&=\langle(I-P)\varphi,H_f(I-P)\varphi\rangle+\langle(I-P)\varphi,(I-P)\Delta W^*P\varphi\rangle\\
+ &\ge\Lambda\|(I-P)\varphi\|^2-\delta\,\|(I-P)\varphi\|\,\|P\varphi\| ,
+ \end{aligned}
+\]
+which is the first inequality. For the second, the adjoint of $H_fW=WH_c+\Delta$ gives $(H_c-\lambda)W^*\varphi=-\Delta^*\varphi$. The vector $W^*\varphi$ lies in $\Ran Q$, which reduces $H_c$, and $\|W^*\varphi\|=\|P\varphi\|\ge(1+\eta^2)^{-1/2}$ by the first inequality. Hence $\dist(\lambda,\spec(H_c|_{\Ran Q}))\le\delta/\|W^*\varphi\|\le\delta\sqrt{1+\eta^2}$.
+\end{proof}
+
+\begin{proposition}[Gap transfer]\label{prop:gap}
+Suppose $H_c|_{\Ran Q}$ has a simple lowest eigenvalue $E_c$ and no other spectrum below $E_c+\Delta_c$. Let $\lambda_0\le\lambda_1$ be the two lowest eigenvalues of $H_f$, counted with multiplicity, with $\lambda_1<\Lambda$. Put $\eta_1=\delta/(\Lambda-\lambda_1)$ and $\varepsilon_1=\delta\sqrt{1+\eta_1^2}$, and assume
+\[
+ 2\eta_1^2<1,\qquad \kappa:=\frac{\sqrt2\,(\delta+\varepsilon_1)}{\sqrt{1-2\eta_1^2}}<\Delta_c .
+\]
+Then $\lambda_0\le E_c+\delta$ and $\lambda_1-\lambda_0\ge\Delta_c-\delta-\varepsilon_1$.
+\end{proposition}
+
+\begin{proof}
+By Proposition~\ref{prop:shadow}(i) some eigenvalue of $H_f$ lies within $\delta$ of $E_c$, so $\lambda_0\le E_c+\delta$. Suppose $\lambda_1<E_c+\Delta_c-\varepsilon_1$. Since $\eta$ increases with $\lambda$, Proposition~\ref{prop:shadow}(ii) places $\lambda_0$ and $\lambda_1$ within $\varepsilon_1$ of $\spec(H_c|_{\Ran Q})$, and the only point of that spectrum below $E_c+\Delta_c$ is $E_c$. So $|\lambda_i-E_c|\le\varepsilon_1$ for $i=0,1$. Let $\varphi_0,\varphi_1$ be orthonormal eigenvectors and $\psi_i=W^*\varphi_i\in\Ran Q$. Their Gram matrix is $G_{ij}=\delta_{ij}-\langle(I-P)\varphi_i,(I-P)\varphi_j\rangle$, whose off-identity entries are at most $\eta_1^2$ in modulus, so $G\ge(1-2\eta_1^2)I$. For $s=c_0\psi_0+c_1\psi_1$ we get $\|s\|^2\ge(1-2\eta_1^2)|c|^2$ and, using $\|(H_c-\lambda_i)\psi_i\|\le\delta$ from the proof of Proposition~\ref{prop:shadow},
+\[
+ \|(H_c-E_c)s\|\le\sum_i|c_i|\bigl(\delta+|\lambda_i-E_c|\bigr)\le\sqrt2\,(\delta+\varepsilon_1)|c|\le\kappa\|s\| .
+\]
+The span of $\psi_0,\psi_1$ is two-dimensional and contains a unit vector $s$ orthogonal to the ground vector of $H_c|_{\Ran Q}$, for which $\|(H_c-E_c)s\|\ge\Delta_c$. This contradicts $\kappa<\Delta_c$. Hence $\lambda_1\ge E_c+\Delta_c-\varepsilon_1$, and with $\lambda_0\le E_c+\delta$ the gap bound follows.
+\end{proof}
+
+All inequalities of Propositions~\ref{prop:shadow} and~\ref{prop:gap}, including the windowed form with $W=W_0Q$, are checked on random instances in \texttt{check\_spectral\_transfer.jl}; the gap-transfer hypotheses hold in 82 of its 200 trials.
+
+\section{Along a renormalization-group trajectory}
+
+\begin{corollary}\label{cor:chain}
+Let lattices $k=0$ (finest) to $K$ (coarsest) have spacings $a_k=2^ka_0$ and Hamiltonians $H_k$ in lattice units. Let $W_k:\K_{k+1}\to\K_k$ be partial isometries as above, with defects $\delta_k=\|H_kW_k-W_k\tfrac12H_{k+1}\|$, the coarse energies converted to fine lattice units. Write $m_k=\Delta_k/a_k$ for the gap of $H_k$ in physical units. If the hypotheses of Proposition~\ref{prop:gap} hold at every step, with error $\varepsilon_k$, then
+\[
+ m_0\ \ge\ m_K-\sum_{k<K}\frac{\delta_k+\varepsilon_k}{a_k} .
+\]
+\end{corollary}
+
+\begin{proof}
+Proposition~\ref{prop:gap} with $H_f=H_k$ and $H_c=\tfrac12H_{k+1}$ gives $\Delta_k\ge\tfrac12\Delta_{k+1}-\delta_k-\varepsilon_k$. Divide by $a_k=a_{k+1}/2$ and sum.
+\end{proof}
+
+At the coarsest scale the coupling is strong. There a positive gap of the lattice transfer matrix is known rigorously (Osterwalder and Seiler, 1978). The corollary transfers it to the finest lattice whenever the summed defects stay below $m_K$.
+
+\begin{remark}[What the criterion requires, and what it does not do]
+\begin{enumerate}
+\item[(a)] The coarse Hamiltonians must be the effective Hamiltonians produced by the block-spin maps, not Kogut--Susskind Hamiltonians with a renormalized coupling. They contain every irrelevant operator, and controlling them uniformly in $a_0$ is the renormalization group itself (Balaban's program, in the Euclidean setting).
+\item[(b)] The defects must be restricted to low-energy windows. The unrestricted defect is of the order of the cutoff $1/a_k$, and then $\sum_k\delta_k/a_k$ diverges. If irrelevant operators suppress the windowed defects as $\delta_k\le C\,(a_km)^{1+p}$ with $p>0$, the sum is at most $Cm\sum_k(a_km)^p$, a convergent geometric series. That estimate, with constants uniform as $a_0\to0$, is exactly what has to be proved.
+\item[(c)] The omitted energies must scale like $\Lambda_k\sim c/a_k$: states not represented on the coarser lattice must cost energy of the order of its cutoff.
+\item[(d)] Nothing here constructs the maps $W_k$. The criterion is a reformulation in the language of presentations and defects. It isolates the quantities that a proof must control, and it makes them measurable.
+\end{enumerate}
+\end{remark}
+
+\begin{remark}[Lattice measurables]
+For a one-dimensional window, spanned by the state that a smeared glueball operator $O_k$ creates from the vacuum, the projection $P$ is onto that state and $\|P\varphi_0\|^2$ is the ground-state fraction $|\langle G|O_k|0\rangle|^2/\langle0|O_k^\dagger O_k|0\rangle_{\rm conn}$, which a variational lattice analysis measures. The first inequality of Proposition~\ref{prop:shadow}(ii) then reads $\|P\varphi_0\|^2\ge(1+\eta^2)^{-1}$. The gap to the next state in the channel plays the role of $\Lambda$, and the drift of an effective mass with time reflects the defect. These are the quantities reported by \texttt{lattice/examples/glueball\_analysis.jl}.
+\end{remark}
+
+\end{document}

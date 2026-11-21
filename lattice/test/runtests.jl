@@ -1,6 +1,6 @@
 using Test, Random, LinearAlgebra
 using LatticeYM
-using LatticeYM: SUBGROUPS, lmul_su2, su2_near_identity, sample_a0
+using LatticeYM: SUBGROUPS, lmul_su2, su2_near_identity, sample_a0, ONE3
 
 const SYM_TWIST = ((1, 2) => 1, (3, 4) => 1)
 const HB_OR = (Heatbath(), Overrelaxation(), Overrelaxation(), Overrelaxation())
@@ -174,6 +174,123 @@ end
         mb, eb, _ = mean_err(getindex.(series, k + 1))
         @test agree(mc, ec, mb, eb)
     end
+end
+
+# ---------------------------------------------------------------------------
+# Smearing, glueball operators, Wilson loops, correlator analysis
+
+# a thermalized-looking field on a small 4D lattice
+function rough_field(dims, seed; β = 5.7, n = 6)
+    rng = Xoshiro(seed)
+    g = hot_start(Lattice(dims), rng)
+    for _ in 1:n
+        sweep!(g, β, Heatbath(), rng)
+    end
+    return g, rng
+end
+
+@testset "expm3 matches the dense exponential" begin
+    rng = Xoshiro(60)
+    for s in (0.01, 0.3, 1.0, 4.0, 12.0)
+        for _ in 1:20
+            M = randn(rng, ComplexF64, 3, 3)
+            H = (M + M') / 2
+            H -= tr(H) / 3 * I
+            X = Mat3(1im * s * H / norm(H))
+            E = LatticeYM.expm3(X)
+            @test Matrix(E) ≈ exp(Matrix(X)) atol = 1e-12
+            @test su3_deviation(E) < 1e-12
+        end
+    end
+end
+
+@testset "stout smearing: SU(3), time links untouched, unit and pure-gauge fields fixed" begin
+    g, rng = rough_field((4, 4, 4, 6), 61)
+    h = stout_spatial(g, 0.1, 5)
+    @test maximum(su3_deviation, h.U[1:3, :]) < 1e-12
+    @test h.U[4, :] == g.U[4, :]
+    @test all(i -> isapprox(stout_spatial(g, 0.0).U[i], g.U[i]; atol = 1e-14), eachindex(g.U))
+    c = cold_start(Lattice((4, 4, 4, 6)))
+    @test maximum(su3_deviation, stout_spatial(c, 0.2, 3).U) < 1e-14
+    @test all(x -> isapprox(x, ONE3; atol = 1e-14), stout_spatial(c, 0.2, 3).U)
+    pure = gauge_transform!(copy(c), [haar_su3(rng) for _ in 1:nsites(c.lat)])
+    @test all(≈(1.0; atol = 1e-12), slice_plaquettes(stout_spatial(pure, 0.15, 4)))
+end
+
+@testset "stout smearing commutes with gauge transformations" begin
+    g, rng = rough_field((4, 4, 4, 6), 62)
+    G = [haar_su3(rng) for _ in 1:nsites(g.lat)]
+    a = gauge_transform!(stout_spatial(g, 0.12, 3), G)
+    b = stout_spatial(gauge_transform!(copy(g), G), 0.12, 3)
+    @test maximum(maximum(abs, (a.U[i] - b.U[i]).e) for i in eachindex(a.U)) < 1e-12
+end
+
+@testset "stout smearing smooths: spatial plaquettes increase" begin
+    g, _ = rough_field((4, 4, 4, 6), 63)
+    p = [sum(slice_plaquettes(stout_spatial(g, 0.1, n))) for n in (0, 1, 2, 4, 8)]
+    @test issorted(p)
+end
+
+@testset "glueball operators and Wilson loops" begin
+    g, rng = rough_field((4, 4, 4, 6), 64)
+    # slice average = mean of the spatial planes
+    P = plane_plaquettes(g)
+    @test sum(slice_plaquettes(g)) / 6 ≈ (P[1, 2] + P[1, 3] + P[2, 3]) / 3 atol = 1e-12
+    levels = [0, 2, 5]
+    O = glueball_operators(g, 0.1, levels)
+    for (k, n) in enumerate(levels)
+        @test O[k, :] ≈ slice_plaquettes(stout_spatial(g, 0.1, n)) atol = 1e-13
+    end
+    G = [haar_su3(rng) for _ in 1:nsites(g.lat)]
+    gt = gauge_transform!(copy(g), G)
+    @test glueball_operators(gt, 0.1, levels) ≈ O atol = 1e-12
+    W = wilson_loops_rt(g, 3, 4)
+    for R in 1:3, T in 1:4
+        @test W[R, T] ≈ sum(wilson_loop(g, μ, 4, R, T) for μ in 1:3) / 3 atol = 1e-12
+    end
+    @test W[1, 1] ≈ (P[1, 4] + P[2, 4] + P[3, 4]) / 3 atol = 1e-12
+    @test wilson_loops_rt(gt, 3, 4) ≈ W atol = 1e-12
+end
+
+@testset "correlator analysis on exact and synthetic data" begin
+    rng = Xoshiro(65)
+    T = 24
+    # effective mass of an exact periodic correlator
+    for m in (0.3, 0.77, 1.4)
+        c = [cosh(m * (t - T / 2)) for t in 0:T-1]
+        @test all(≈(m; atol = 1e-9), effective_masses(c))
+    end
+    # GEVP recovers both energies of an exact two-state, two-operator correlator
+    E = [0.8, 1.6]; Z = [1.0 0.5; 0.7 -0.9]
+    C = zeros(2, 2, T)
+    for t in 0:T-1
+        C[:, :, t+1] = Z * Diagonal(exp.(-E .* t)) * Z'
+    end
+    for (t0, t) in ((0, 1), (1, 3), (2, 5))
+        λ, V = gevp(C, t0, t)
+        @test λ ≈ exp.(-E .* (t - t0)) rtol = 1e-10
+        @test V' * C[:, :, t0+1] * V ≈ I atol = 1e-10
+    end
+    # correlator_matrix against a direct implementation
+    O = randn(rng, 5, 3, 8)
+    Cm = correlator_matrix(O)
+    m = vec(sum(O; dims = (1, 3))) ./ (5 * 8)
+    for k in 1:3, l in 1:3, t in 0:7
+        direct = sum(O[c, k, mod1(t0 + t, 8)] * O[c, l, t0] for c in 1:5, t0 in 1:8) / 40 - m[k] * m[l]
+        directT = sum(O[c, l, mod1(t0 + t, 8)] * O[c, k, t0] for c in 1:5, t0 in 1:8) / 40 - m[k] * m[l]
+        @test Cm[k, l, t+1] ≈ (direct + directT) / 2 atol = 1e-12
+    end
+    # products binned before the subtraction reproduce the unbinned correlator
+    P, M = correlator_products(O)
+    Pm = dropdims(sum(P; dims = 1); dims = 1) ./ 5
+    Mm = vec(sum(M; dims = 1)) ./ 5
+    @test correlator_from_means(Pm, Mm) ≈ Cm atol = 1e-12
+    # jackknife error of a mean equals the standard error; binning averages blocks
+    x = randn(rng, 50)
+    est, err = jackknife(v -> sum(v) / length(v), x)
+    @test est ≈ sum(x) / 50
+    @test err ≈ sqrt(sum(abs2, x .- est) / (49 * 50)) rtol = 1e-12
+    @test bin_means(collect(1.0:10.0), 3) ≈ [2.0, 5.0, 8.0]
 end
 
 end

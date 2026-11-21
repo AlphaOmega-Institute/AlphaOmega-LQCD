@@ -19,6 +19,9 @@ export staple, plaquette, plaquette_retr, action, gauge_transform!
 export mean_plaquette, plane_plaquettes, corner_and_bulk, polyakov_loop, wilson_loop
 export Metropolis, Heatbath, Overrelaxation, sweep!
 export mean_err, single_plaquette_average
+export stout_spatial, slice_plaquettes, glueball_operators, wilson_loops_rt
+export bin_means, jackknife, correlator_matrix, correlator_products, correlator_from_means
+export cosh_mass, effective_masses, gevp
 
 include("su3.jl")
 include("geometry.jl")
@@ -27,5 +30,7 @@ include("updates.jl")
 include("observables.jl")
 include("analysis.jl")
 include("exact.jl")
+include("smearing.jl")
+include("spectroscopy.jl")
 
 end
