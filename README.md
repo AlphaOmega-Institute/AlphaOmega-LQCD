@@ -25,4 +25,4 @@ See [lattice/README.md](lattice/README.md) for conventions, what each test check
 
 ## License
 
-Copyright © 2026 Alpha Omega Lattice Corporation, doing business as AlphaOmega Institute. The Julia code is licensed under the PolyForm Noncommercial License 1.0.0, and the documentation under CC BY-NC 4.0. The logo is not licensed. See [LICENSE.md](LICENSE.md) for details. Commercial use requires a separate license from Alpha Omega Lattice Corporation.
+Copyright © 2026 Alpha Omega Lattice Corporation, doing business as AlphaOmega Institute. The Julia code is licensed under the PolyForm Noncommercial License 1.0.0, and the documentation under CC BY-NC 4.0. The logo is not licensed. See [LICENSE.md](LICENSE.md) for details. Versions whose README showed an MIT badge, and the v0.1.0 archive on Zenodo, keep their earlier terms. For commercial uses that require permission beyond the applicable license, contact Alpha Omega Lattice Corporation.

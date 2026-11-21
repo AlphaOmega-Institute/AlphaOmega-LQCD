@@ -2,7 +2,11 @@
 
 Copyright © 2026 Alpha Omega Lattice Corporation, doing business as AlphaOmega Institute.
 
-This repository contains software and other material under two licenses.
+## Earlier versions
+
+README versions from commit `8ce0d5d` (December 2025) until commit `1017c5c` (September 2026), which removed it, displayed an MIT license badge. No license file accompanied it. The present Julia code is unchanged since commit `812d02e`, one of those versions. To the extent those versions were licensed under the MIT License, copies of them remain available under its terms. Release v0.1.0 of the earlier engine was archived on Zenodo under CC BY 4.0 (<https://doi.org/10.5281/zenodo.17844109>) and remains available under that license.
+
+The licenses below apply to later versions. This repository contains software and other material under two licenses.
 
 ## Software: PolyForm Noncommercial License 1.0.0
 
@@ -10,7 +14,7 @@ The Julia source code (`*.jl`) and the project file `lattice/Project.toml` are l
 
 ## Everything else: CC BY-NC 4.0
 
-All other material, including the READMEs and documentation, is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](LICENSES/CC-BY-NC-4.0.txt) (CC BY-NC 4.0, <https://creativecommons.org/licenses/by-nc/4.0/>).
+All other material that Alpha Omega Lattice Corporation owns or is authorized to license, including the READMEs and documentation, is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](LICENSES/CC-BY-NC-4.0.txt) (CC BY-NC 4.0, <https://creativecommons.org/licenses/by-nc/4.0/>).
 
 ## Not covered
 
@@ -19,6 +23,6 @@ All other material, including the READMEs and documentation, is licensed under t
 
 ## Commercial use
 
-Commercial use of any part of this repository requires a separate license from Alpha Omega Lattice Corporation.
+For commercial uses that require permission beyond the applicable license, contact Alpha Omega Lattice Corporation.
 
 Required Notice: Copyright © 2026 Alpha Omega Lattice Corporation, doing business as AlphaOmega Institute
