@@ -75,3 +75,61 @@ function stout_spatial(g::GaugeField, ρ::Real, n::Integer)
     end
     return h
 end
+
+"""
+    su3_project(A)
+
+Project a 3×3 matrix onto SU(3) through its polar decomposition:
+W = A (A†A)^{-1/2}, then W times a cube root of conj(det W). For G, H in SU(3),
+`su3_project(G A H') = G su3_project(A) H'`, so the projection is covariant at
+both ends of a path. (`reunitarize`, row Gram–Schmidt, is covariant only under
+right multiplication.) `A` must be invertible.
+"""
+function su3_project(A::Mat3)
+    M = Matrix(A)
+    F = eigen(Hermitian(M' * M))
+    W = M * F.vectors * Diagonal(1 ./ sqrt.(F.values)) * F.vectors'
+    return Mat3(cis(-angle(det(W)) / 3) * W)
+end
+
+"""
+    block_spatial(g, α) -> GaugeField
+
+One blocking step in the spatial directions. The coarse lattice has spatial
+extents L_i/2 (which must be even) and the same time extent; coarse site X sits
+on fine site x with x_i = 2X_i − 1. A coarse spatial link is the SU(3)
+projection of the straight path U_μ(x) U_μ(x+μ̂) plus α times the 2(D−2) bent
+paths of length four from x to x+2μ̂ through x ± ν̂ (ν spatial, ν ≠ μ). Every path
+runs from x to x+2μ̂, so with `su3_project` the blocked links transform under
+the gauge transformation restricted to coarse sites. Time links are copied
+from the fine site and are not blocked. Untwisted lattices only.
+"""
+function block_spatial(g::GaugeField{D}, α::Real) where {D}
+    lat, U = g.lat, g.U
+    all(==(1), lat.z) || throw(ArgumentError("block_spatial supports untwisted lattices only"))
+    cdims = ntuple(d -> d == D ? lat.dims[d] : lat.dims[d] ÷ 2, D)
+    all(d -> iseven(lat.dims[d]) && iseven(cdims[d]), 1:D-1) ||
+        throw(ArgumentError("spatial extents must be multiples of 4"))
+    clat = Lattice(cdims)
+    li = LinearIndices(lat.dims)
+    Uc = Matrix{Mat3}(undef, D, nsites(clat))
+    αf = Float64(α)
+    Threads.@threads for X in 1:nsites(clat)
+        x = li[CartesianIndex(ntuple(d -> d == D ? clat.coords[d, X] : 2clat.coords[d, X] - 1, D))]
+        Uc[D, X] = U[D, x]
+        for μ in 1:D-1
+            xμ = lat.fwd[μ, x]
+            x2μ = lat.fwd[μ, xμ]
+            A = U[μ, x] * U[μ, xμ]
+            for ν in 1:D-1
+                ν == μ && continue
+                xp = lat.fwd[ν, x]                     # through x + ν̂
+                A = A + αf * (U[ν, x] * U[μ, xp] * U[μ, lat.fwd[μ, xp]] * U[ν, x2μ]')
+                xm = lat.bwd[ν, x]                     # through x − ν̂
+                A = A + αf * (U[ν, xm]' * U[μ, xm] * U[μ, lat.fwd[μ, xm]] * U[ν, lat.bwd[ν, x2μ]])
+            end
+            Uc[μ, X] = su3_project(A)
+        end
+    end
+    return GaugeField(clat, Uc)
+end

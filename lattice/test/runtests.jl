@@ -302,4 +302,97 @@ end
     @test bin_means(collect(1.0:10.0), 3) ≈ [2.0, 5.0, 8.0]
 end
 
+
+@testset "su3_project: SU(3), fixed points, covariance at both ends" begin
+    rng = Xoshiro(70)
+    for _ in 1:50
+        A = Mat3(randn(rng, ComplexF64, 3, 3))
+        P = su3_project(A)
+        @test su3_deviation(P) < 1e-12
+        G, H = haar_su3(rng), haar_su3(rng)
+        @test maximum(abs, (su3_project(G * A * H') - G * P * H').e) < 1e-11
+        U = haar_su3(rng)
+        @test maximum(abs, (su3_project(U) - U).e) < 1e-12
+        @test maximum(abs, (su3_project(2.5 * U) - U).e) < 1e-12
+    end
+    # row Gram–Schmidt is not covariant under left multiplication, which is why blocking does not use it
+    A = Mat3(randn(rng, ComplexF64, 3, 3)); G = haar_su3(rng)
+    @test maximum(abs, (reunitarize(G * A) - G * reunitarize(A)).e) > 1e-3
+end
+
+@testset "block_spatial: geometry, α = 0, unit field, gauge covariance" begin
+    g, rng = rough_field((8, 8, 8, 6), 71)
+    b = block_spatial(g, 0.3)
+    @test b.lat.dims == (4, 4, 4, 6)
+    @test maximum(su3_deviation, b.U) < 1e-12
+    b0 = block_spatial(g, 0.0)
+    li = LinearIndices(g.lat.dims)
+    for X in (1, 17, 40, nsites(b0.lat))
+        c = b0.lat.coords[:, X]
+        x = li[2c[1] - 1, 2c[2] - 1, 2c[3] - 1, c[4]]
+        for μ in 1:3
+            @test maximum(abs, (b0.U[μ, X] - g.U[μ, x] * g.U[μ, g.lat.fwd[μ, x]]).e) < 1e-12
+        end
+        @test b0.U[4, X] == g.U[4, x]
+    end
+    c = cold_start(Lattice((8, 8, 8, 6)))
+    @test all(u -> maximum(abs, (u - ONE3).e) < 1e-12, block_spatial(c, 0.4).U)
+    G = [haar_su3(rng) for _ in 1:nsites(g.lat)]
+    gb = block_spatial(gauge_transform!(copy(g), G), 0.3)
+    Gc = [G[li[2b.lat.coords[1, X] - 1, 2b.lat.coords[2, X] - 1, 2b.lat.coords[3, X] - 1, b.lat.coords[4, X]]]
+          for X in 1:nsites(b.lat)]
+    bg = gauge_transform!(copy(b), Gc)
+    @test maximum(maximum(abs, (gb.U[i] - bg.U[i]).e) for i in eachindex(gb.U)) < 1e-11
+    @test glueball_operators(gb, 0.1, [0, 3]) ≈ glueball_operators(b, 0.1, [0, 3]) atol = 1e-11
+end
+
+@testset "operator windows: compressions, leakage, alignment, Proposition 6" begin
+    rng = Xoshiro(72)
+    psd(n) = (A = randn(rng, n, n); M = A * A'; Symmetric(M / opnorm(M)))
+    isq(G) = (F = eigen(Symmetric(G)); F.vectors * Diagonal(1 ./ sqrt.(F.values)) * F.vectors')
+    for _ in 1:30
+        nf, nc, k, T = 20, 9, rand(rng, 1:3), 12
+        Sf, Sc = psd(nf), psd(nc)
+        F, Cs = randn(rng, nf, k), randn(rng, nc, k)
+        Cf = cat((F' * Sf^t * F for t in 0:T-1)...; dims = 3)
+        Cc = cat((Cs' * Sc^t * Cs for t in 0:T-1)...; dims = 3)
+        Kf, Lf, Gf = window_compression(Cf, 1)
+        Kc, Lc, Gc = window_compression(Cc, 1)
+        Uf, Uc = F * isq(F' * F), Cs * isq(Cs' * Cs)
+        @test Kf ≈ Uf' * Sf * Uf atol = 1e-10
+        @test Lf ≈ Uf' * Sf * (I - Uf * Uf') * Sf * Uf atol = 1e-10
+        V, M = induced_alignment(Gf, Gc)
+        @test V' * V ≈ I atol = 1e-10
+        @test V * M ≈ sqrt(Symmetric(Gf)) * isq(Gc) atol = 1e-10
+        W = Uf * V * Uc'
+        @test opnorm(Sf * W - W * Sc) <= window_defect_bound(Kf, Lf, Kc, Lc, V) + 1e-10
+        # ℓ = 2 uses lags 0, 2, 4
+        K2, L2, _ = window_compression(Cf, 2)
+        @test K2 ≈ Uf' * Sf^2 * Uf atol = 1e-10
+    end
+    _, M = induced_alignment([2.0 0.3; 0.3 1.0], [2.0 0.3; 0.3 1.0])
+    @test M ≈ I atol = 1e-12
+end
+
+@testset "ground_state_fractions: exact at every t0" begin
+    E = [0.8, 1.7]; Z = [1.0 0.6; 0.4 -0.9]                  # Z[k, n]: operator k, state n
+    for periodic in (false, true), t0 in (0, 1, 2)
+        T = 24
+        C = zeros(2, 2, T)
+        for t in 0:T-1
+            w = periodic ? exp.(-E .* t) .+ exp.(-E .* (T - t)) : exp.(-E .* t)
+            C[:, :, t+1] = Z * Diagonal(w) * Z'
+        end
+        f, E0 = ground_state_fractions(C, [1, 2]; t0, periodic)
+        @test E0 ≈ E[1] rtol = 1e-8
+        w0 = periodic ? 1 + exp(-E[1] * T) : 1.0
+        @test f ≈ [Z[k, 1]^2 * w0 / C[k, k, 1] for k in 1:2] rtol = 1e-8
+    end
+    # a single exponential with overlap one gives f = 1 at any t0
+    C1 = reshape([3.0 * exp(-0.9t) for t in 0:15], 1, 1, 16)
+    for t0 in 0:3
+        @test ground_state_fractions(C1, [1]; t0, periodic = false)[1][1] ≈ 1 rtol = 1e-10
+    end
+end
+
 end

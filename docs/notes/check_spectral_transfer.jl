@@ -70,4 +70,51 @@ end
             @test distance(λ, ec[1:3]) <= δE * sqrt(1 + η^2) + 1e-10
         end
     end
+    # sharp residual bound of Remark 5: Var_ψ(H) ≥ g² f (1 − f)
+    rng = Xoshiro(11)
+    for _ in 1:200
+        n = 8
+        E = sort([0.0; 1.0 .+ 3rand(rng, n - 1)])
+        g = E[2] - E[1]
+        ψ = randn(rng, ComplexF64, n); ψ /= norm(ψ)
+        f = abs2(ψ[1])
+        H = Diagonal(E)
+        δ = norm((H - real(ψ' * H * ψ) * I) * ψ)
+        @test δ >= g * sqrt(f * (1 - f)) - 1e-12
+    end
+    for f in (0.1, 0.5, 0.93)                                   # equality for two levels
+        ψ = [sqrt(f), sqrt(1 - f)]; H = Diagonal([0.0, 1.7])
+        @test norm((H - (ψ' * H * ψ) * I) * ψ) ≈ 1.7 * sqrt(f * (1 - f))
+    end
+    # Proposition 4: two operator windows, with the alignment induced by an operator correspondence
+    rng = Xoshiro(12)
+    psd(rng, n) = (A = randn(rng, ComplexF64, n, n); M = A * A'; Hermitian(M / opnorm(M)))
+    isqrt(G) = (F = eigen(Hermitian(G)); F.vectors * Diagonal(1 ./ sqrt.(F.values)) * F.vectors')
+    msqrt(G) = (F = eigen(Hermitian(G)); F.vectors * Diagonal(sqrt.(F.values)) * F.vectors')
+    polar_u(A) = (F = svd(A); F.U * F.Vt)
+    for trial in 1:300
+        nf, nc, k = 30, 12, rand(rng, 1:4)
+        Sf, Sc = psd(rng, nf), psd(rng, nc)
+        F = randn(rng, ComplexF64, nf, k)                         # fine operator states f_j
+        Cs = randn(rng, ComplexF64, nc, k)                        # coarse operator states c_j
+        Gf, Gc = F' * F, Cs' * Cs
+        Uf, Uc = F * isqrt(Gf), Cs * isqrt(Gc)
+        V = polar_u(msqrt(Gf) * isqrt(Gc))
+        W = Uf * V * Uc'
+        # W is the polar part of the operator-state correspondence W0 c_j = f_j
+        W0 = Uf * msqrt(Gf) * isqrt(Gc) * Uc'
+        @test W0 * Cs ≈ F
+        @test W ≈ polar_u(W0 * Uc) * Uc' atol = 1e-8
+        # K and L from correlators C(t) = states' S^t states
+        Cf(t) = F' * Sf^t * F
+        Cc(t) = Cs' * Sc^t * Cs
+        Kf = isqrt(Gf) * Cf(1) * isqrt(Gf); Lf = isqrt(Gf) * Cf(2) * isqrt(Gf) - Kf^2
+        Kc = isqrt(Gc) * Cc(1) * isqrt(Gc); Lc = isqrt(Gc) * Cc(2) * isqrt(Gc) - Kc^2
+        @test Kf ≈ Uf' * Sf * Uf atol = 1e-10
+        @test Lf ≈ Uf' * Sf * (I - Uf * Uf') * Sf * Uf atol = 1e-10
+        @test eigmin(Hermitian(Lc)) >= -1e-10
+        lhs = opnorm(Sf * W - W * Sc)
+        rhs = opnorm(Kf * V - V * Kc) + max(sqrt(opnorm(Lf)), sqrt(opnorm(Lc)))
+        @test lhs <= rhs + 1e-10
+    end
 end

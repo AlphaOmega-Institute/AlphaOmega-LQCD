@@ -9,6 +9,8 @@
 #          --ops 2,3,4   operator levels (1-based) used in the GEVP (default: all)
 #          --t0 0        GEVP reference time (the eigenvectors are fixed at t0, t0+1)
 #          --tau 2       Wilson-loop time used for V(R) = log W(R,τ)/W(R,τ+1)
+#          --windows 2,3,4,5;2,3   operator windows (1-based levels) for the coarse window
+#                        compression K and leakage L at one time step (Proposition 6)
 
 using LatticeYM, Printf, LinearAlgebra
 
@@ -31,7 +33,7 @@ fmt(x, e) = isfinite(x) && isfinite(e) ? @sprintf("%.4f(%s)", x, lpad(round(Int,
 
 function main(args)
     path = args[1]
-    opt = Dict("bin" => "10", "drop" => "0", "ops" => "", "t0" => "0", "tau" => "2")
+    opt = Dict("bin" => "10", "drop" => "0", "ops" => "", "t0" => "0", "tau" => "2", "windows" => "")
     i = 2
     while i <= length(args)
         opt[lstrip(args[i], '-')] = args[i+1]
@@ -44,6 +46,7 @@ function main(args)
     nlev = length(levels)
     b, drop, t0, τ = parse.(Int, (opt["bin"], opt["drop"], opt["t0"], opt["tau"]))
     ops = isempty(opt["ops"]) ? collect(1:nlev) : parse.(Int, split(opt["ops"], ","))
+    windows = isempty(opt["windows"]) ? [ops] : [parse.(Int, split(w, ",")) for w in split(opt["windows"], ";")]
     X = X[drop+1:end, :]
     nconf = size(X, 1)
 
@@ -79,23 +82,21 @@ function main(args)
             append!(out, effective_masses(c)[1:tshow+1])
         end
         length(ops) == 1 && append!(out, fill(NaN, tshow + 1))
-        # ground-state overlap of each level: (C(t0) v0)_k^2 / C_kk(0) e^{-2 E0 t0}
+        # ground-state fraction of each level (variational, see ground_state_fractions)
         v0 = zeros(nlev); v0[ops] = V[:, 1]
         c0 = [v0' * C[:, :, t] * v0 for t in 1:T]
-        E0 = cosh_mass(c0[t0+2] / c0[t0+3], t0 + 1, T)
-        Zt0 = C[:, :, t0+1] * v0 ./ sqrt(v0' * C[:, :, t0+1] * v0)
-        f = [Zt0[k]^2 * exp(2E0 * t0) / C[k, k, 1] for k in 1:nlev]
+        f, E0 = ground_state_fractions(C, ops; t0)
         append!(out, f)
-        # first excited level in the channel (GEVP n = 1), and the defect bound of
-        # Proposition 1(ii) for the one-dimensional window of each level:
-        # δ ≥ (Λ − E0) √(1/f − 1), with Λ ≈ E1
+        # first excited level in the channel (GEVP n = 1), and the sharp lower bound on the
+        # Hamiltonian residual of each trial state given f and the gap g = E1 − E0 to the rest
+        # of the channel: δ ≥ g √(f (1 − f)) (Remark 5)
         E1 = NaN
         if length(ops) >= 2
             v1 = zeros(nlev); v1[ops] = V[:, 2]
             c1 = [v1' * C[:, :, t] * v1 for t in 1:T]
             E1 = cosh_mass(c1[t0+1] / c1[t0+2], t0, T)
         end
-        append!(out, [(E1 - E0) * sqrt(max(1 / fk - 1, 0.0)) for fk in f])
+        append!(out, [(E1 - E0) * sqrt(max(fk * (1 - fk), 0.0)) for fk in f])
         # second estimator, from the decay of each diagonal correlator at t = 1 and 2:
         # f_k(t) = C_kk(t) cosh(E0 T/2) / (C_kk(0) cosh(E0 (t − T/2))); excited states make it
         # an overestimate that decreases with t
@@ -109,6 +110,14 @@ function main(args)
             δT = transfer_residual(cv)
             gapT = 1 - cv[2] / cv[1]
             append!(out, [δT, gapT, δT / (gapT / (2 * sqrt(2)))])
+        end
+        # coarse window compression K and squared leakage L for one time step (Proposition 6):
+        # signed eigenvalues of L and K, and the largest eigenvalue of L
+        for w in windows
+            K, L, _ = window_compression(C[w, w, :], 1)
+            lL = sort(eigvals(Symmetric(L)))
+            lK = sort(eigvals(Symmetric(K)); rev = true)
+            append!(out, lL, lK, [lL[end]])
         end
         # static potential and Cornell fits
         Vr = [log(Wm[R, τ] / Wm[R, τ+1]) for R in 1:rmax]
@@ -141,7 +150,7 @@ function main(args)
     println("\nground-state fraction f_k = |<G|O_k|0>|²/C_kk(0) = ‖Pφ₀‖² per level")
     println("  ", join([@sprintf("%d: %s", levels[k], fmt(est[p+k], err[p+k])) for k in 1:nlev], "   "))
     p += nlev
-    println("defect bound a·δ_k ≥ a(E₁ − E₀)·√(1/f_k − 1) per level (Proposition 1(ii), Λ ≈ E₁)")
+    println("residual bound a·δ_k ≥ a(E₁ − E₀)·√(f_k(1 − f_k)) per level (Remark 5, sharp given f and E₁ − E₀)")
     println("  ", join([@sprintf("%d: %s", levels[k], fmt(est[p+k], err[p+k])) for k in 1:nlev], "   "))
     p += nlev
     for t in (1, 2)
@@ -155,6 +164,18 @@ function main(args)
         name = k <= nlev ? @sprintf("level %3d", levels[k]) : "GEVP     "
         println("  ", name, ": ", join([fmt(est[p+j], err[p+j]) for j in 1:3], "   "))
         p += 3
+    end
+    println("\ncoarse window at one time step (Proposition 6): signed eigenvalues of the leakage L,")
+    println("eigenvalues of the compression K, and the largest leakage eigenvalue")
+    for w in windows
+        n = length(w)
+        println("  window ", levels[w], ":")
+        println("    L: ", join([fmt(est[p+j], err[p+j]) for j in 1:n], "  "))
+        p += n
+        println("    K: ", join([fmt(est[p+j], err[p+j]) for j in 1:n], "  "))
+        p += n
+        println("    largest L eigenvalue: ", fmt(est[p+1], err[p+1]))
+        p += 1
     end
     println("\nstatic potential a·V(R) from τ = $τ → $(τ+1), R = 1 … $rmax")
     println("  ", join([fmt(est[p+R], err[p+R]) for R in 1:rmax], "  "))

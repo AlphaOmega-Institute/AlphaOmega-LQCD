@@ -18,7 +18,7 @@
 
 \begin{abstract}
 \noindent
-A block-spin map from a coarse lattice Hamiltonian to a fine one can be written as a partial isometry, a presentation in the sense of the polar formalism. How far it fails to intertwine the two Hamiltonians is measured by a defect $\delta$. We show that coarse levels shadow fine levels within $\delta$. Below the energy $\Lambda$ of the states that the map leaves out, fine levels shadow coarse levels within $\delta\sqrt{1+\eta^2}$, where $\eta=\delta/(\Lambda-\lambda)$. A simple coarse ground with gap $\Delta_c$ then forces a fine gap of at least $\Delta_c$ minus terms of order $\delta$. Iterated along a renormalization-group trajectory, starting at strong coupling where a lattice gap is known, the criterion reduces a gap in physical units to the construction of block-spin maps whose defects, restricted to low energies, are summable in physical units and whose omitted states lie at the cutoff. The criterion does not supply those maps. It moves the difficulty of the mass-gap problem into their construction, which is the content of the renormalization group.
+A block-spin map from a coarse lattice Hamiltonian to a fine one can be written as a partial isometry, a presentation in the sense of the polar formalism. How far it fails to intertwine the two Hamiltonians is measured by a defect $\delta$. We show that coarse levels shadow fine levels within $\delta$. Below the energy $\Lambda$ of the states that the map leaves out, fine levels shadow coarse levels within $\delta\sqrt{1+\eta^2}$, where $\eta=\delta/(\Lambda-\lambda)$. A simple coarse ground with gap $\Delta_c$ then forces a fine gap of at least $\Delta_c$ minus terms of order $\delta$. For two lattices compared through finite operator windows, the defect of the window map is bounded by the mismatch of the two window compressions and the leakage out of each window, quantities measurable on each lattice separately. Iterated along a renormalization-group trajectory, starting at strong coupling where a lattice gap is known, the criterion reduces a gap in physical units to the construction of block-spin maps whose defects, restricted to low energies, are summable in physical units and whose omitted states lie at the cutoff. The criterion does not supply those maps. It moves the difficulty of the mass-gap problem into their construction, which is the content of the renormalization group.
 \end{abstract}
 
 \section{Setting}
@@ -88,17 +88,19 @@ All inequalities of Propositions~\ref{prop:shadow} and~\ref{prop:gap}, including
 \section{Along a renormalization-group trajectory}
 
 \begin{corollary}\label{cor:chain}
-Let lattices $k=0$ (finest) to $K$ (coarsest) have spacings $a_k=2^ka_0$ and Hamiltonians $H_k$ in lattice units. Let $W_k:\K_{k+1}\to\K_k$ be partial isometries as above, with defects $\delta_k=\|H_kW_k-W_k\tfrac12H_{k+1}\|$, the coarse energies converted to fine lattice units. Write $m_k=\Delta_k/a_k$ for the gap of $H_k$ in physical units. If the hypotheses of Proposition~\ref{prop:gap} hold at every step, with error $\varepsilon_k$, then
+Let lattices $k=0$ (finest) to $K$ (coarsest) have spacings $a_k=2^ka_0$ and Hamiltonians $H_k$ in lattice units. Let $W_k:\K_{k+1}\to\K_k$ be partial isometries as above, whose initial projections $Q_{k+1}$ are spectral projections of $H_{k+1}$ for intervals containing its simple ground state and its first excited level, with defects $\delta_k=\|H_kW_k-W_k\tfrac12H_{k+1}\|$, the coarse energies converted to fine lattice units. Write $m_k=\Delta_k/a_k$ for the gap of $H_k$ in physical units. If the hypotheses of Proposition~\ref{prop:gap} hold at every step, with error $\varepsilon_k$, then
 \[
  m_0\ \ge\ m_K-\sum_{k<K}\frac{\delta_k+\varepsilon_k}{a_k} .
 \]
 \end{corollary}
 
 \begin{proof}
-Proposition~\ref{prop:gap} with $H_f=H_k$ and $H_c=\tfrac12H_{k+1}$ gives $\Delta_k\ge\tfrac12\Delta_{k+1}-\delta_k-\varepsilon_k$. Divide by $a_k=a_{k+1}/2$ and sum.
+Apply Proposition~\ref{prop:gap} with $H_f=H_k$ and $H_c=\tfrac12H_{k+1}$. Because $Q_{k+1}$ contains the ground state and the first excited level of $H_{k+1}$, the window gap is $\tfrac12\Delta_{k+1}$, and Proposition~\ref{prop:gap} gives $\Delta_k\ge\tfrac12\Delta_{k+1}-\delta_k-\varepsilon_k$. Divide by $a_k=a_{k+1}/2$ and sum.
 \end{proof}
 
-At the coarsest scale the coupling is strong. There a positive gap of the lattice transfer matrix is known rigorously (Osterwalder and Seiler, 1978). The corollary transfers it to the finest lattice whenever the summed defects stay below $m_K$.
+The hypothesis on $Q_{k+1}$ cannot be dropped. Take coarse energies $0,4,5$ and a window that keeps only $4$ and $5$, mapped exactly to fine energies $2$ and $2.5$, with the omitted fine level at $10$. After the rescaling the defect is zero, and Proposition~\ref{prop:gap} correctly gives the fine gap $0.5$, but the rescaled full coarse gap is $2$.
+
+At the coarsest scale the coupling is strong. There a positive gap of the lattice transfer matrix is known rigorously (Osterwalder and Seiler, 1978). The corollary transfers it to the finest lattice whenever the summed defects stay below $m_K$. A gap in the continuum limit needs this uniformly: $\sum_{k<K}(\delta_k+\varepsilon_k)/a_k\le m_K-\mu$ for some $\mu>0$ independent of $a_0$.
 
 \begin{remark}[What the criterion requires, and what it does not do]
 \begin{enumerate}
@@ -110,7 +112,48 @@ At the coarsest scale the coupling is strong. There a positive gap of the lattic
 \end{remark}
 
 \begin{remark}[Lattice measurables]
-For a one-dimensional window, spanned by the state that a smeared glueball operator $O_k$ creates from the vacuum, the projection $P$ is onto that state and $\|P\varphi_0\|^2$ is the ground-state fraction $|\langle G|O_k|0\rangle|^2/\langle0|O_k^\dagger O_k|0\rangle_{\rm conn}$, which a variational lattice analysis measures. The first inequality of Proposition~\ref{prop:shadow}(ii) then reads $\|P\varphi_0\|^2\ge(1+\eta^2)^{-1}$. The gap to the next state in the channel plays the role of $\Lambda$, and the drift of an effective mass with time reflects the defect. These are the quantities reported by \texttt{lattice/examples/glueball\_analysis.jl}.
+For a one-dimensional window, spanned by the state that a smeared glueball operator $O_k$ creates from the vacuum, the projection $P$ is onto that state and $\|P\varphi_0\|^2$ is the ground-state fraction $|\langle G|O_k|0\rangle|^2/\langle0|O_k^\dagger O_k|0\rangle_{\rm conn}$, which a variational lattice analysis measures. The first inequality of Proposition~\ref{prop:shadow}(ii) then reads $\|P\varphi_0\|^2\ge(1+\eta^2)^{-1}$. Here $\Lambda$ is the bottom of $H$ on the orthogonal complement of the trial state, which is not the next level of the channel: for two levels with spacing $g$ and ground weight $f$, the orthogonal direction lies only $fg$ above the ground. If the rest of the channel lies at least $g$ above the ground energy $E_0$, the trial state's residual $\delta=\|(H-\langle H\rangle_\psi)\psi\|$ obeys the sharp bound
+\[
+ \delta\ \ge\ g\sqrt{f(1-f)} .
+\]
+Indeed, with $E_0=0$ and $\psi=\sqrt f\,e_0+\sqrt{1-f}\,\chi$, $\chi\perp e_0$, $h=\langle\chi,H\chi\rangle\ge g$, the variance is at least $(1-f)h^2-(1-f)^2h^2=f(1-f)h^2$, with equality for two levels. For the transfer matrix $T=e^{-aH}$ the residual
+\[
+ \|(I-P_\psi)T\psi\|^2=\frac{c(2)}{c(0)}-\Bigl(\frac{c(1)}{c(0)}\Bigr)^2
+\]
+needs no fitted energies; Proposition~\ref{prop:windows} is its form for several operators. These quantities are reported by \texttt{lattice/examples/glueball\_analysis.jl}.
+\end{remark}
+
+\section{Comparing two lattices through operator windows}
+
+The quantities above refer to one lattice. To test a change of scale, compare a fine lattice and a coarse lattice through finite windows of operator states. Let $S_f$ and $S_c$ be bounded self-adjoint operators, for instance $S_f=T_f^2$ (two fine time steps) and $S_c=T_c$ (one coarse step). Let $U_f$ and $U_c$ be isometries from $\mathbb C^n$ onto the two windows, with projections $P_i=U_iU_i^*$, and put
+\[
+ K_i=U_i^*S_iU_i,\qquad L_i=U_i^*S_i^2U_i-K_i^2=U_i^*S_i(I-P_i)S_iU_i\ \ge0 .
+\]
+$K_i$ is the evolution inside window $i$ and $L_i$ the squared leakage out of it.
+
+\begin{proposition}\label{prop:windows}
+For every unitary $V$ on $\mathbb C^n$, the partial isometry $W=U_fVU_c^*$ satisfies
+\[
+ \|S_fW-WS_c\|\ \le\ \|K_fV-VK_c\|+\max\bigl\{\|L_f\|^{1/2},\|L_c\|^{1/2}\bigr\} .
+\]
+\end{proposition}
+
+\begin{proof}
+Write $S_fU_f=U_fK_f+(I-P_f)S_fU_f$ and, by self-adjointness, $U_c^*S_c=K_cU_c^*+U_c^*S_c(I-P_c)$. Then
+\[
+ S_fW-WS_c=U_f(K_fV-VK_c)U_c^*+(I-P_f)S_fU_fVU_c^*-U_fVU_c^*S_c(I-P_c) .
+\]
+With respect to $\Ran P_c\oplus\Ran(I-P_c)$ and $\Ran P_f\oplus\Ran(I-P_f)$ the first term is the diagonal block $A$, and the other two are the off-diagonal blocks $B=(I-P_f)S_fU_fVU_c^*$ and $C=-U_fVU_c^*S_c(I-P_c)$. Hence the norm is at most $\|A\|+\max\{\|B\|,\|C\|\}$. Here $\|A\|=\|K_fV-VK_c\|$, $\|B\|^2=\|V^*L_fV\|=\|L_f\|$ and $\|C\|^2=\|L_c\|$.
+\end{proof}
+
+If the windows are spanned by the states $F=(f_1,\dots,f_n)$ and $C=(c_1,\dots,c_n)$ that $n$ operators create from the vacuum, with Gram matrices $G_f=F^*F$ and $G_c=C^*C$, the frames $U_f=FG_f^{-1/2}$ and $U_c=CG_c^{-1/2}$ give $K_i=G_i^{-1/2}\mathcal C_i(\ell_i)G_i^{-1/2}$ and $K_i^2+L_i=G_i^{-1/2}\mathcal C_i(2\ell_i)G_i^{-1/2}$, where $\mathcal C_i(t)$ is the connected correlator matrix and $\ell_f=2$, $\ell_c=1$. The fine lags $0,2,4$ and the coarse lags $0,1,2$ suffice.
+
+\begin{remark}[The alignment induced by blocking]
+The unitary $V$ must be specified by the physics, not chosen to make the bound small. A blocking map $B$ from fine to coarse link configurations turns each coarse operator $O$ into the fine operator $O\circ B$. The induced map of operator states, $c_k\mapsto f_k$, is $W_0=U_fG_f^{1/2}G_c^{-1/2}U_c^*$. Its polar decomposition separates two kinds of mismatch, as in the polar formalism: the polar part $U_fVU_c^*$, with $V$ the unitary factor of $G_f^{1/2}G_c^{-1/2}$, is the presentation used in Proposition~\ref{prop:windows}, and the positive factor $|G_f^{1/2}G_c^{-1/2}|$ measures how far the normalizations of the operator states disagree. If the coarse action were the exact blocked action, the correlators of $O\circ B$ at fine lag $2t$ would equal those of $O$ at coarse lag $t$, so $G_f=G_c$, $K_f=K_c$, $L_f=L_c$ and $V=I$: the defect would reduce to leakage.
+\end{remark}
+
+\begin{remark}[What a measurement of the bound shows]
+Nonzero coarse leakage means the coarse window is not a reducing subspace, so it does not meet the hypothesis on $Q$ in Propositions~\ref{prop:shadow} and~\ref{prop:gap}. A low-energy state that no measured operator creates leaves every correlator unchanged, so it is invisible to the bound. What the bound measures is a transfer defect for named operators and a named blocking map. A statement about the lattice gap needs, in addition, control of the omitted energies.
 \end{remark}
 
 \end{document}

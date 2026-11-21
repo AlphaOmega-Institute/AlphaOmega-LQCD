@@ -245,3 +245,78 @@ function gevp(C::AbstractArray{<:Real,3}, t0::Int, t::Int)
     p = sortperm(F.values; rev = true)
     return F.values[p], F.vectors[:, p]
 end
+
+# ---------------------------------------------------------------------------
+# Operator windows (docs/notes/spectral_transfer.tex, Proposition 6)
+
+_herm(A) = (A + A') / 2
+function _invsqrt(G)
+    F = eigen(Symmetric(_herm(G)))
+    minimum(F.values) > 0 || throw(DomainError(minimum(F.values), "Gram matrix not positive definite"))
+    return F.vectors * Diagonal(1 ./ sqrt.(F.values)) * F.vectors'
+end
+function _sqrtm(G)
+    F = eigen(Symmetric(_herm(G)))
+    return F.vectors * Diagonal(sqrt.(max.(F.values, 0.0))) * F.vectors'
+end
+
+"""
+    window_compression(C, ℓ) -> (K, L, G)
+
+For the connected correlator matrix C of n operators (n × n × T, time index t+1)
+and the step operator S = T^ℓ (T the transfer matrix), with G = C(0):
+K = G^{-1/2} C(ℓ) G^{-1/2} is the compression of S to the window spanned by the
+operator states, and L = G^{-1/2} C(2ℓ) G^{-1/2} − K² ≥ 0 is the squared leakage
+out of it. With noisy data L can have small negative eigenvalues.
+"""
+function window_compression(C::AbstractArray{<:Real,3}, ℓ::Int)
+    G = C[:, :, 1]
+    R = _invsqrt(G)
+    K = _herm(R * C[:, :, ℓ+1] * R)
+    L = _herm(R * C[:, :, 2ℓ+1] * R - K * K)
+    return K, L, _herm(G)
+end
+
+"""
+    induced_alignment(Gf, Gc) -> (V, M)
+
+For the correspondence of operator states c_k ↦ f_k with Gram matrices Gc and Gf,
+the map in orthonormal frames is Gf^{1/2} Gc^{-1/2} = V M with V unitary and
+M ≥ 0. V is the alignment used in Proposition 6; M measures the mismatch of the
+normalizations (M = I when Gf = Gc).
+"""
+function induced_alignment(Gf::AbstractMatrix, Gc::AbstractMatrix)
+    A = _sqrtm(Gf) * _invsqrt(Gc)
+    F = svd(A)
+    return F.U * F.Vt, F.V * Diagonal(F.S) * F.Vt
+end
+
+"""
+    window_defect_bound(Kf, Lf, Kc, Lc, V)
+
+Right side of Proposition 6: ‖Kf V − V Kc‖ + max(‖Lf‖, ‖Lc‖)^{1/2}, with negative
+leakage eigenvalues (noise) treated as zero.
+"""
+window_defect_bound(Kf, Lf, Kc, Lc, V) =
+    opnorm(Kf * V - V * Kc) + sqrt(max(eigmax(Symmetric(_herm(Lf))), eigmax(Symmetric(_herm(Lc))), 0.0))
+
+"""
+    ground_state_fractions(C, ops; t0 = 0, periodic = true) -> (f, E0)
+
+Variational estimate of |⟨G|O_k|0⟩|² / C_kk(0) for every operator k, from the
+GEVP on the operators `ops` with eigenvectors fixed at (t0, t0+1). The amplitude
+at t0 is converted back to t = 0 with the single-state time dependence:
+exp(E0 t0) without periodic images, cosh for a periodic correlator of extent T.
+"""
+function ground_state_fractions(C::AbstractArray{<:Real,3}, ops::AbstractVector{<:Integer};
+                                t0::Int = 0, periodic::Bool = true)
+    n, _, T = size(C)
+    _, V = gevp(C[ops, ops, :], t0, t0 + 1)
+    v = zeros(n); v[ops] = V[:, 1]
+    c = [v' * C[:, :, t] * v for t in 1:T]
+    E0 = periodic ? cosh_mass(c[t0+2] / c[t0+3], t0 + 1, T) : log(c[t0+2] / c[t0+3])
+    Z = C[:, :, t0+1] * v ./ sqrt(v' * C[:, :, t0+1] * v)
+    shape(t) = periodic ? exp(-E0 * T / 2) * 2cosh(E0 * (t - T / 2)) : exp(-E0 * t)
+    f = [Z[k]^2 / shape(t0) * shape(0) / C[k, k, 1] for k in 1:n]
+    return f, E0
+end

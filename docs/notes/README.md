@@ -2,7 +2,7 @@
 
 | File | Contents |
 |---|---|
-| `spectral_transfer.tex` / `.pdf` | *Spectral transfer along block-spin maps.* A block-spin map written as a partial isometry; coarse and fine levels shadow each other within its defect; a coarse gap transfers to the fine lattice; the renormalization-group chain this implies. |
+| `spectral_transfer.tex` / `.pdf` | *Spectral transfer along block-spin maps.* A block-spin map written as a partial isometry; coarse and fine levels shadow each other within its defect; a coarse gap transfers to the fine lattice; the renormalization-group chain this implies; and (Proposition 6) a bound on the defect of a map between two lattices compared through operator windows. |
 | `check_spectral_transfer.jl` | Random-instance checks of every inequality in the note (Julia, standard library only). |
 
 ## Context
@@ -21,11 +21,12 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 1712 tests
-    julia docs/notes/check_spectral_transfer.jl                        # 4260 checks
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 2131 tests
+    julia docs/notes/check_spectral_transfer.jl                        # 6263 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
     gunzip -k lattice/results/glueball_b570_L8T16.txt.gz           # 3000 configurations, 2.6 MB
-    julia --project=lattice lattice/examples/glueball_analysis.jl lattice/results/glueball_b570_L8T16.txt --bin 10 --ops 2,3,4,5
+    julia --project=lattice lattice/examples/glueball_analysis.jl lattice/results/glueball_b570_L8T16.txt \
+          --bin 10 --ops 2,3,4,5 --windows "2,3,4,5;2,3"
 
 The data file was produced with
 
@@ -42,10 +43,17 @@ t₀ = 0. Full output: `lattice/results/glueball_b570_L8T16_analysis.txt`.
 | quantity | value |
 |---|---|
 | ⟨P⟩ | 0.549239(56) |
-| σa² (Cornell fit, e = π/12 / e free) | 0.1677(7) / 0.1576(24) |
+| σa², Cornell fit with e = π/12 fixed | 0.1677(7) |
+| σa², Cornell fit with e free (e = 0.342(16)) | 0.1576(24) |
 | a·m₀⁺⁺ (GEVP, t = 1) | 0.967(33) |
-| m₀⁺⁺/√σ | 2.36(8), below the continuum ≈ 3.5: the known scalar dip near β = 5.7 |
+| m₀⁺⁺/√σ (with the fixed-e σ) | 2.36(8), below the continuum ≈ 3.5: the known scalar dip near β = 5.7 |
 | a·E₁ (GEVP, t = 0 → 1) | 2.43(5), poorly determined beyond t = 0 |
+
+Comparison with Lucini and Teper (hep-lat/0103027, Table 2; β = 5.70 on 8⁴, string tension from
+flux loops): a√σ = 0.3961(23), i.e. σa² = 0.1569(18); am₀⁺⁺ = 0.999(25); first excited scalar
+am₀⁺⁺⋆ = 2.07(21). The free-e fit agrees with their string tension and the fixed-e fit is 7% higher, a
+systematic spread larger than either statistical error. Our scalar mass agrees. Our E₁ is probably
+contaminated upward.
 
 Per smearing level (stout steps, ρ = 0.1):
 
@@ -53,21 +61,56 @@ Per smearing level (stout steps, ρ = 0.1):
 |---|---|---|---|---|---|---|---|
 | f, variational | 0.356(7) | 0.896(7) | 0.927(5) | 0.770(10) | 0.600(12) | 0.457(12) | |
 | f, from decay at t = 2 | 0.36(3) | 0.83(3) | 0.86(3) | 0.74(3) | 0.57(3) | 0.43(3) | |
-| a·δ bound, (E₁ − E₀)√(1/f − 1) | 1.97(8) | 0.50(3) | 0.41(2) | 0.80(4) | 1.20(6) | 1.60(8) | |
+| a·δ bound, (E₁ − E₀)√(f(1 − f)) | 0.70(3) | 0.45(2) | 0.38(2) | 0.62(3) | 0.72(3) | 0.73(3) | |
 | δ_T = ‖(I − P_ψ)Tψ‖ | 0.125(17) | 0.122(17) | 0.133(16) | 0.152(15) | 0.152(15) | 0.145(16) | 0.100(20) |
 | window gap 1 − c(1)/c(0) | 0.811(5) | 0.676(5) | 0.673(5) | 0.711(5) | 0.755(5) | 0.798(5) | 0.648(5) |
 | δ_T / [(1 − c)/2√2] | 0.44(6) | 0.51(7) | 0.56(7) | 0.60(6) | 0.57(6) | 0.51(6) | 0.43(9) |
 
 Reading the two defect measures together:
-- With H, the bound built from f and E₁ puts the best trial state's defect at ≳ 0.41 against a mass gap
-  of 0.97, above the Proposition 2 scale m/2√2 ≈ 0.34. The bound depends on the poorly measured E₁.
+- With H, the sharp bound given f and the gap E₁ − E₀ (Remark 5) puts the best trial state's residual
+  at ≳ 0.38, or ≳ 0.29 with the published E₁. Both inputs are estimates, so neither figure establishes
+  that the gap-transfer criterion fails. (An earlier version substituted E₁ for the bottom of the
+  omitted-space compression and overstated the bound by 1/f.)
 - With T, the directly measured residual of the best trial states is 0.43–0.56 of the Proposition 2
   scale. Euclidean time damps excited admixtures; this is a necessary condition only (see Status).
+
+## Two lattices: pilot on the coarse ensemble
+
+Proposition 6 compares the window compression K and leakage L of a coarse lattice (one time step) with
+those of a blocked fine lattice (two time steps). Before running the fine lattice, the coarse data fix
+how precisely these quantities can be measured. Coarse leakage, signed eigenvalues with jackknife errors
+(the exact matrix is positive):
+
+| window (stout levels) | eigenvalues of L_c | largest | eigenvalues of K_c |
+|---|---|---|---|
+| 4, 8, 16, 24 | −0.0100(50), −0.0071(44), 0.0038(44), 0.0111(42) | 0.0111(42) | 0.352(5), 0.088(5), 0.024(5), 0.005(5) |
+| 4, 8 | 0.0039(44), 0.0149(42) | 0.0149(42) | 0.339(5), 0.064(5) |
+
+The negative eigenvalues of the larger window are noise of the same size as its positive ones. The
+largest eigenvalue of a noisy matrix is also biased upward, so its square root, 0.105(20) or 0.122(17),
+is an estimate dominated by noise, not a bound. Two standard errors above it gives 0.14–0.15.
+
+Budget. In transfer-matrix units the gap of the window {vacuum, glueball} is 1 − 0.35 ≈ 0.65, so the
+Proposition 2 scale is about 0.65/2√2 ≈ 0.23. With leakage up to 0.15, the in-window mismatch
+‖K_f V − V K_c‖ must stay below about 0.08 for the measured defect to fall under that scale. The
+eigenvalues of K_c are measured to ±0.005, and the fine lattice, at the same physical volume and with
+lags 0, 2, 4, should reach similar precision with a similar number of configurations. So the fine run can
+resolve the comparison if the mismatch is above about 0.02.
+
+Proposed fine run (not yet done): β = 6.054, where the Necco–Sommer interpolation gives twice the r₀/a of
+β = 5.7; 16³ × 32 blocked once to 8³ × 32; blocking parameters α = 0, 0.3, 0.6; the same stout levels.
+Measured cost: 4.5 s per configuration on four threads, so 2000–3000 configurations take 2.5–3.75 hours.
+A tiny smoke run of the whole pipeline (`blocked_glueball.jl`, then `window_transfer.jl`) works.
 
 ## Status
 
 - The β = 5.7 point reproduces known lattice physics: the string tension and the low 0⁺⁺ mass of the
   "scalar dip" near this coupling. It validates the code and the analysis, not a new claim.
+- Corrections after review: Remark 5 now uses the bottom of the omitted-space compression, with the sharp
+  bound δ ≥ g√(f(1 − f)); Corollary 3 requires each window to contain the simple coarse vacuum and the
+  first excited level, and the continuum statement a uniform margin; the variational overlap estimator
+  converts its amplitude to t = 0 with exp(E₀t₀) (it used exp(2E₀t₀); the committed run used t₀ = 0 and
+  is unaffected). Blocking uses a polar SU(3) projection, covariant at both ends of a path.
 - The question the measurements are meant to answer: does the best presentation's defect shrink
   relative to the gap as the lattice gets finer? Corollary 3 of the note needs that, in Wilsonian form
   δ/Δ ~ (am)^p with p > 0. Runs at β = 5.85 and 6.0 are planned. Optimized single-operator overlaps are
@@ -91,6 +134,18 @@ Reading the two defect measures together:
   T_{k+1}) is the natural next statement to write down.
 
 ## Points for review, most important first
+
+New in this round:
+
+1. Proposition 6 and Remark 7: the bound, and the alignment induced by blocking as the polar part of the
+   operator-state correspondence c_k ↦ f_k, with the normalization mismatch as its positive part.
+2. `block_spatial` and `su3_project` (`lattice/src/smearing.jl`): paths, covariance at both ends, and
+   whether a two-link-plus-staples blocking is a reasonable first map.
+3. The pilot and budget above: whether the fine run, as designed, can answer the question.
+4. `examples/blocked_glueball.jl` and `examples/window_transfer.jl`: the two-ensemble jackknife and the
+   use of fine lag 2 against coarse lag 1.
+
+From the previous round:
 
 1. Propositions 1 and 2 of the note: the proofs, and the windowed form with W = W₀Q.
 2. Corollary 3 and Remark 4: whether the reduction of the gap to summable windowed defects and omitted

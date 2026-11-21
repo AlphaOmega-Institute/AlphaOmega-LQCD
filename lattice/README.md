@@ -8,6 +8,7 @@ A small, tested engine for pure SU(3) Yang–Mills theory on the lattice, in Jul
 - Plaquette (total, per plane), Polyakov loop, R×T Wilson loops
 - Error bars that account for autocorrelation (Madras–Sokal windowing)
 - Glueball spectroscopy: spatial stout smearing, 0⁺⁺ operators per time slice at several smearing levels, smeared R×T Wilson loops for the static potential, and a correlator analysis (binning, jackknife, periodic effective masses, generalized eigenvalue problem)
+- Spatial blocking with a gauge-covariant SU(3) projection, and operator-window quantities for comparing a coarse lattice with a blocked fine one
 
 This is standard lattice gauge theory, not new physics. It is meant as a foundation whose results can be trusted, because every piece is checked against something exact.
 
@@ -36,6 +37,14 @@ mean_plaquette(g)
 julia --project=lattice -t auto lattice/examples/glueball.jl --beta 5.7 --L 8 --T 16 --confs 3000 \
       --levels 0,4,8,16,24,32 --wlevel 16 > data.txt
 julia --project=lattice lattice/examples/glueball_analysis.jl data.txt --bin 10 --ops 2,3,4,5
+```
+
+To compare two lattice spacings, block a fine lattice and measure the same operators, then compare
+with the coarse data (`docs/notes/spectral_transfer.tex`, Proposition 6):
+
+```sh
+julia --project=lattice -t auto lattice/examples/blocked_glueball.jl --beta 6.054 --L 16 --T 32 > fine.txt
+julia --project=lattice lattice/examples/window_transfer.jl data.txt fine.txt --window 2,3
 ```
 
 The first script writes, per configuration, the mean plaquette, the 0⁺⁺ slice operators at each smearing
@@ -71,6 +80,9 @@ and the string tension.
 | Stout smearing | Links stay in SU(3); time links unchanged; unit and pure-gauge fields stay so; ρ = 0 is the identity; smearing commutes with random gauge transformations to 1e-12; spatial plaquettes increase |
 | Glueball operators | Slice average equals the spatial plane plaquettes; each smearing level matches direct smearing; gauge invariant |
 | Smeared Wilson loops | `wilson_loops_rt` equals `wilson_loop` averaged over spatial directions; W(1,1) equals the space-time plaquettes; gauge invariant |
+| SU(3) projection | `su3_project` lands in SU(3), fixes SU(3) matrices and their positive multiples, and satisfies su3_project(G A H†) = G su3_project(A) H† to 1e-11; row Gram–Schmidt fails that test |
+| Spatial blocking | Halved spatial extents; links in SU(3); α = 0 gives the product of two links; the unit field stays unit; blocking commutes with gauge transformations restricted to coarse sites; operators on blocked fields are gauge invariant |
+| Operator windows | `window_compression` reproduces U*SU and U*S(1 − P)SU on exact models, for lag 1 and 2; `induced_alignment` gives the polar factorization; the Proposition 6 bound holds; `ground_state_fractions` is exact for two-state correlators at t₀ = 0, 1, 2, with and without periodic images |
 | Correlator analysis | Effective masses of exact cosh correlators; GEVP recovers both energies of an exact two-state correlator at several (t₀, t); `correlator_matrix` against a direct implementation; binned products reproduce it; the jackknife error of a mean equals the standard error; `transfer_residual` equals ‖(I − P_ψ)Tψ‖ for random positive transfer matrices |
 
 The statistical tests allow 4.5 standard errors, with errors that include autocorrelation.
@@ -114,8 +126,10 @@ The 8⁴ box is too small at this coupling and sits about 0.0007 high. From 12�
 ### Glueball spectroscopy at β = 5.7
 
 8³ × 16, 3000 configurations, data in `results/glueball_b570_L8T16.txt.gz` (with the analysis output next
-to it). String tension σa² = 0.1677(7) from smeared Wilson loops (Cornell fit with e = π/12), consistent
-with the literature. 0⁺⁺ mass a·m = 0.967(33) from a variational analysis, so m/√σ = 2.36(8). This is
+to it). String tension from smeared Wilson loops: σa² = 0.1677(7) from a Cornell fit with the Coulomb
+coefficient fixed at π/12, and 0.1576(24) with it free; the spread between the two fits is larger than
+either error. Lucini and Teper (hep-lat/0103027) find 0.1569(18) at this β from flux loops. 0⁺⁺ mass
+a·m = 0.967(33) from a variational analysis, against their 0.999(25), so m/√σ = 2.36(8). This is
 below the continuum value of about 3.5, as expected at this coupling: the scalar glueball has a known dip
 near β = 5.7. Ground-state fractions per smearing level and the transfer-matrix residuals are tabulated
 in `../docs/notes/README.md`.
