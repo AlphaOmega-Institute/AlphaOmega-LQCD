@@ -24,8 +24,8 @@ mass gap. Three pieces of work belong together:
     julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 1712 tests
     julia docs/notes/check_spectral_transfer.jl                        # 4260 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
-    gunzip -k lattice/data/glueball_b570_L8T16.txt.gz
-    julia --project=lattice lattice/examples/glueball_analysis.jl lattice/data/glueball_b570_L8T16.txt --bin 10 --ops 2,3,4,5
+    gunzip -k lattice/results/glueball_b570_L8T16.txt.gz           # 3000 configurations, 2.6 MB
+    julia --project=lattice lattice/examples/glueball_analysis.jl lattice/results/glueball_b570_L8T16.txt --bin 10 --ops 2,3,4,5
 
 The data file was produced with
 
@@ -36,7 +36,33 @@ Julia 1.13.4, four threads. Results do not depend on the thread count.
 
 ## Results at β = 5.7
 
-The 3000-configuration run is in progress. Its data file and these results will be added in the next commit; until then the data file named above does not exist yet.
+8³ × 16, 3000 configurations (4 sweeps apart), bins of 10, GEVP on smearing levels 4, 8, 16, 24 with
+t₀ = 0. Full output: `lattice/results/glueball_b570_L8T16_analysis.txt`.
+
+| quantity | value |
+|---|---|
+| ⟨P⟩ | 0.549239(56) |
+| σa² (Cornell fit, e = π/12 / e free) | 0.1677(7) / 0.1576(24) |
+| a·m₀⁺⁺ (GEVP, t = 1) | 0.967(33) |
+| m₀⁺⁺/√σ | 2.36(8), below the continuum ≈ 3.5: the known scalar dip near β = 5.7 |
+| a·E₁ (GEVP, t = 0 → 1) | 2.43(5), poorly determined beyond t = 0 |
+
+Per smearing level (stout steps, ρ = 0.1):
+
+| level | 0 | 4 | 8 | 16 | 24 | 32 | GEVP |
+|---|---|---|---|---|---|---|---|
+| f, variational | 0.356(7) | 0.896(7) | 0.927(5) | 0.770(10) | 0.600(12) | 0.457(12) | |
+| f, from decay at t = 2 | 0.36(3) | 0.83(3) | 0.86(3) | 0.74(3) | 0.57(3) | 0.43(3) | |
+| a·δ bound, (E₁ − E₀)√(1/f − 1) | 1.97(8) | 0.50(3) | 0.41(2) | 0.80(4) | 1.20(6) | 1.60(8) | |
+| δ_T = ‖(I − P_ψ)Tψ‖ | 0.125(17) | 0.122(17) | 0.133(16) | 0.152(15) | 0.152(15) | 0.145(16) | 0.100(20) |
+| window gap 1 − c(1)/c(0) | 0.811(5) | 0.676(5) | 0.673(5) | 0.711(5) | 0.755(5) | 0.798(5) | 0.648(5) |
+| δ_T / [(1 − c)/2√2] | 0.44(6) | 0.51(7) | 0.56(7) | 0.60(6) | 0.57(6) | 0.51(6) | 0.43(9) |
+
+Reading the two defect measures together:
+- With H, the bound built from f and E₁ puts the best trial state's defect at ≳ 0.41 against a mass gap
+  of 0.97, above the Proposition 2 scale m/2√2 ≈ 0.34. The bound depends on the poorly measured E₁.
+- With T, the directly measured residual of the best trial states is 0.43–0.56 of the Proposition 2
+  scale. Euclidean time damps excited admixtures; this is a necessary condition only (see Status).
 
 ## Status
 

@@ -111,6 +111,15 @@ Check against the literature at β = 6.0, where the commonly quoted large-volume
 
 The 8⁴ box is too small at this coupling and sits about 0.0007 high. From 12⁴ upward the result agrees with the literature.
 
+### Glueball spectroscopy at β = 5.7
+
+8³ × 16, 3000 configurations, data in `results/glueball_b570_L8T16.txt.gz` (with the analysis output next
+to it). String tension σa² = 0.1677(7) from smeared Wilson loops (Cornell fit with e = π/12), consistent
+with the literature. 0⁺⁺ mass a·m = 0.967(33) from a variational analysis, so m/√σ = 2.36(8). This is
+below the continuum value of about 3.5, as expected at this coupling: the scalar glueball has a known dip
+near β = 5.7. Ground-state fractions per smearing level and the transfer-matrix residuals are tabulated
+in `../docs/notes/README.md`.
+
 ## Not yet included
 
 - Gauge groups other than SU(3), and the Twisted Eguchi–Kawai (single-site, large-N) model
