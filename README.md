@@ -22,3 +22,7 @@ julia --project=lattice -t auto lattice/examples/beta_scan.jl --L 8 5.7 6.0   # 
 ```
 
 See [lattice/README.md](lattice/README.md) for conventions, what each test checks, and reference results.
+
+## License
+
+Copyright © 2026 Alpha Omega Lattice Corporation, doing business as AlphaOmega Institute. The Julia code is licensed under the PolyForm Noncommercial License 1.0.0, and the documentation under CC BY-NC 4.0. The logo is not licensed. See [LICENSE.md](LICENSE.md) for details. Commercial use requires a separate license from Alpha Omega Lattice Corporation.
