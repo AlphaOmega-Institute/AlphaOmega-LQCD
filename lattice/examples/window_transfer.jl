@@ -37,8 +37,8 @@
 # the grid for both choices of k. All are computed in every jackknife replicate. Errors: delete-one jackknife over the
 # bins of each lattice, the two independent variances added; all α and both variants are
 # computed from the same fine bins, so they are resampled together. When both variants
-# are present, the differences fixed − zero of the mismatch, the bound and the defect are
-# reported for each α with paired errors (same configurations, same bins).
+# are present, the differences fixed − zero of the mismatch, the bound, the defect, the total
+# departure and ε₊ are reported for each α with paired errors (same configurations, same bins).
 
 using LatticeYM, Printf, LinearAlgebra
 
@@ -138,7 +138,7 @@ function main(args)
     ng = length(qgrid)
     per = 4n + 16 + 2ng
     paired = variants == ["fixed", "zero"]
-    pix = [4n+2, 4n+4, 4n+5, 4n+9]  # mismatch, bound, defect, total departure from the aligned graph
+    pix = [4n+2, 4n+4, 4n+5, 4n+9, 4n+12]  # mismatch, bound, defect, total departure, ε₊
     function f(ic, jf)
         q = [window_quantities(meanC(Pc, Mc, ic), meanC(Pf, Mf, jf), sref, qgrid) for (Pf, Mf) in fine]
         v = vcat(q...)
@@ -183,7 +183,8 @@ function main(args)
         for (ia, α) in enumerate(alphas)
             p = nvar * per + length(pix) * (ia - 1)
             println("  α = $α   Δ‖K_f V − V K_c‖ ", fmt(est[p+1], err[p+1]), "   Δbound ", fmt(est[p+2], err[p+2]),
-                    "   Δdefect ", fmt(est[p+3], err[p+3]), "   Δdeparture ", fmt(est[p+4], err[p+4]))
+                    "   Δdefect ", fmt(est[p+3], err[p+3]), "   Δdeparture ", fmt(est[p+4], err[p+4]),
+                    "   Δε₊ ", fmt(est[p+5], err[p+5]))
         end
     end
 end

@@ -16,6 +16,10 @@
 # With --coarse, the same for the coarse lattice at coarse times t = 0 … 3, and a table of
 # matched intervals: the fine mass over 2j → 2j+2 against the coarse mass over j → j+1, per fine
 # step, with their difference (the ensembles are independent, so the errors add in quadrature).
+# Finally, correlated fits A cosh(m (t − T/2)) of the GEVP ground-state correlator (vector fixed
+# on the full ensemble, jackknife covariance) over fine t ∈ [2, 8], [3, 8], [4, 8] and coarse
+# t ∈ [1, 4], [2, 4], so that the first interval is removed in turn; the matched pairs are fine
+# [2, 8] with coarse [1, 4] and fine [4, 8] with coarse [2, 4]. Masses per fine step.
 # Errors: delete-one jackknife over bins.
 
 using LatticeYM, Printf, LinearAlgebra
@@ -48,6 +52,35 @@ function masses(O, b, t0, tmax, lag, jmax)
     end
     return jackknife(derived, collect(1:size(Pb, 1)))
 end
+
+# correlated cosh fits of the GEVP ground-state correlator over each range in `ranges`
+function fits(O, b, t0, ranges)
+    P, M = correlator_products(O)
+    Pb, Mb = bin_means(P, b), bin_means(M, b)
+    nb, T = size(Pb, 1), size(O, 3)
+    Cof(ix) = correlator_from_means(dropdims(sum(Pb[ix, :, :, :]; dims = 1); dims = 1) ./ length(ix),
+                                    vec(sum(Mb[ix, :]; dims = 1)) ./ length(ix))
+    Cfull = Cof(1:nb)
+    _, V = gevp(Cfull, t0, t0 + 1)
+    v = V[:, 1]
+    proj(C) = [v' * C[:, :, t] * v for t in 1:T]
+    cfull = proj(Cfull)
+    cj = [proj(Cof(setdiff(1:nb, i))) for i in 1:nb]
+    cbar = sum(cj) / nb
+    out = []
+    for ts in ranges
+        idx = collect(ts) .+ 1
+        D = reduce(hcat, [c[idx] .- cbar[idx] for c in cj])
+        cov = (nb - 1) / nb .* (D * D')
+        m, _, χ = cosh_fit(cfull, cov, ts, T)
+        mj = [cosh_fit(c, cov, ts, T)[1] for c in cj]
+        err = sqrt((nb - 1) / nb * sum((mj .- sum(mj) / nb) .^ 2))
+        push!(out, (ts = ts, m = m, err = err, chi2dof = χ / (length(ts) - 2)))
+    end
+    return out
+end
+
+fitcell(f, s = 1.0) = rpad(fmt(s * f.m, s * f.err) * @sprintf(" χ²/dof %.2f", f.chi2dof), 30)
 
 function report(est, err, tmax, jmax, lag, ops, scale, unit, other)
     row(label, s) = println(@sprintf("  %-30s", label), join([fmt(s * est[t+1], s * err[t+1]) for t in 0:tmax], " "))
@@ -88,6 +121,9 @@ function main(args)
     tf = min(7, Tf ÷ 2 - 1)
     jf = min(3, (Tf ÷ 2) ÷ 2 - 1)
     matched = []
+    tfmax = min(8, Tf ÷ 2)
+    franges = [t:tfmax for t in (2, 3, 4) if tfmax - t + 1 >= 3]
+    ffits = []
     println("fine: β = $(kf["beta"]), $(kf["L"])³ × $Tf blocked to $(kf["blocked"])³, $(size(Xf, 1)) configurations; ",
             "GEVP on stout levels $ops, t0 = $t0, bins of $b; a_c/a_f = $ratio")
     for (ia, α) in enumerate(alphas), (iv, var) in enumerate(variants)
@@ -96,6 +132,7 @@ function main(args)
         println("\nα = $α, $var")
         report(est, err, tf, jf, 2, ops, ratio, "fine", "coarse")
         push!(matched, ("α = $α, $var", est[tf+2:tf+2+jf], err[tf+2:tf+2+jf]))
+        push!(ffits, ("α = $α, $var", fits(operators(Xf, off, idx, Tf), b, t0, franges)))
     end
 
     isempty(opt["coarse"]) && return
@@ -117,6 +154,28 @@ function main(args)
     for (label, mf, ef) in matched
         cells = [rpad(fmt(mf[j+1], ef[j+1]) * " Δ " * fmt(mf[j+1] - mc[j+1], sqrt(ef[j+1]^2 + ec[j+1]^2)), 26) for j in 0:J]
         println(@sprintf("  %-26s", label), join(cells))
+    end
+
+    tcmax = min(4, Tc ÷ 2)
+    cranges = [t:tcmax for t in (1, 2) if tcmax - t + 1 >= 3]
+    cfits = fits(operators(Xc, 1, [findfirst(==(l), clev) for l in ops], Tc), b, t0, cranges)
+    println("\ncorrelated fits A cosh(m (t − T/2)), mass per fine step (fine units)")
+    println(@sprintf("  %-26s", "coarse"), join([rpad("[$(first(f.ts)), $(last(f.ts))] ", 8) * fitcell(f, 1 / ratio) for f in cfits], "  "))
+    for (label, ff) in ffits
+        println(@sprintf("  %-26s", label), join([rpad("[$(first(f.ts)), $(last(f.ts))] ", 8) * fitcell(f) for f in ff], "  "))
+    end
+    pairs = [(2, 1), (4, 2)]
+    println("\nmatched fit ranges (fine [2, 8] with coarse [1, 4], fine [4, 8] with coarse [2, 4]): fine − coarse")
+    for (label, ff) in ffits
+        cells = String[]
+        for (tf0, tc0) in pairs
+            i = findfirst(f -> first(f.ts) == tf0, ff)
+            j = findfirst(f -> first(f.ts) == tc0, cfits)
+            (i === nothing || j === nothing) && continue
+            f, c = ff[i], cfits[j]
+            push!(cells, rpad("from fine t = $tf0: " * fmt(f.m - c.m / ratio, sqrt(f.err^2 + (c.err / ratio)^2)), 32))
+        end
+        println(@sprintf("  %-26s", label), join(cells, "  "))
     end
 end
 

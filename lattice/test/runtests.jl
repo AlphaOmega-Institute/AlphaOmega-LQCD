@@ -576,6 +576,33 @@ end
     @test isnan(leakage_q_floor([1.0 0; 0 -0.1], [0.1 0; 0 0.1]))
 end
 
+@testset "correlated cosh fit" begin
+    rng = Xoshiro(79)
+    for m in (0.4, 0.66, 1.0), T in (16, 32)
+        c = [3.0 * cosh(m * (t - T / 2)) for t in 0:T-1]
+        ts = 1:T÷4
+        X = randn(rng, length(ts), length(ts))
+        cov = (X * X' + I) .* 1e-6
+        mf, A, χ = cosh_fit(c, cov, ts, T)
+        @test mf ≈ m rtol = 1e-7
+        @test A ≈ 3.0 rtol = 1e-6
+        @test χ < 1e-8
+    end
+    # with noise drawn from the covariance, χ² per degree of freedom is of order one on average
+    T, m, ts = 32, 0.66, 2:8
+    c0 = [cosh(m * (t - T / 2)) for t in 0:T-1]
+    cov = Diagonal((0.02 .* c0[ts .+ 1]) .^ 2) |> Matrix
+    χs, ms = Float64[], Float64[]
+    for _ in 1:200
+        c = copy(c0)
+        c[ts .+ 1] .+= sqrt.(diag(cov)) .* randn(rng, length(ts))
+        mf, _, χ = cosh_fit(c, cov, ts, T)
+        push!(χs, χ); push!(ms, mf)
+    end
+    @test 0.7 < sum(χs) / 200 / (length(ts) - 2) < 1.3
+    @test abs(sum(ms) / 200 - m) < 0.01
+end
+
 @testset "cosh_mass over one step and over longer intervals" begin
     for m in (0.3, 0.7, 1.4), T in (16, 32), lag in (1, 2, 3)
         c = [cosh(m * (t - T / 2)) for t in 0:T-1]

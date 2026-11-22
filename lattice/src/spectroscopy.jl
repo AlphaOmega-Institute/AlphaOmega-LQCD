@@ -224,6 +224,38 @@ function cosh_mass(r::Real, t::Real, T::Real; lag::Real = 1)
 end
 
 """
+    cosh_fit(c, cov, ts, T; mrange = (0.01, 4.0)) -> (m, A, χ²)
+
+Correlated least-squares fit of a periodic correlator, c(t) ≈ A cosh(m (t − T/2)), over the
+times `ts` (c indexed by t+1), with the covariance `cov` of c[ts .+ 1]. For each m the amplitude
+is linear and is profiled out; χ²(m) is minimized over `mrange` by a grid search refined by
+golden-section search. Returns the mass per lattice step, the amplitude and the minimum χ²
+(degrees of freedom: length(ts) − 2).
+"""
+function cosh_fit(c::AbstractVector, cov::AbstractMatrix, ts, T; mrange = (0.01, 4.0))
+    y = c[collect(ts) .+ 1]
+    W = inv(Symmetric((cov + cov') / 2))
+    function chi2(m)
+        b = cosh.(m .* (collect(ts) .- T / 2))
+        A = dot(b, W * y) / dot(b, W * b)
+        r = y .- A .* b
+        return dot(r, W * r), A
+    end
+    grid = range(mrange[1], mrange[2]; length = 400)
+    vals = [chi2(m)[1] for m in grid]
+    i = argmin(vals)
+    lo, hi = grid[max(i - 1, 1)], grid[min(i + 1, length(grid))]
+    g = (sqrt(5) - 1) / 2
+    for _ in 1:100
+        a, b = hi - g * (hi - lo), lo + g * (hi - lo)
+        chi2(a)[1] < chi2(b)[1] ? (hi = b) : (lo = a)
+    end
+    m = (lo + hi) / 2
+    χ, A = chi2(m)
+    return m, A, χ
+end
+
+"""
     effective_masses(c) -> Vector
 
 Effective masses m(t), t = 0, …, T/2 − 1, of a periodic correlator c (index t+1).

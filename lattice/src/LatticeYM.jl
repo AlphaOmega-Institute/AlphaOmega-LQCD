@@ -21,7 +21,7 @@ export Metropolis, Heatbath, Overrelaxation, sweep!
 export mean_err, single_plaquette_average
 export stout_spatial, slice_plaquettes, glueball_operators, wilson_loops_rt
 export bin_means, jackknife, correlator_matrix, correlator_products, correlator_from_means
-export cosh_mass, effective_masses, gevp, transfer_residual
+export cosh_mass, effective_masses, gevp, transfer_residual, cosh_fit
 export su3_project, block_spatial
 export window_compression, induced_alignment, window_defect_bound, window_defect, ground_state_fractions
 export graph_departure, one_sided_bound, q_needed, leakage_q_floor
