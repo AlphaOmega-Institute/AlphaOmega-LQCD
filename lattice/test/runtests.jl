@@ -571,6 +571,8 @@ end
         qn >= 0 && @test one_sided_bound(kk, ℓ2, qn) ≈ s rtol = 1e-10
     end
     @test isnan(q_needed(0.3, 0.4, 0.01))
+    @test q_needed(0.3, 0.3, 0.0) == 0.3 && one_sided_bound(0.3, 0.0, 0.3) ≈ 0.3   # k = s, no leakage
+    @test q_needed(0.3, 0.2, -1e-4) == 0.3 && isnan(q_needed(0.3, 0.3, 1e-6))
     @test isnan(leakage_q_floor([1.0 0; 0 -0.1], [0.1 0; 0 0.1]))
 end
 

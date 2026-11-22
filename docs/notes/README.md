@@ -22,7 +22,7 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 3887 tests
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 3889 tests
     julia --project=lattice lattice/test/runner_checks.jl              # the fine-run program, 19 checks
     julia docs/notes/check_spectral_transfer.jl                        # 6563 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
@@ -294,7 +294,9 @@ floor is q ≥ 0.0146/0.2331 ≈ 0.063 from the largest leakage, about 0.18 from
 Certifying a fine gap equal to the coarse reference over the matched interval, s = e^{−0.973} ≈ 0.378,
 needs q ≤ 0.277 with the directly measured k = 0.2331; with the coarse-derived k = 0.3392 + 0.0422 =
 0.3814 > s no q suffices. The difference between the two shows what is lost when the fine window must be
-inferred from the coarse lattice. `window_transfer.jl` prints these quantities with jackknife errors
+inferred from the coarse lattice. In words, q ≤ 0.277 means that every normalized scalar state outside
+the window retains at most that much autocorrelation over one interval. An omitted state could be
+smooth and have the right symmetry; the question is whether the chosen operators see it. `window_transfer.jl` prints these quantities with jackknife errors
 (`--mref 0.973` for this reference).
 
 What an argument about the vacuum would have to supply. Not a smallness of the window's correlators:
@@ -383,7 +385,12 @@ with the symmetric normalization β₁ = γ₁ = C(0)^{1/2}, the residual Δ₂ 
 block-Lanczos iteration of Hackett and Wagman (Phys. Rev. D 112, 014514, 2025; arXiv:2412.04444,
 Eq. 21), used there for spectroscopy on one lattice; here one such matrix enters on each side of a
 blocking map fixed by the physics. Two-lattice Monte Carlo renormalization group matching, a method of the 1980s, has been
-applied to SU(3) gauge theories (A. Hasenfratz, arXiv:0907.0919). The intertwining relation
+applied to SU(3) gauge theories (A. Hasenfratz, arXiv:0907.0919). Matching two lattice spacings through
+glueball correlations was itself discussed then, with blocked loop observables preferred because the
+long-distance glueball signal was statistically hard, and with the remark that blocking a fine Wilson
+action need not reproduce a coarse Wilson action (P. B. Mackenzie, Fermilab-Conf-84/048-T, 1984; the
+preprint could not be retrieved from here, so this summary is not checked). The question was seen; the
+aim then was to tune the coarse action, with observables chosen for that. The intertwining relation
 S_f W = W S_c has the form of the lumpability condition QC = Cq for Markov chains, and Ward et al.
 (Commun. Phys., 2022, doi:10.1038/s42005-022-00834-1) measure the failure of approximate lumping by
 ‖QC − Cq‖, the algebraic form of the defect; there the coarse generator minimizes its Frobenius norm
@@ -401,7 +408,11 @@ operators, and gradient flow as a continuous blocking (e.g. Carosso, Hasenfratz 
 arXiv:1806.01385). Rigorous background: Bałaban's ultraviolet stability for lattice Yang–Mills
 (expounded by Dimock) and the strong-coupling gap of Osterwalder and Seiler.
 
-What we put forward is the combination. Blocking fixes which coarse operator corresponds to which fine
+What we put forward is a test of whether the correspondence between two lattice descriptions preserves
+what happens to the states it pairs, a physics question that stands whether or not a proof of the gap
+follows. Evolving a coarse state one step and then translating it, or translating it first and evolving
+the fine state over the same physical interval, the defect is how far apart the two end up. The
+measurement is the combination: blocking fixes which coarse operator corresponds to which fine
 operator; the polar map aligns their normalizations; correlators measured independently at the two
 spacings then determine the full intertwining defect of that window map, including evolution out of
 either window, and show how much of the disagreement is already visible inside the paired windows. We
@@ -409,7 +420,13 @@ found precedents for each ingredient, but not this measurement for SU(3), in the
 search and the closest papers, not a systematic citation search). The physics question it answers: when
 two lattice spacings give compatible glueball masses, do the corresponding operators also evolve alike?
 Two operators can share the leading decay while weighting higher excitations differently, and the
-measurement exposes that difference; Corollary 3 says why its size matters.
+measurement exposes that difference; Corollary 3 says why its size matters. Whether a disagreement can
+weaken a lower bound on the gap depends on its direction (the one-sided bound). The clearest payoff of
+the polar formalism so far is the pilot's opposite ranking at α = 0.6: the fixed grid preserves the
+lengths of the paired states better, the origin-averaged grid makes their evolution agree better.
+Judged by how faithfully it prepares the state at the initial instant, the map would have been chosen
+wrongly for tracking the state one step later; separating near-neutrality of the graph from its
+near-invariance is what told us to measure the two apart.
 
 ## Status
 

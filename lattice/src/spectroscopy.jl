@@ -356,10 +356,14 @@ one_sided_bound(k, ℓ2, q) = (k + q) / 2 + sqrt(((k - q) / 2)^2 + max(ℓ2, 0.0
 """
     q_needed(s, k, ℓ2)
 
-The largest q for which `one_sided_bound(k, ℓ2, q) ≤ s`: [k ℓ; ℓ q] ≤ s exactly when k < s and
-q ≤ s − ℓ²/(s − k). NaN when k ≥ s (no q suffices); a negative value also means none does.
+The largest q for which `one_sided_bound(k, ℓ2, q) ≤ s`. With leakage, [k ℓ; ℓ q] ≤ s exactly when
+k < s and q ≤ s − ℓ²/(s − k); without leakage (ℓ2 ≤ 0) when k ≤ s and q ≤ s. NaN when no q
+suffices; a negative value also means none does.
 """
-q_needed(s, k, ℓ2) = k < s ? s - max(ℓ2, 0.0) / (s - k) : NaN
+function q_needed(s, k, ℓ2)
+    ℓ2 <= 0 && return k <= s ? float(s) : NaN
+    return k < s ? s - ℓ2 / (s - k) : NaN
+end
 
 """
     leakage_q_floor(K, L)
