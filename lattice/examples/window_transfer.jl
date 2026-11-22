@@ -10,6 +10,7 @@
 #          --window 4,8      stout levels spanning the window (values, not indices)
 #          --bin 10          configurations per bin, on both lattices
 #          --drop 0          fine configurations dropped at the start
+# A file still being written can be analysed: an incomplete last line is dropped.
 # For each blocking parameter α and each variant (fixed origin, zero momentum) the script
 # reports the coarse compression K_c and leakage L_c at coarse lag 1, the fine ones K_f and
 # L_f at fine lag 2, the alignment V induced by the correspondence O ↦ O∘B (polar part of
@@ -29,8 +30,12 @@ function read_file(path)
         isempty(strip(line)) && continue
         startswith(line, "#") ? (header = line) : push!(rows, parse.(Float64, split(line)))
     end
+    if length(rows) >= 2 && length(rows[end]) != length(rows[end-1])
+        @warn "$path: dropping an incomplete last line (file still being written?)"
+        pop!(rows)
+    end
     widths = unique(length.(rows))
-    length(widths) == 1 || error("$path: rows of different widths $widths (an incomplete last line?)")
+    length(widths) == 1 || error("$path: rows of different widths $widths")
     kv = Dict(split(p, "=")[1] => split(p, "=")[2] for p in split(header[3:end]) if occursin("=", p))
     return kv, permutedims(reduce(hcat, rows))
 end

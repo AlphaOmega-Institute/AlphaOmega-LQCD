@@ -14,8 +14,11 @@
 #          --therm 500 --confs 3000 --skip 4 --seed 6054
 #          --alphas 0.0,0.3,0.6   blocking parameters
 #          --rho 0.1 --levels 4,8,16,24   stout levels (a subset of the coarse ones)
+#          --out file         write the output to this file instead of standard output
 #          --checkpoint file  save the chain (fields and random state) every 25 configurations
-#          --resume file      continue a chain from a checkpoint; append the output (>>)
+#          --resume file      continue a chain from a checkpoint. With --out, the output file
+#                             is first cut back to the configurations in the checkpoint, so
+#                             lines written after it are not duplicated; then it is appended.
 # Output: a header, then per configuration the fine mean plaquette followed, for each α,
 # by the fixed-origin O[level, t] and then the zero-momentum O[level, t] (level-major).
 # A resumed chain continues exactly as an uninterrupted one would.
@@ -25,7 +28,7 @@ using LatticeYM, Random, Printf, Serialization
 function main(args)
     opt = Dict("beta" => "6.054", "L" => "16", "T" => "32", "therm" => "500", "confs" => "3000",
                "skip" => "4", "seed" => "6054", "alphas" => "0.0,0.3,0.6", "rho" => "0.1",
-               "levels" => "4,8,16,24", "checkpoint" => "", "resume" => "")
+               "levels" => "4,8,16,24", "checkpoint" => "", "resume" => "", "out" => "")
     i = 1
     while i <= length(args)
         key = lstrip(args[i], '-')
@@ -44,9 +47,10 @@ function main(args)
     lat = Lattice((L, L, L, T))
 
     if isempty(opt["resume"])
+        io = isempty(opt["out"]) ? stdout : open(opt["out"], "w")
         rng = Xoshiro(seed)
         g = hot_start(lat, rng)
-        println("# beta=$β L=$L T=$T blocked=$(L ÷ 2) rho=$ρ levels=$(join(levels, ",")) ",
+        println(io, "# beta=$β L=$L T=$T blocked=$(L ÷ 2) rho=$ρ levels=$(join(levels, ",")) ",
                 "alphas=$(join(alphas, ",")) variants=fixed,zero origins=8 therm=$ntherm skip=$nskip ",
                 "seed=$seed threads=$(Threads.nthreads())")
         for _ in 1:ntherm, alg in algs
@@ -57,7 +61,18 @@ function main(args)
         state = deserialize(opt["resume"])
         state.physics == physics || error("the checkpoint was made with different physics options: $(state.physics)")
         g, rng, done = GaugeField(lat, state.U), state.rng, state.done
-        @printf(stderr, "resuming after configuration %d\n", done)
+        if isempty(opt["out"])
+            io = stdout
+            @printf(stderr, "resuming after configuration %d: keep only the header and the first %d data lines of the earlier output\n", done, done)
+        else
+            lines = readlines(opt["out"])
+            length(lines) >= done + 1 || error("$(opt["out"]) has fewer lines than the checkpoint")
+            open(opt["out"], "w") do f
+                foreach(l -> println(f, l), lines[1:done+1])
+            end
+            io = open(opt["out"], "a")
+            @printf(stderr, "resuming after configuration %d; %s cut back to it\n", done, opt["out"])
+        end
     end
 
     t0 = time()
@@ -79,9 +94,9 @@ function main(args)
                 @printf(buf, " %.12e", O[k, t])
             end
         end
-        println(String(take!(buf)))
+        println(io, String(take!(buf)))
         if c % 25 == 0
-            flush(stdout)
+            flush(io)
             if !isempty(opt["checkpoint"])
                 tmp = opt["checkpoint"] * ".tmp"
                 serialize(tmp, (physics = physics, U = g.U, rng = copy(rng), done = c))
@@ -90,6 +105,7 @@ function main(args)
             @printf(stderr, "beta=%.3f conf %d/%d, %.2f s per conf\n", β, c, nconf, (time() - t0) / (c - done))
         end
     end
+    io === stdout || close(io)
 end
 
 main(ARGS)
