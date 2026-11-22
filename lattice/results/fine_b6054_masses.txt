@@ -61,9 +61,9 @@ correlated fits A cosh(m (t − T/2)), mass per fine step (fine units)
   α = 0.6, zero             [2, 8]    0.655(23) χ²/dof 0.98 κ 6e+01           [3, 8]    0.653(47) χ²/dof 1.22 κ 5e+01           [4, 8]    0.612(69) χ²/dof 1.48 κ 4e+01         
 
 matched fit ranges (same physical interval): fine − coarse, and m_f/m_c − 1
-  α = 0.0, fixed            fine [2, 8]: Δ 0.138(84), ratio − 1 0.285(175)            fine [4, 8]: Δ 0.121(215), ratio − 1 0.263(470)         
-  α = 0.0, zero             fine [2, 8]: Δ 0.214(44), ratio − 1 0.443(99)             fine [4, 8]: Δ 0.227(171), ratio − 1 0.493(383)         
-  α = 0.3, fixed            fine [2, 8]: Δ 0.174(36), ratio − 1 0.360(81)             fine [4, 8]: Δ 0.098(88), ratio − 1 0.212(199)          
-  α = 0.3, zero             fine [2, 8]: Δ 0.180(30), ratio − 1 0.372(70)             fine [4, 8]: Δ 0.141(81), ratio − 1 0.305(190)          
-  α = 0.6, fixed            fine [2, 8]: Δ 0.179(34), ratio − 1 0.369(77)             fine [4, 8]: Δ 0.098(81), ratio − 1 0.212(184)          
-  α = 0.6, zero             fine [2, 8]: Δ 0.171(29), ratio − 1 0.354(68)             fine [4, 8]: Δ 0.150(79), ratio − 1 0.326(187)          
+  α = 0.0, fixed            fine [2, 8]: Δ 0.138(84), ratio − 1 0.285(175), 90% CI [-0.003, 0.572] unresolved             fine [4, 8]: Δ 0.121(215), ratio − 1 0.263(470), 90% CI [-0.510, 1.036] unresolved          
+  α = 0.0, zero             fine [2, 8]: Δ 0.214(44), ratio − 1 0.443(99), 90% CI [0.280, 0.606] beyond ±5%               fine [4, 8]: Δ 0.227(171), ratio − 1 0.493(383), 90% CI [-0.137, 1.122] unresolved          
+  α = 0.3, fixed            fine [2, 8]: Δ 0.174(36), ratio − 1 0.360(81), 90% CI [0.227, 0.493] beyond ±5%               fine [4, 8]: Δ 0.098(88), ratio − 1 0.212(199), 90% CI [-0.116, 0.540] unresolved           
+  α = 0.3, zero             fine [2, 8]: Δ 0.180(30), ratio − 1 0.372(70), 90% CI [0.256, 0.487] beyond ±5%               fine [4, 8]: Δ 0.141(81), ratio − 1 0.305(190), 90% CI [-0.008, 0.617] unresolved           
+  α = 0.6, fixed            fine [2, 8]: Δ 0.179(34), ratio − 1 0.369(77), 90% CI [0.243, 0.496] beyond ±5%               fine [4, 8]: Δ 0.098(81), ratio − 1 0.212(184), 90% CI [-0.092, 0.515] unresolved           
+  α = 0.6, zero             fine [2, 8]: Δ 0.171(29), ratio − 1 0.354(68), 90% CI [0.242, 0.466] beyond ±5%               fine [4, 8]: Δ 0.150(79), ratio − 1 0.326(187), 90% CI [0.019, 0.633] unresolved            

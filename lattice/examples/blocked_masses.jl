@@ -24,9 +24,10 @@
 # t ∈ [1, 4], [2, 4] by default, so that the first interval is removed in turn. A fine range is
 # matched with a coarse one when it covers the same physical interval, its first and last times
 # twice the coarse ones (fine [2, 8] or 2:2:8 with coarse [1, 4], fine [4, 16] or 4:2:16 with coarse
-# [2, 8], …); for each matched pair the difference and the
-# ratio m_f/m_c − 1 are printed. Each fit reports χ²/dof and the condition number κ of its
-# covariance matrix. Masses per fine step.
+# [2, 8], …); for each matched pair the difference, the ratio r = m_f/m_c − 1, its two-sided 90%
+# interval (±1.645 standard errors; conditional on --ratio) and the verdict of a ±5% equivalence
+# test (inside the band, beyond it, or unresolved) are printed. Each fit reports χ²/dof and the
+# condition number κ of its covariance matrix. Masses per fine step.
 # Errors: delete-one jackknife over bins.
 
 using LatticeYM, Printf, LinearAlgebra
@@ -184,7 +185,10 @@ function main(args)
             mc, ec = c.m / ratio, c.err / ratio
             r = f.m / mc - 1
             er = (r + 1) * sqrt((f.err / f.m)^2 + (ec / mc)^2)
-            push!(cells, rpad("fine $(rangelabel(f.ts)): Δ " * fmt(f.m - mc, sqrt(f.err^2 + ec^2)) * ", ratio − 1 " * fmt(r, er), 56))
+            lo, hi = r - 1.645er, r + 1.645er
+            verdict = (lo >= -0.05 && hi <= 0.05) ? "within ±5%" : (lo > 0.05 || hi < -0.05) ? "beyond ±5%" : "unresolved"
+            push!(cells, rpad("fine $(rangelabel(f.ts)): Δ " * fmt(f.m - mc, sqrt(f.err^2 + ec^2)) * ", ratio − 1 " * fmt(r, er) *
+                              @sprintf(", 90%% CI [%.3f, %.3f] %s", lo, hi, verdict), 92))
         end
         println(@sprintf("  %-26s", label), join(cells, "  "))
     end

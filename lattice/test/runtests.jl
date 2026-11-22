@@ -607,6 +607,9 @@ end
     end
     @test q_needed_matrix(0.4, fill(0.3, 1, 1), fill(0.01, 1, 1)) ≈ q_needed(0.4, 0.3, 0.01) rtol = 1e-10
     @test isnan(q_needed_matrix(0.3, fill(0.35, 1, 1), fill(0.01, 1, 1)))
+    # λ_max(C) = s: passes when the leakage vanishes along the saturating direction, fails otherwise
+    @test q_needed_matrix(0.4, [0.4 0; 0 0.2], [0 0; 0 0.01]) ≈ 0.35 rtol = 1e-9
+    @test isnan(q_needed_matrix(0.4, [0.4 0; 0 0.2], [0.01 0; 0 0.01]))
 end
 
 @testset "correlated cosh fit" begin

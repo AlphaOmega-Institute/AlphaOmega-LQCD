@@ -404,13 +404,28 @@ Matrix form of `q_needed`. If the window block of T² is bounded by C, the leaka
 the omitted block is bounded by q, completing the square gives, for every γ > 0,
 T² ≤ (C + L/γ) ⊕ (q + γ) I_Q, so with γ = s − q the test C + L/(s − q) ≤ s implies T² ≤ s on the
 vacuum's complement. Returns the largest q < s that passes (bisection; λ_max(C + L/(s − q))
-increases with q), or NaN if λ_max(C) ≥ s. It keeps the directions of C and L, so it is at least as
-large as `q_needed(s, λ_max(C), λ_max(L))`. Negative eigenvalues of L (noise) are set to zero.
+increases with q), or NaN if no q < s passes, as when λ_max(C) > s. If λ_max(C) = s the test can still
+pass when the leakage vanishes along the saturating direction. It keeps the directions of C and L, so
+it is at least as large as `q_needed(s, λ_max(C), λ_max(L))`. Negative eigenvalues of L (noise) are
+set to zero; comparisons with s allow a relative rounding tolerance of 1e-12.
 """
 function q_needed_matrix(s, C, L)
+    tol = 1e-12 * max(abs(s), 1.0)
+    F = eigen(Hermitian(_herm(C)))
+    F.values[end] <= s + tol || return NaN
+    Lp = _ppart(L)
+    sat = F.values .>= s - tol                       # directions where C reaches s
+    if any(sat)
+        # C + L/γ ≤ s needs L to vanish on that eigenspace (and, as L ≥ 0, to annihilate it);
+        # the test then reduces to the complement
+        Ps = F.vectors[:, sat]
+        opnorm(Lp * Ps) <= 1e-10 * max(opnorm(Lp), 1.0) || return NaN
+        all(sat) && return float(s)
+        W = F.vectors[:, .!sat]
+        return q_needed_matrix(s, Diagonal(F.values[.!sat]), W' * Lp * W)
+    end
     Ch = Hermitian(_herm(C))
-    Lp = Hermitian(_ppart(L))
-    eigmax(Ch) < s || return NaN
+    Lp = Hermitian(Lp)
     eigmax(Lp) <= 0 && return float(s)
     ok(q) = eigmax(Hermitian(Ch + Lp / (s - q))) <= s
     lo, hi = s - 1.0, s

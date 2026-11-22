@@ -22,7 +22,7 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 4471 tests
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 4473 tests
     julia --project=lattice lattice/test/runner_checks.jl              # the fine-run program, 19 checks
     julia docs/notes/check_spectral_transfer.jl                        # 6563 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
@@ -341,6 +341,13 @@ window eigenvalues differ by 0.103. The finite-spacing shift of the scalar mass 
 separation; the full symmetric mismatch (0.166) and the defect (which includes leakage and the rotation
 above) are not attributed to it.
 
+Lag dependence. At twice the matched interval (coarse lag 2, fine lag 4) the alignment angle stays at
+23.0(3.0)° while ε₊ falls from 0.0448(57) to 0.0092(62). Evolving twice inside each measured window,
+with K_f(1)² and K_c(1)² and the same alignment, predicts 0.0127(13); the measured value, which also
+allows evolution to leave the windows and return, differs from it by −0.0035(60) (paired jackknife; the
+same at bins of 20 and 50). The measured window modes, evolving at their own rates, already account
+for the decline within errors, so the angle can persist while the absolute one-sided error falls.
+
 Checks. Bins of 20 and 50 change no central value. The headline quantities of the primary recipe grow
 by at most about 8% (at α = 0.6, zero momentum: mismatch 0.0060 → 0.0065, defect 0.0125 → 0.0132, ε₊
 0.0057 → 0.0059); across the full output the largest growth is 23% (the paired departure difference at
@@ -390,9 +397,12 @@ run was in progress):
 - Primary comparison: α = 0.6 with zero momentum, window {4, 8}, one coarse step (coarse lag 1, fine
   lag 2). The 0.03 target concerns the leading window eigenvalues and so also how much weight the
   operators put on higher states; agreement of the masses alone does not guarantee it.
-- Mass endpoint: r = m_f/m_c − 1 in common units, from the principal fit ranges below. An uncertainty
-  interval contained in [−0.05, 0.05] supports agreement to 5%; an interval spanning zero and extending
-  beyond that band leaves the question unresolved.
+- Mass endpoint: r = m_f/m_c − 1 in common units, from the principal fit ranges below, with bins of 10
+  primary and bins of 20 and 50 as sensitivity checks. The verdict uses the two-sided 90% interval
+  (±1.645 standard errors), as in a 5%-level equivalence test: an interval wholly inside [−0.05, 0.05]
+  supports agreement to 5%; one wholly above or below the band supports a discrepancy beyond tolerance;
+  partial overlap leaves the verdict unresolved, even when the interval excludes zero. The interval is
+  conditional on the adopted spacing ratio. `blocked_masses.jl` prints the interval and the verdict.
 - Caveats. Athenodorou and Teper find at β = 6.235 scalar masses 0.4773(53), 0.4969(29), 0.4965(41) at
   L√σ ≈ 2.7, 3.9, 5.1, a 4% shift between the smallest and middle boxes; our two boxes are matched to
   each other near 3.2, which helps the internal comparison, but their tables do not calibrate a 5%
@@ -403,8 +413,9 @@ run was in progress):
   Reported there: the leading-direction angle with its error and the separation of the first two
   eigenvalues (a nearly degenerate leading direction can rotate within errors); ε₊ and the defect raw,
   as rates per coarse step for the native comparison, and relative to the reference gap 1 − e^{−m_ref τ}
-  with the declared m_ref = 0.655 per β = 6.054 step (our fitted value from the first pair) for both
-  pairs' comparisons on this lattice, `--mref 0.655`. The same number of stout steps smooths over a
+  with the declared m_ref = 0.655 per β = 6.054 step (our fitted value from the first pair). `--mref`
+  takes the mass in units of each pair's coarse lattice: 0.655 for the new pair, 0.655 × 2.0015 = 1.311
+  for the first pair in a cross-pair comparison (the first pair's own gap question keeps 0.973). The same number of stout steps smooths over a
   shorter physical distance on the finer lattice; the comparison tests the recipes as specified.
 - Masses (`blocked_masses.jl --ratio 1.9997`): principal fit fine [4, 16] against coarse [2, 8] (the
   physical range of the first pair's principal fit); delayed start fine [8, 16] against coarse [4, 8];
@@ -412,7 +423,8 @@ run was in progress):
   only 20 blocks, too few for a 13-point covariance); and the short ranges fine [2, 8] against coarse
   [1, 4] to show the influence of early times. The condition number of each covariance is reported.
 
-Analysis commands, once both files are in hand:
+Analysis commands, once both files are in hand (for the cross-pair comparison, the first pair is rerun
+with `--mref 1.311`):
 
     julia --project=lattice lattice/examples/window_transfer.jl coarse_b6054.txt fine_b6546.txt --window 4,8 --mref 0.655
     julia --project=lattice lattice/examples/window_transfer.jl coarse_b6054.txt fine_b6546.txt --window 4,8 --mref 0.655 --lag 2
@@ -473,9 +485,10 @@ off-diagonal block gives, for every γ > 0,
 and the operator square root preserves the inequality, a full bound B_f for the next rung that keeps
 the directions of E and L. For a target mass m_* with s = e^{−a_c m_*} > q, γ = s − q gives the window
 test C + L/(s − q) ≤ s, which implies T_f ≤ e^{−a_f m_*}; a uniform gap needs one m_* through every
-refinement, volume and sector claimed. `q_needed_matrix` returns the largest q passing the test; on the
-first pair (α = 0.6, zero momentum) it gives 0.326(27) with the fine window measured directly and
-0.167(117) inferred from the coarse lattice (scalar forms 0.326 and 0.146). Carrying the matrix across
+refinement, volume and sector claimed. `q_needed_matrix` returns the largest q passing the test,
+including the boundary case λ_max(C) = s when the leakage vanishes along the saturating direction; on
+the first pair (α = 0.6, zero momentum) it gives the conditional ceilings 0.326(27) with the fine window
+measured directly and 0.167(117) inferred from the coarse lattice (scalar forms 0.326 and 0.146). Carrying the matrix across
 the shared β = 6.054 lattice, where the first pair ends on blocked operators and the second starts on
 unblocked ones, needs the cross-Gram matrix between the two operator families on the same
 configurations, a targeted extra measurement at β = 6.054.
