@@ -167,7 +167,13 @@ Pilot analysis, at any time during the run:
     julia --project=lattice lattice/examples/window_transfer.jl lattice/results/glueball_b570_L8T16.txt \
           fine_b6054.txt --window 4,8
 
-It ends with the fixed-origin minus zero-momentum differences of the mismatch, the bound, the defect and
+and the glueball mass on both lattices in the same physical units (a spectral difference between
+the windows bounds the mismatch from below for every alignment, by Weyl's inequality):
+
+    julia --project=lattice lattice/examples/blocked_masses.jl fine_b6054.txt \
+          --coarse lattice/results/glueball_b570_L8T16.txt
+
+`window_transfer.jl` ends with the fixed-origin minus zero-momentum differences of the mismatch, the bound, the defect and
 the departure from the aligned graph (below) for each α, with paired errors (same configurations and
 bins): how much the choice of blocking grid changes the conclusion.
 
