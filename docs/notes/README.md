@@ -251,8 +251,9 @@ blocking map fixed by the physics. Two-lattice Monte Carlo renormalization group
 applied to SU(3) gauge theories (A. Hasenfratz, arXiv:0907.0919). The intertwining relation
 S_f W = W S_c has the form of the lumpability condition QC = Cq for Markov chains, and Ward et al.
 (Commun. Phys., 2022, doi:10.1038/s42005-022-00834-1) measure the failure of approximate lumping by
-‖QC − Cq‖, the algebraic form of the defect; there the coarse generator is chosen to minimize it,
-whereas here the coarse dynamics come from an independently simulated lattice. Lang, Liegener and Thiemann (Hamiltonian renormalisation I–IX, arXiv:1711.05685 and
+‖QC − Cq‖, the algebraic form of the defect; there the coarse generator minimizes its Frobenius norm
+(their Theorem 2.1), whereas here the operator norm is measured, with the coarse dynamics taken from an
+independently simulated lattice. Lang, Liegener and Thiemann (Hamiltonian renormalisation I–IX, arXiv:1711.05685 and
 sequels) derive the compression of the semigroup to the coarse space that blocking induces through
 Osterwalder–Schrader reconstruction, and when the embedded space is invariant; their work is analytic,
 for free and solvable models. Isometric scaling maps between lattice Hilbert spaces with an inductive limit: Morinelli,
