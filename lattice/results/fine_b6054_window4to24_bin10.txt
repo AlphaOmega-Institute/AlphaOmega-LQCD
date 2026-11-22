@@ -140,6 +140,6 @@ window: stout levels [4, 8, 16, 24] (ρ = 0.1), bins of 10; centered excitations
     μ(q), coarse k                    0.4208(128)  0.4263(160)  0.4382(218)
 
 fixed origin − zero momentum (paired errors: same configurations and bins)
-  α = 0.0   Δ‖K_f V − V K_c‖ 0.0542(39)   Δbound 0.0397(155)   Δdefect 0.0555(68)   Δdeparture 0.0258(59)
-  α = 0.3   Δ‖K_f V − V K_c‖ 0.0338(29)   Δbound 0.0511(250)   Δdefect 0.0457(64)   Δdeparture 0.0306(60)
-  α = 0.6   Δ‖K_f V − V K_c‖ 0.0272(25)   Δbound 0.0387(253)   Δdefect 0.0394(59)   Δdeparture 0.0274(54)
+  α = 0.0   Δ‖K_f V − V K_c‖ 0.0542(39)   Δbound 0.0397(155)   Δdefect 0.0555(68)   Δdeparture 0.0258(59)   Δε₊ -0.0343(57)
+  α = 0.3   Δ‖K_f V − V K_c‖ 0.0338(29)   Δbound 0.0511(250)   Δdefect 0.0457(64)   Δdeparture 0.0306(60)   Δε₊ -0.0488(84)
+  α = 0.6   Δ‖K_f V − V K_c‖ 0.0272(25)   Δbound 0.0387(253)   Δdefect 0.0394(59)   Δdeparture 0.0274(54)   Δε₊ -0.0413(30)

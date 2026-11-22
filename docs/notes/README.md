@@ -268,8 +268,9 @@ one-step discrepancy persists in the long-time scalar decay?
 ## Full run at β = 6.054: 3000 configurations
 
 The same chain extended to 3000 configurations (4.9 s per configuration on 12 threads, no projection
-fallbacks). Bins of 10; the bin-size checks (20, 50) and the four-level window are recorded below when
-available. The output file will be added to `lattice/results/`.
+fallbacks). The data and the analysis outputs are in `lattice/results/` (`fine_b6054*`); rerun on a
+different machine, the analyses reproduce the outputs made on the simulation machine byte for byte.
+Bins of 10 unless stated.
 
 Masses (`blocked_masses.jl`, GEVP on levels 4 and 8, fine units). The fine effective mass has a plateau:
 0.674(13), 0.658(24), 0.663(49) at t = 1, 2, 3 for α = 0.6 with zero momentum, and the same within errors
@@ -317,6 +318,30 @@ Window {4, 8} (`window_transfer.jl --mref 0.973`):
   0.339, plus ε₊, plus the leakage term leaves no room below s = 0.378.
 - The best symmetric defect, 0.203(13), is 2.2 errors below the provisional scale 0.23 (within one error
   in the pilot); the symmetric defect is not the quantity a lower bound needs.
+- With paired errors the reversal in ε₊ is decisive: fixed origin − zero momentum = −0.0369(27) at
+  α = 0.6 and −0.0401(57) at α = 0.3.
+
+Checks. Bins of 20 and 50 change no central value and enlarge the errors by at most about 8% (at
+α = 0.6, zero momentum: mismatch 0.0060 → 0.0065, defect 0.0125 → 0.0132, ε₊ 0.0057 → 0.0059). The
+window {4, 8, 16, 24} gives the same picture: mismatch 0.166(6), defect 0.197(13), and ε₊ = 0.056(6)
+with zero momentum at both α against 0.014(6) (α = 0.6) and 0.007(5) (α = 0.3) with the fixed origin.
+Its third and fourth fine eigenvalues exceed the coarse ones (0.035 against 0.024, 0.014 against 0.005),
+so the slower-decaying direction plausibly involves excited states that the coarse cutoff pushes up.
+
+Correlated fits A cosh(m (t − T/2)) of the GEVP ground-state correlator (vector fixed on the full
+ensemble, jackknife covariance), masses per fine step:
+
+| range | α = 0.6 zero | α = 0.3 zero | α = 0.6 fixed | coarse |
+|---|---|---|---|---|
+| fine [2, 8] / coarse [1, 4] | 0.655(23), χ²/dof 0.98 | 0.664(25), 0.75 | 0.663(29), 2.53 | 0.484(17), 1.56 |
+| fine [3, 8] | 0.653(47), 1.22 | 0.653(49), 0.92 | 0.624(56), 3.01 | |
+| fine [4, 8] / coarse [2, 4] | 0.612(69), 1.48 | 0.602(71), 1.02 | 0.559(71), 3.67 | 0.461(39), 2.79 |
+
+Matched differences, fine − coarse: 0.171(29) from fine t = 2 against coarse t = 1 and 0.150(79) from
+fine t = 4 against coarse t = 2 (α = 0.6, zero momentum); 0.180(30) and 0.141(81) for α = 0.3. The
+fitted fine mass agrees with the benchmark (about 0.645). With the first interval removed the
+difference keeps its central value at lower significance. The fixed-origin correlators fit a single
+cosh less well (χ²/dof 2.2–3.7).
 
 ## One-sided bound
 
@@ -517,7 +542,8 @@ near-invariance is what told us to measure the two apart.
 ## Points for review, most important first
 
 Newest: the full run ("Full run at β = 6.054"): the persistence of the mass difference over
-matched intervals, and the one-sided reversal between the recipes. Before that: the one-sided bound ("One-sided bound"): the 2 × 2 lemma, the positivity floor on q, the q
+matched intervals and in correlated fits, the one-sided reversal between the recipes with paired
+errors, the bin-size and four-level checks, and the data in `lattice/results/`. Before that: the one-sided bound ("One-sided bound"): the 2 × 2 lemma, the positivity floor on q, the q
 needed for a reference gap, and what a vacuum argument would have to supply. Before that: the pilot results at β = 6.054 ("Pilot at β = 6.054"): the spectral reading of the mismatch,
 the mass comparison and its interpretation, and the scope statement. Before that: the doubled-space
 reading and `graph_departure` (the identity ‖[S, R]‖ = ‖S_fW − WS_c‖ and
