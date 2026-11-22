@@ -265,6 +265,59 @@ here, a factor 2 from β = 6.054 means β ≈ 6.55 (β = 6.4 is only 1.66, and a
 larger than the present one). The question the 3000-configuration run addresses: how much of the
 one-step discrepancy persists in the long-time scalar decay?
 
+## Full run at β = 6.054: 3000 configurations
+
+The same chain extended to 3000 configurations (4.9 s per configuration on 12 threads, no projection
+fallbacks). Bins of 10; the bin-size checks (20, 50) and the four-level window are recorded below when
+available. The output file will be added to `lattice/results/`.
+
+Masses (`blocked_masses.jl`, GEVP on levels 4 and 8, fine units). The fine effective mass has a plateau:
+0.674(13), 0.658(24), 0.663(49) at t = 1, 2, 3 for α = 0.6 with zero momentum, and the same within errors
+for α = 0.3 and for the fixed origin. It agrees with the published benchmark (about 0.645 at β = 6.054,
+in larger boxes). Matched intervals, mass per fine step (fine t = 2j → 2j+2 against coarse j → j+1):
+
+| j | fine, α = 0.6 zero | coarse | difference | α = 0.3 zero | α = 0.6 fixed | α = 0.3 fixed |
+|---|---|---|---|---|---|---|
+| 0 | 0.722(9) | 0.540(7) | 0.182(12) | 0.198(12) | 0.294(13) | 0.357(13) |
+| 1 | 0.660(32) | 0.486(17) | 0.174(37) | 0.178(37) | 0.181(41) | 0.192(44) |
+| 2 | 0.730(134) | 0.457(44) | 0.27(14) | 0.24(14) | 0.29(17) | 0.32(20) |
+
+(The last three columns are differences.) The difference persists one matched interval later: for zero
+momentum it is 0.182 at j = 0 and 0.174 at j = 1, and all four recipes agree at j = 1 (0.17–0.19, each
+about 4.5 standard errors; they share configurations). The discrepancy therefore lies in the long-time
+scalar decay, the mass itself, not only in short-time excited-state content. In the same physical units
+the fine mass is 1.32 in coarse units against the coarse 0.973, about 36% heavier; with the published
+string tension near β = 6.054 that is m₀/√σ ≈ 3.3, against about 2.4 on the coarse lattice. Both masses
+agree with the published Wilson-action values, so the run is consistent with a finite-spacing shift of
+the scalar mass between β = 5.7 and 6.054 (the scalar dip); attributing it to the bulk endpoint would
+require varying the action.
+
+Window {4, 8} (`window_transfer.jl --mref 0.973`):
+
+| α, blocking | ‖K_f V − V K_c‖ | defect | total departure | eig(V*K_f V − K_c) | ε₊ | q floor | q needed (fine k) |
+|---|---|---|---|---|---|---|---|
+| 0, fixed origin | 0.301(6) | 0.333(9) | 0.183(7) | −0.050(6), −0.301(6) | 0 | 0.20(8) | 0.352(9) |
+| 0, zero momentum | 0.252(6) | 0.286(10) | 0.165(8) | +0.010(6), −0.252(6) | 0.010(6) | 0.24(17) | 0.306(14) |
+| 0.3, fixed origin | 0.208(6) | 0.256(10) | 0.156(9) | −0.003(6), −0.208(6) | 0 | 0.12(4) | 0.304(16) |
+| 0.3, zero momentum | 0.173(6) | 0.209(12) | 0.129(11) | +0.040(6), −0.173(6) | 0.040(6) | 0.05(7) | 0.322(26) |
+| 0.6, fixed origin | 0.193(6) | 0.243(10) | 0.150(9) | +0.008(6), −0.193(6) | 0.008(6) | 0.12(6) | 0.299(18) |
+| 0.6, zero momentum | 0.166(6) | 0.203(13) | 0.126(11) | +0.045(6), −0.166(6) | 0.045(6) | 0.05(7) | 0.326(27) |
+
+- Averaging over the blocking origins lowers the symmetric quantities at every α; at α = 0.6 the paired
+  differences are 0.0273(25) for the in-window mismatch, 0.0396(53) for the defect and 0.0243(45) for the
+  total departure.
+- It also introduces a direction in which the fine evolution decays more slowly than the coarse one:
+  ε₊ = 0.045(6) and 0.040(6) with zero momentum at α = 0.6 and 0.3, against 0.008(6) and 0 with the fixed
+  origin. For a lower bound on the fine gap, the one-sided criterion, the fixed-origin map is the better
+  one. This is a second axis on which the recipes rank in opposite order, after near-neutrality against
+  near-invariance.
+- Certificate. With the fine window measured directly, a fine gap at least the coarse reference
+  (s = e^{−0.973}) needs q ≤ 0.30–0.33 for every recipe, above the positivity floors (0.05–0.24, noisy).
+  With the fine window inferred from the coarse lattice no q suffices for any recipe: the coarse top
+  0.339, plus ε₊, plus the leakage term leaves no room below s = 0.378.
+- The best symmetric defect, 0.203(13), is 2.2 errors below the provisional scale 0.23 (within one error
+  in the pilot); the symmetric defect is not the quantity a lower bound needs.
+
 ## One-sided bound
 
 For a lower bound on the fine gap only one direction of disagreement matters: whether the fine
@@ -463,7 +516,8 @@ near-invariance is what told us to measure the two apart.
 
 ## Points for review, most important first
 
-Newest: the one-sided bound ("One-sided bound"): the 2 × 2 lemma, the positivity floor on q, the q
+Newest: the full run ("Full run at β = 6.054"): the persistence of the mass difference over
+matched intervals, and the one-sided reversal between the recipes. Before that: the one-sided bound ("One-sided bound"): the 2 × 2 lemma, the positivity floor on q, the q
 needed for a reference gap, and what a vacuum argument would have to supply. Before that: the pilot results at β = 6.054 ("Pilot at β = 6.054"): the spectral reading of the mismatch,
 the mass comparison and its interpretation, and the scope statement. Before that: the doubled-space
 reading and `graph_departure` (the identity ‖[S, R]‖ = ‖S_fW − WS_c‖ and
