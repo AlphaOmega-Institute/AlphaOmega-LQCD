@@ -143,10 +143,14 @@ The angle between the leading eigenvectors of $K_c$ and $V^*K_fV$ measures how f
 pairing departs from a pairing in spectral order.
 
 In the doubled space $\mathcal H_c\oplus\mathcal H_f$ with $S=S_c\oplus S_f$, the polar reflection
-$R=\begin{psmallmatrix}0&W^*\\W&0\end{psmallmatrix}$ has the aligned and anti-aligned graphs
-$\{(x,\pm Wx)\}$ as eigenspaces, and $\|[S,R]\|=\|S_fW-WS_c\|$: the defect measures how far evolution fails
-to commute with the operation that exchanges each matched coarse description with its fine partner. The
-normalization $\|M-I\|$ measures how far the raw correspondence is from isometric, which is the
+$R=\begin{psmallmatrix}0&W^*\\W&0\end{psmallmatrix}$ has as its $\pm1$ eigenspaces the aligned and
+anti-aligned graphs $\{(x,\pm Wx):x\in\operatorname{Ran}U_c\}$. The restriction matters: $W$ vanishes on the
+coarse complement, and $R$ annihilates the complements of both windows. Moreover $\|[S,R]\|=\|S_fW-WS_c\|$:
+the defect measures how far evolution fails to commute with the operation that exchanges each matched
+coarse description with its fine partner. The departure of the aligned graph itself,
+$\|(I-P_+)SP_+\|$ with $P_+$ the projection onto it, is a different quantity: on the primary recipe of the
+first pair the commutator norm is $0.2030(125)$ and the departure $0.1258(109)$ (Table~\ref{tab:window}).
+The normalization $\|M-I\|$ measures how far the raw correspondence is from isometric, which is the
 near-neutrality of its graph for the form $\operatorname{diag}(I,-I)$; the defect measures the
 near-invariance of the polar graph (Appendix~\ref{app:doubled}).
 
@@ -299,8 +303,10 @@ Table~\ref{tab:window} collects the window quantities. The in-window mismatch, $
 above the noise reference: pairs of independent resamples of 3000 configurations of the coarse ensemble,
 whose true mismatch is zero, give an apparent mismatch with 95th percentile $0.017$. The window
 $\{4,8,16,24\}$ gives the same picture (mismatch $0.166(6)$, disagreement over window inputs $0.177(11)$,
-defect $0.197(13)$). The two maximizations differ by about $0.02$ for every recipe: states outside the
-coarse window that evolve into it add little to what the window states themselves show.
+defect $0.197(13)$). Allowing all coarse inputs increases the maximum disagreement by about $0.02$ for
+each recipe. That is the increase of the maximum when the restriction on inputs is lifted, not the size
+of the disagreement for external inputs: for inputs lying entirely outside the coarse window the maximum
+disagreement is $\sqrt{\|L_c\|}$, which is $0.122(17)$ on the primary recipe.
 
 \subsection{What the blocking map shows beyond the spectra}
 
@@ -373,9 +379,9 @@ predicted $0.003$ is illustrative and the mass verdict is conditional on the rat
 \section{Discussion}
 
 The measurement answers a question that masses do not: whether a fixed map between two lattice
-descriptions preserves the evolution of the states it pairs. On the first pair the answer is no, for two
-reasons that the method separates. The leading spectral separation is a known finite-spacing effect in
-the scalar channel. The rotation of the leading direction under the blocking-fixed pairing, and the
+descriptions preserves the evolution of the states it pairs. On the first pair the answer is no, and the
+method separates two features. The fitted scalar masses, which show a known finite-spacing shift,
+reproduce the leading spectral separation within uncertainty. The rotation of the leading direction under the blocking-fixed pairing, and the
 one-sided discrepancy it produces, are properties of the map. The second pair tests whether the first
 shrinks when both lattices scale, and whether the second shrinks with it.
 
@@ -395,9 +401,10 @@ four operators, and statistical errors; the scale ratios come from an interpolat
 \section{Conclusion}
 
 A blocking-fixed correspondence between two lattices, aligned by its polar decomposition, can be tested
-exactly through correlators. On $\beta=5.7$ against $6.054$ it reveals a rotation of the leading window
-direction and a one-sided discrepancy that the spectra hide, beside a spectral separation explained by the
-scalar dip. The one-sided criterion states what such measurements can establish for a gap, and what they
+through its defect, estimated from correlators through an identity exact for vacuum transfer moments. On
+$\beta=5.7$ against $6.054$ it reveals a rotation of the leading window direction and a one-sided
+discrepancy that the spectra hide, beside a spectral separation that the fitted scalar masses reproduce
+within uncertainty. The one-sided criterion states what such measurements can establish for a gap, and what they
 cannot.
 
 \appendix
@@ -407,9 +414,12 @@ cannot.
 \emph{Proposition~\ref{prop:defect}.} Write $Y_i\sqrt{L_i}$ for the polar decomposition of
 $(I-U_iU_i^*)S_iU_i$, with $Y_i$ a partial isometry into the complement of the window that acts
 isometrically on the support of $L_i$. Then $S_fW-WS_c=U_f(K_fV-VK_c)U_c^*+Y_f\sqrt{L_f}VU_c^*-
-U_fV\sqrt{L_c}Y_c^*$. In the systems $(U_f,Y_f)$ and $(U_c,Y_c)$ this is the block matrix shown; it
-annihilates the part of the input space outside the support of $\sqrt{L_c}$ and has range in the
-corresponding output support, so the norms are equal also when the leakage matrices are singular. The
+U_fV\sqrt{L_c}Y_c^*=[U_f\ Y_f]\,B\,[U_c\ Y_c]^*$, with $B$ the block matrix shown. The map
+$(a,b)\mapsto U_ia+Y_ib$ is isometric on $\mathbb C^{n}\oplus\operatorname{supp}L_i$, with $n$ the number of window operators. The block $B$
+annihilates $\{0\}\oplus\ker L_c$, so only second input coordinates in $\operatorname{supp}L_c$ matter;
+its second output coordinate, $\sqrt{L_f}Va$, lies in $\operatorname{supp}L_f$, and its first output
+coordinate is unrestricted, $U_f$ being an isometry. The norms are therefore equal also when the leakage
+matrices are singular. The
 bound follows from the triangle inequality, and the window-input formula from restricting to inputs
 $U_ca$.
 
