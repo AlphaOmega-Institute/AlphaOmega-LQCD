@@ -34,7 +34,11 @@
 # fine transfer matrix implies, q ≥ λ_max(K_f^{-1/2} L_f K_f^{-1/2}); the largest q for which the
 # bound μ = top of [k ℓ; ℓ q] stays below the reference s, with k the fine window top measured
 # directly or inferred from the coarse lattice as λ_max(K_c) + ε₊ (ℓ² = λ_max(L_f)); and μ(q) on
-# the grid for both choices of k. All are computed in every jackknife replicate. Errors: delete-one jackknife over the
+# the grid for both choices of k. Keeping the direction of the one-sided error sharpens the
+# coarse-derived bound: V*K_f V = K_c + D ≤ K_c + D₊, so k ≤ λ_max(K_c + D₊) ≤ λ_max(K_c) + ε₊.
+# Also printed: the angle between the leading eigenvectors of K_c and of V*K_f V, the rotation
+# that the blocking-fixed pairing introduces relative to a pairing in spectral order. All are
+# computed in every jackknife replicate. Errors: delete-one jackknife over the
 # bins of each lattice, the two independent variances added; all α and both variants are
 # computed from the same fine bins, so they are resampled together. When both variants
 # are present, the differences fixed − zero of the mismatch, the bound, the defect, the total
@@ -65,12 +69,17 @@ function window_quantities(Cc, Cf, sref, qgrid)
     kd, kc = eigmax(Hermitian(Kf)), eigmax(Hermitian(Kc)) + εp
     ℓ2 = max(maximum(λf), 0.0)
     s = sref === nothing ? eigmax(Hermitian(Kc)) : sref
+    FD = eigen(Hermitian((V' * Kf * V - Kc + (V' * Kf * V - Kc)') / 2))
+    Dp = FD.vectors * Diagonal(max.(FD.values, 0.0)) * FD.vectors'
+    km = eigmax(Hermitian(Kc + Dp))
+    θ = acosd(min(1.0, abs(dot(eigen(Hermitian(Kc)).vectors[:, end], V' * eigen(Hermitian(Kf)).vectors[:, end]))))
     return vcat(sort(eigvals(Symmetric(Kc)); rev = true), sort(eigvals(Symmetric(Kf)); rev = true),
                 sort(λc), sort(λf),
                 [opnorm(M - I), mis, leak, mis + leak, window_defect(Kf, Lf, Kc, Lc, V),
                  opnorm(M^2 - I), anti, out, tot],
                 [dl[end], dl[1], εp, leakage_q_floor(Kf, Lf), s, q_needed(s, kd, ℓ2), q_needed(s, kc, ℓ2)],
-                [one_sided_bound(kd, ℓ2, q) for q in qgrid], [one_sided_bound(kc, ℓ2, q) for q in qgrid])
+                [one_sided_bound(kd, ℓ2, q) for q in qgrid], [one_sided_bound(kc, ℓ2, q) for q in qgrid],
+                [θ, km, q_needed(s, km, ℓ2)])
 end
 
 function two_sample_jackknife(f, nc, nf)
@@ -136,7 +145,7 @@ function main(args)
 
     n = length(wlev)
     ng = length(qgrid)
-    per = 4n + 16 + 2ng
+    per = 4n + 19 + 2ng
     paired = variants == ["fixed", "zero"]
     pix = [4n+2, 4n+4, 4n+5, 4n+9, 4n+12]  # mismatch, bound, defect, total departure, ε₊
     function f(ic, jf)
@@ -177,6 +186,10 @@ function main(args)
         line("  q needed, k = coarse top + ε₊", [fmt(est[p+7], err[p+7])])
         line("  μ(q), fine k, q = $(join(qgrid, ", "))", [fmt(est[p+7+j], err[p+7+j]) for j in 1:ng])
         line("  μ(q), coarse k", [fmt(est[p+7+ng+j], err[p+7+ng+j]) for j in 1:ng])
+        o = p + 7 + 2ng
+        line("  angle of leading directions (°)", [@sprintf("%.1f(%.1f)", est[o+1], err[o+1])])
+        line("  k = λ_max(K_c + D₊)", [fmt(est[o+2], err[o+2])])
+        line("  q needed, k = λ_max(K_c + D₊)", [fmt(est[o+3], err[o+3])])
     end
     if paired
         println("\nfixed origin − zero momentum (paired errors: same configurations and bins)")

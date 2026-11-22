@@ -23,6 +23,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 20; centered excitations
     q needed, k = coarse top + ε₊     0.1565(864)
     μ(q), fine k, q = 0.1, 0.2, 0.3   0.1694(164)  0.2434(131)  0.3302(100)
     μ(q), coarse k                    0.3709(114)  0.3855(142)  0.4143(169)
+    angle of leading directions (°)   24.5(2.9)
+    k = λ_max(K_c + D₊)               0.3392(52)
+    q needed, k = λ_max(K_c + D₊)     0.1565(864)
 
 α = 0.0, zero
   eig K_c (coarse lag 1)  0.3392(52)  0.0636(47)
@@ -46,6 +49,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 20; centered excitations
     q needed, k = coarse top + ε₊     -0.2142(2026)
     μ(q), fine k, q = 0.1, 0.2, 0.3   0.2537(138)  0.3050(134)  0.3738(116)
     μ(q), coarse k                    0.4050(119)  0.4249(132)  0.4574(141)
+    angle of leading directions (°)   35.3(1.3)
+    k = λ_max(K_c + D₊)               0.3398(52)
+    q needed, k = λ_max(K_c + D₊)     -0.0681(1088)
 
 α = 0.3, fixed
   eig K_c (coarse lag 1)  0.3392(52)  0.0636(47)
@@ -69,6 +75,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 20; centered excitations
     q needed, k = coarse top + ε₊     -0.0241(1027)
     μ(q), fine k, q = 0.1, 0.2, 0.3   0.2628(138)  0.3095(139)  0.3750(122)
     μ(q), coarse k                    0.3925(107)  0.4125(125)  0.4459(138)
+    angle of leading directions (°)   23.2(1.2)
+    k = λ_max(K_c + D₊)               0.3392(52)
+    q needed, k = λ_max(K_c + D₊)     -0.0241(1027)
 
 α = 0.3, zero
   eig K_c (coarse lag 1)  0.3392(52)  0.0636(47)
@@ -92,6 +101,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 20; centered excitations
     q needed, k = coarse top + ε₊        —   
     μ(q), fine k, q = 0.1, 0.2, 0.3   0.2763(175)  0.3071(205)  0.3626(190)
     μ(q), coarse k                    0.4067(127)  0.4178(154)  0.4395(189)
+    angle of leading directions (°)   25.2(1.0)
+    k = λ_max(K_c + D₊)               0.3453(49)
+    q needed, k = λ_max(K_c + D₊)     0.1212(1190)
 
 α = 0.6, fixed
   eig K_c (coarse lag 1)  0.3392(52)  0.0636(47)
@@ -115,6 +127,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 20; centered excitations
     q needed, k = coarse top + ε₊     -0.1101(1569)
     μ(q), fine k, q = 0.1, 0.2, 0.3   0.2748(138)  0.3172(144)  0.3790(130)
     μ(q), coarse k                    0.3976(114)  0.4165(130)  0.4484(143)
+    angle of leading directions (°)   23.0(1.1)
+    k = λ_max(K_c + D₊)               0.3400(51)
+    q needed, k = λ_max(K_c + D₊)     -0.0175(1047)
 
 α = 0.6, zero
   eig K_c (coarse lag 1)  0.3392(52)  0.0636(47)
@@ -138,6 +153,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 20; centered excitations
     q needed, k = coarse top + ε₊        —   
     μ(q), fine k, q = 0.1, 0.2, 0.3   0.2773(180)  0.3055(219)  0.3594(206)
     μ(q), coarse k                    0.4078(129)  0.4177(158)  0.4374(200)
+    angle of leading directions (°)   24.8(1.0)
+    k = λ_max(K_c + D₊)               0.3464(48)
+    q needed, k = λ_max(K_c + D₊)     0.1462(1227)
 
 fixed origin − zero momentum (paired errors: same configurations and bins)
   α = 0.0   Δ‖K_f V − V K_c‖ 0.0492(36)   Δbound 0.0408(222)   Δdefect 0.0464(63)   Δdeparture 0.0179(58)   Δε₊ -0.0100(59)

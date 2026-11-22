@@ -309,20 +309,42 @@ Window {4, 8} (`window_transfer.jl --mref 0.973`):
   total departure.
 - It also introduces a direction in which the fine evolution decays more slowly than the coarse one:
   ε₊ = 0.045(6) and 0.040(6) with zero momentum at α = 0.6 and 0.3, against 0.008(6) and 0 with the fixed
-  origin. For a lower bound on the fine gap, the one-sided criterion, the fixed-origin map is the better
-  one. This is a second axis on which the recipes rank in opposite order, after near-neutrality against
-  near-invariance.
+  origin, a second axis on which the recipes rank in opposite order. Which map is better for a gap
+  certificate depends on ε₊ and the leakage together (see the matrix-form bound below): the zero-momentum
+  map has the larger one-sided error but half the fine leakage (0.007 against 0.015), and neither ranking
+  is settled by these errors.
 - Certificate. With the fine window measured directly, a fine gap at least the coarse reference
-  (s = e^{−0.973}) needs q ≤ 0.30–0.33 for every recipe, above the positivity floors (0.05–0.24, noisy).
-  With the fine window inferred from the coarse lattice no q suffices for any recipe: the coarse top
-  0.339, plus ε₊, plus the leakage term leaves no room below s = 0.378.
+  (s = e^{−0.973}) needs q between 0.2985 and 0.3521 depending on the recipe, above the positivity floors
+  (0.05–0.24, noisy). With the fine window inferred from the coarse lattice through the scalar bound
+  λ_max(K_c) + ε₊ no q suffices for any recipe; the matrix form below changes that.
 - The best symmetric defect, 0.203(13), is 2.2 errors below the provisional scale 0.23 (within one error
   in the pilot); the symmetric defect is not the quantity a lower bound needs.
 - With paired errors the reversal in ε₊ is decisive: fixed origin − zero momentum = −0.0369(27) at
   α = 0.6 and −0.0401(57) at α = 0.3.
 
-Checks. Bins of 20 and 50 change no central value and enlarge the errors by at most about 8% (at
-α = 0.6, zero momentum: mismatch 0.0060 → 0.0065, defect 0.0125 → 0.0132, ε₊ 0.0057 → 0.0059). The
+What the blocking map shows beyond the spectra. In the primary window both fine eigenvalues lie below
+their coarse partners (0.2360 and 0.0459 against 0.3392 and 0.0636): pairing the eigenvectors in
+spectral order gives ε₊ = 0 exactly. Pairing the operators as blocking prescribes gives ε₊ = 0.045(6),
+because the leading direction of V*K_f V is rotated by 24.8(1.0)° from that of K_c (23.0(1.1)° for the
+fixed origin, 25.2(1.0)° for α = 0.3 with zero momentum). The physical pairing reveals a slower-decaying
+direction that a comparison of spectra cannot. Keeping the direction of the error also sharpens the
+coarse-derived bound: since V*K_f V = K_c + D ≤ K_c + D₊, k ≤ λ_max(K_c + D₊) = 0.3464(45), below the
+reference s = 0.378, against the scalar λ_max(K_c) + ε₊ = 0.384. With the measured leakage the sufficient
+ceiling becomes q ≤ 0.146(125) (zero momentum, α = 0.6), and −0.017(102), no room, for the fixed origin,
+whose leakage is twice as large. Part of the earlier conclusion that coarse information leaves no room
+came from replacing a matrix by its norm; for Corollary 3 this suggests carrying the defects from rung
+to rung as operator inequalities rather than as norms.
+
+The scalar dip and the leading separation. The correlated fits predict single-state decay factors
+e^{−0.969} = 0.380 and e^{−1.310} = 0.270 over the matched interval, a difference of 0.110; the leading
+window eigenvalues differ by 0.103. The finite-spacing shift of the scalar mass accounts for that leading
+separation; the full symmetric mismatch (0.166) and the defect (which includes leakage and the rotation
+above) are not attributed to it.
+
+Checks. Bins of 20 and 50 change no central value. The headline quantities of the primary recipe grow
+by at most about 8% (at α = 0.6, zero momentum: mismatch 0.0060 → 0.0065, defect 0.0125 → 0.0132, ε₊
+0.0057 → 0.0059); across the full output the largest growth is 23% (the paired departure difference at
+α = 0, 0.0056 → 0.0069). The
 window {4, 8, 16, 24} gives the same picture: mismatch 0.166(6), defect 0.197(13), and ε₊ = 0.056(6)
 with zero momentum at both α against 0.014(6) (α = 0.6) and 0.007(5) (α = 0.3) with the fixed origin.
 Its third and fourth fine eigenvalues exceed the coarse ones (0.035 against 0.024, 0.014 against 0.005),
@@ -342,6 +364,36 @@ fine t = 4 against coarse t = 2 (α = 0.6, zero momentum); 0.180(30) and 0.141(8
 fitted fine mass agrees with the benchmark (about 0.645). With the first interval removed the
 difference keeps its central value at lower significance. The fixed-origin correlators fit a single
 cosh less well (χ²/dof 2.2–3.7).
+
+## Next pair: β = 6.054 against β = 6.546 (prediction written before the run)
+
+A factor 2 from β = 6.054 under the same scale prescription is β = 6.546 (a(6.054)/a(6.546) = 1.9997).
+Plan: the coarse side is a new, independent β = 6.054 ensemble on 16³ × 32 measured unblocked
+(`examples/glueball.jl`, stout levels 4, 8, 16, 24, Wilson loops at level 16); the fine side is β = 6.546
+on 32³ × 64 blocked once to 16³ × 64 (`examples/blocked_glueball.jl`, α = 0.3, 0.6, eight origins, the same
+stout levels, 8 sweeps between measurements because autocorrelations grow at finer spacing). Both boxes
+have the same physical size, L√σ ≈ 3.2, as the first pair.
+
+Prediction. Published Wilson-action masses (Athenodorou and Teper) give m₀/√σ ≈ 3.27 at β = 6.0625 and,
+extrapolated, about 3.36 at β = 6.546, so in units of the β = 6.054 spacing the two scalar masses are
+about 0.655 (our fit) and 0.649: pure ground-state decay factors over one coarse step differ by about
+0.003, against 0.110 for the first pair. If the scalar dip drives the leading separation of the first
+pair, then on this pair
+- the leading window eigenvalues should agree to within about 0.03 (first pair: 0.103), and
+- the matched-interval mass difference should be consistent with zero, below about 5% of the mass
+  (first pair: 36%).
+No prediction is made for the alignment angle (24.8° on the first pair), the one-sided error ε₊ or the
+leakage; whether they shrink with the spectral separation is the open question this run is for.
+
+Commands (time each first with a few configurations):
+
+    julia --project=lattice -t 12 lattice/examples/glueball.jl --beta 6.054 --L 16 --T 32 --therm 500 \
+          --confs 3000 --skip 4 --levels 4,8,16,24 --wlevel 16 --rmax 6 --tmax 8 --seed 60540 > coarse_b6054.txt
+    julia --project=lattice -t 12 lattice/examples/blocked_glueball.jl --beta 6.546 --L 32 --T 64 \
+          --therm 1000 --skip 8 --alphas 0.3,0.6 --levels 4,8,16,24 --seed 6546 --confs 1000 \
+          --out fine_b6546.txt --checkpoint fine_b6546.ckpt
+    julia --project=lattice lattice/examples/window_transfer.jl coarse_b6054.txt fine_b6546.txt \
+          --window 4,8 --mref <coarse mass over one coarse step>
 
 ## One-sided bound
 
@@ -541,7 +593,8 @@ near-invariance is what told us to measure the two apart.
 
 ## Points for review, most important first
 
-Newest: the full run ("Full run at β = 6.054"): the persistence of the mass difference over
+Newest: the prediction for the next pair ("Next pair"), and in the full run the alignment angle and
+the matrix-form bound. Before that: the full run ("Full run at β = 6.054"): the persistence of the mass difference over
 matched intervals and in correlated fits, the one-sided reversal between the recipes with paired
 errors, the bin-size and four-level checks, and the data in `lattice/results/`. Before that: the one-sided bound ("One-sided bound"): the 2 × 2 lemma, the positivity floor on q, the q
 needed for a reference gap, and what a vacuum argument would have to supply. Before that: the pilot results at β = 6.054 ("Pilot at β = 6.054"): the spectral reading of the mismatch,
