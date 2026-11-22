@@ -543,7 +543,10 @@ readings of the printed numbers (`graph_departure`; all checked on exact models 
 
 Control: comparing the coarse ensemble with itself (levels 4, 8; V = I) gives 0 into the anti-aligned
 graph and 0.122 both out of the windows and in total, the square root of the largest coarse leakage
-eigenvalue 0.0149. So a total departure near 0.12 can coexist with perfect agreement; disagreement
+eigenvalue 0.0149. The defect and the disagreement over window inputs are also 0.122 in this comparison: with
+D = 0 the window-input disagreement is λ_max(V*L_f V)^{1/2}, the fine evolution leaving the window, which
+for the primary recipe of the first pair would be 0.086(22) on its own. So a total departure, a defect or
+a window-input disagreement near 0.12 can coexist with perfect agreement; disagreement
 inside the window is read from ‖K_f V − V K_c‖, whose pilot-size noise reference is 0.024 (0.012 for the
 anti-aligned amplitude, its half). These are reference values, not calibrated thresholds for the fine
 ensemble.

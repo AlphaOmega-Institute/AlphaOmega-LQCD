@@ -134,7 +134,10 @@ to inputs in the coarse window the disagreement is
 \begin{equation}
  \|(S_fW-WS_c)U_c\|=\lmax\bigl(D^*D+V^*L_fV\bigr)^{1/2},
 \end{equation}
-which is at most the defect. The proof (Appendix~\ref{app:proofs}) uses the polar decompositions of the
+which is at most the defect. Neither maximization vanishes for an exact correspondence of windows that
+leak: with $D=0$ the window-input disagreement is $\lmax(V^*L_fV)^{1/2}$, from the part of the fine
+evolution that leaves the fine window, which $W$ cannot supply. Disagreement inside the windows is
+measured by $D$. The proof (Appendix~\ref{app:proofs}) uses the polar decompositions of the
 leakage maps $(I-U_iU_i^*)S_iU_i$. Three quantities have distinct meanings, though their norms do not add. The minimum
 of $\|V'^*K_fV'-K_c\|$ over all unitary $V'$ is the largest difference between matched sorted eigenvalues
 of $K_f$ and $K_c$ \cite{Bhatia}, a floor set by the spectra. The alignment $V$ selected by blocking gives
@@ -295,7 +298,8 @@ $\alpha$, blocking & $\|M-I\|$ & $\|K_fV-VK_c\|$ & floor & window inputs & defec
 \caption{Window $\{4,8\}$ at one coarse step. ``Floor'': the minimum mismatch over alignments;
 ``window inputs'': the disagreement maximized over coarse-window states; ``defect'': maximized over all
 coarse states; ``departure'': $\|(I-P_+)SP_+\|$ for the aligned graph; $\eps_+$: the positive part of
-$\lmax(V^*K_fV-K_c)$. The coarse window compared with itself gives a departure of $0.122$.}
+$\lmax(V^*K_fV-K_c)$. The coarse window compared with itself gives $0.122$ for the window-input disagreement, the defect
+and the departure alike, all of it leakage.}
 \label{tab:window}
 \end{table}
 
@@ -306,7 +310,10 @@ $\{4,8,16,24\}$ gives the same picture (mismatch $0.166(6)$, disagreement over w
 defect $0.197(13)$). Allowing all coarse inputs increases the maximum disagreement by about $0.02$ for
 each recipe. That is the increase of the maximum when the restriction on inputs is lifted, not the size
 of the disagreement for external inputs: for inputs lying entirely outside the coarse window the maximum
-disagreement is $\sqrt{\|L_c\|}$, which is $0.122(17)$ on the primary recipe.
+disagreement is $\sqrt{\|L_c\|}$, which is $0.122(17)$ on the primary recipe. Leakage enters even when
+the windows agree: the coarse window compared with itself gives $0.122(17)$ for both maximizations, and on
+the primary recipe the fine leakage alone, with $D=0$, would give $0.086(22)$ over window inputs.
+Disagreement inside the windows is read from the in-window mismatch.
 
 \subsection{What the blocking map shows beyond the spectra}
 
@@ -440,10 +447,50 @@ monotone, and $\gamma=s-q$ gives the window test.
 
 \section{The doubled space}\label{app:doubled}
 
-[To be written from the review guide: the polar reflection and its graphs, the identity
-$\|[S,R]\|=\|S_fW-WS_c\|$, the Krein square of the raw graph, and the transfer of the aligned graph into
-the anti-aligned graph ($\tfrac12\|K_c-V^*K_fV\|$) and out of the windows
-($\lmax(\tfrac12(L_c+V^*L_fV))^{1/2}$).]
+Write $P_c=U_cU_c^*$, $P_f=U_fU_f^*$ and $P_w=P_c\oplus P_f$. Since $V$ is unitary, $W^*W=P_c$ and
+$WW^*=P_f$, so $R^2=P_w$: $R$ is an involution on the two windows and vanishes on their complements. Its
+$\pm1$ eigenspaces are the graphs $\Gamma_\pm=\{(x,\pm Wx):x\in\operatorname{Ran}U_c\}$, with projections
+\[
+ P_\pm=\tfrac12(P_w\pm R)=\tfrac12\begin{pmatrix}P_c&\pm W^*\\ \pm W&P_f\end{pmatrix}.
+\]
+
+\emph{Commutators.} With $X=S_fW-WS_c$ and $S$ self-adjoint, $[S,R]=\begin{psmallmatrix}0&-X^*\\X&0
+\end{psmallmatrix}$, so $\|[S,R]\|=\|X\|$. The departure of the aligned graph is
+$\|(I-P_+)SP_+\|=\|[S,P_+]\|$, and $\|[S,P_w]\|=\max(\|L_c\|,\|L_f\|)^{1/2}=:\lambda_L$ is the leakage term of
+Proposition~\ref{prop:defect}. Because $R=2P_+-P_w$, $[S,R]=2[S,P_+]-[S,P_w]$, so
+\[
+ \|[S,P_+]\|\le\tfrac12\bigl(\|X\|+\lambda_L\bigr),\qquad \|X\|\le2\|[S,P_+]\|+\lambda_L .
+\]
+The defect and the departure are different commutators, which bound each other only up to the leakage
+term; on the primary recipe of the first pair they are $0.203$ and $0.126$, with $\lambda_L=0.122$.
+
+\emph{Transfer of the aligned graph.} For a unit vector $g=2^{-1/2}(U_ca,U_fVa)$ of $\Gamma_+$, with
+$D'=K_c-V^*K_fV$,
+\[
+ P_-Sg=2^{-3/2}\bigl(U_cD'a,\,-U_fVD'a\bigr),\qquad
+ (I-P_w)Sg=2^{-1/2}\bigl(Y_c\sqrt{L_c}\,a,\,Y_f\sqrt{L_f}\,Va\bigr),
+\]
+while $\langle g,Sg\rangle=\tfrac12\langle a,(K_c+V^*K_fV)a\rangle$: the graph's own evolution is the
+average of the two compressions. Since $I-P_+=P_-+(I-P_w)$ and the two transfers have orthogonal ranges,
+\begin{gather*}
+ \|P_-SP_+\|=\tfrac12\|D'\|,\qquad \|(I-P_w)SP_+\|=\lmax\bigl(\tfrac12(L_c+V^*L_fV)\bigr)^{1/2},\\
+ \|(I-P_+)SP_+\|=\lmax\bigl(\tfrac14D'^2+\tfrac12(L_c+V^*L_fV)\bigr)^{1/2}.
+\end{gather*}
+For the coarse window compared with itself ($V=I$, $D'=0$) the departure, the defect and the
+window-input disagreement all equal $\|L_c\|^{1/2}$, $0.122(17)$ on the first pair.
+
+\emph{Krein square of the raw graph.} In orthonormal window coordinates the correspondence induced by
+blocking is $A=G_f^{1/2}G_c^{-1/2}=VM$ with $M=(A^*A)^{1/2}$. For the form $J=\operatorname{diag}(I,-I)$,
+coarse first, its graph $\{(U_cx,U_fAx)\}$ has $[g,g]_J=\|x\|^2-\|Ax\|^2=\langle x,(I-M^2)x\rangle$, whose
+largest absolute value over unit $x$ is $\|M^2-I\|$. The graph is neutral exactly when $A$ is isometric.
+The polar graph $\Gamma_+$ is neutral by construction, and $\|M-I\|$, the largest deviation of a singular
+value of $A$ from one, measures how much the alignment had to renormalize. On the primary recipe
+$\|M-I\|=0.246(4)$ and $\|M^2-I\|=0.432(5)$, both set by the smallest singular value, $0.754$ (the other is $0.861$).
+
+\emph{Conventions.} Replacing $W$ by $-W$ exchanges $\Gamma_+$ and $\Gamma_-$ and leaves every quantity
+above unchanged, since $D'$, $L_c$, $L_f$ and $\|X\|$ are even in $V$: the measurements test the pairing,
+not a relative sign between the two descriptions. And an exact pairing, $X=0$, is compatible with an
+arbitrarily small fine gap, as the decoupled eigenstate of the Discussion shows.
 
 \section{Data, code and reproduction}\label{app:data}
 
