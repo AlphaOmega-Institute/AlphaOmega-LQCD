@@ -576,11 +576,33 @@ end
         @test anti ≈ opnorm(Kf * V - V * Kc) / 2 rtol = 1e-8
         @test out ≈ opnorm((I - Pw) * S * Gp) rtol = 1e-7 atol = 1e-9
         @test tot ≈ opnorm((I - Pp) * S * Gp) rtol = 1e-8
-        # raw correspondence A = V M: largest change of length, and largest Krein square of its graph
+        # raw correspondence A = V M: largest change of length, and largest absolute Krein square
+        # ‖x‖² − ‖Ax‖² of its graph {(x, Ax)} for unit x
         A = V * M
         x = svd(M).V
         @test opnorm(M - I) ≈ maximum(abs(norm(A * x[:, j]) - 1) for j in 1:k) rtol = 1e-10
         @test opnorm(M^2 - I) ≈ opnorm(A' * A - I) rtol = 1e-10
+    end
+    # complex Hermitian windows: the formalism allows them (lattice correlators are real)
+    hpsd(n) = (A = randn(rng, ComplexF64, n, n); M = A * A'; Matrix(Hermitian(M / opnorm(M))))
+    frame(n, k) = Matrix(qr(randn(rng, ComplexF64, n, k)).Q)[:, 1:k]
+    for _ in 1:20
+        nf, nc, k = 7, 5, 2
+        Sf, Sc = hpsd(nf), hpsd(nc)
+        Uf, Uc, V = frame(nf, k), frame(nc, k), frame(k, k)
+        Kf, Kc = Uf' * Sf * Uf, Uc' * Sc * Uc
+        Lf, Lc = Uf' * Sf^2 * Uf - Kf^2, Uc' * Sc^2 * Uc - Kc^2
+        W = Uf * V * Uc'
+        S = [Sc zeros(nc, nf); zeros(nf, nc) Sf]
+        R = [zeros(nc, nc) W'; W zeros(nf, nf)]
+        Gp, Gm = [Uc; Uf * V] / sqrt(2), [Uc; -Uf * V] / sqrt(2)
+        Pw = [Uc * Uc' zeros(nc, nf); zeros(nf, nc) Uf * Uf']
+        anti, out, tot = graph_departure(Kf, Lf, Kc, Lc, V)
+        @test anti ≈ opnorm(Gm' * S * Gp) rtol = 1e-8
+        @test out ≈ opnorm((I - Pw) * S * Gp) rtol = 1e-7
+        @test tot ≈ opnorm((I - Gp * Gp') * S * Gp) rtol = 1e-8
+        @test window_defect(Kf, Lf, Kc, Lc, V) ≈ opnorm(Sf * W - W * Sc) rtol = 1e-8
+        @test opnorm(S * R - R * S) ≈ opnorm(Sf * W - W * Sc) rtol = 1e-10
     end
 end
 

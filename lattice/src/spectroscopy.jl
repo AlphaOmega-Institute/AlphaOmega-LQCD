@@ -251,12 +251,12 @@ end
 
 _herm(A) = (A + A') / 2
 function _invsqrt(G)
-    F = eigen(Symmetric(_herm(G)))
+    F = eigen(Hermitian(_herm(G)))
     minimum(F.values) > 0 || throw(DomainError(minimum(F.values), "Gram matrix not positive definite"))
     return F.vectors * Diagonal(1 ./ sqrt.(F.values)) * F.vectors'
 end
 function _sqrtm(G)
-    F = eigen(Symmetric(_herm(G)))
+    F = eigen(Hermitian(_herm(G)))
     return F.vectors * Diagonal(sqrt.(max.(F.values, 0.0))) * F.vectors'
 end
 
@@ -298,7 +298,7 @@ Right side of Proposition 6: ‖Kf V − V Kc‖ + max(‖Lf‖, ‖Lc‖)^{1/2}
 leakage eigenvalues (noise) treated as zero.
 """
 window_defect_bound(Kf, Lf, Kc, Lc, V) =
-    opnorm(Kf * V - V * Kc) + sqrt(max(eigmax(Symmetric(_herm(Lf))), eigmax(Symmetric(_herm(Lc))), 0.0))
+    opnorm(Kf * V - V * Kc) + sqrt(max(eigmax(Hermitian(_herm(Lf))), eigmax(Hermitian(_herm(Lc))), 0.0))
 
 """
     window_defect(Kf, Lf, Kc, Lc, V)
@@ -309,13 +309,13 @@ the polar decompositions of the two leakage maps (I − P_i) S_i U_i = Y_i √L_
 most `window_defect_bound`. Negative leakage eigenvalues (noise) are set to zero.
 """
 function window_defect(Kf, Lf, Kc, Lc, V)
-    psqrt(L) = (F = eigen(Symmetric(_herm(L))); F.vectors * Diagonal(sqrt.(max.(F.values, 0.0))) * F.vectors')
+    psqrt(L) = (F = eigen(Hermitian(_herm(L))); F.vectors * Diagonal(sqrt.(max.(F.values, 0.0))) * F.vectors')
     n = size(Kf, 1)
     D = Kf * V - V * Kc
     return opnorm([D (-V * psqrt(Lc)); (psqrt(Lf) * V) zeros(n, n)])
 end
 
-_ppart(L) = (F = eigen(Symmetric(_herm(L))); F.vectors * Diagonal(max.(F.values, 0.0)) * F.vectors')
+_ppart(L) = (F = eigen(Hermitian(_herm(L))); F.vectors * Diagonal(max.(F.values, 0.0)) * F.vectors')
 
 """
     graph_departure(Kf, Lf, Kc, Lc, V) -> (antialigned, outside, total)
@@ -335,8 +335,8 @@ function graph_departure(Kf, Lf, Kc, Lc, V)
     D = Kc - V' * Kf * V
     Lsum = (_ppart(Lc) + V' * _ppart(Lf) * V) / 2
     antialigned = opnorm(D) / 2
-    outside = sqrt(max(eigmax(Symmetric(_herm(Lsum))), 0.0))
-    total = sqrt(max(eigmax(Symmetric(_herm(D' * D / 4 + Lsum))), 0.0))
+    outside = sqrt(max(eigmax(Hermitian(_herm(Lsum))), 0.0))
+    total = sqrt(max(eigmax(Hermitian(_herm(D' * D / 4 + Lsum))), 0.0))
     return antialigned, outside, total
 end
 

@@ -18,7 +18,8 @@
 # G_f^{1/2} G_c^{-1/2}), the normalization mismatch ‖M − I‖, the in-window mismatch
 # ‖K_f V − V K_c‖, the larger leakage, the bound of Proposition 6, and the defect itself
 # (`window_defect`). It then reads the window map in the doubled space H_c ⊕ H_f
-# (`graph_departure`): the Krein square ‖M² − I‖ of the raw correspondence's graph, and
+# (`graph_departure`): ‖M² − I‖, the largest absolute Krein square (squared-length imbalance)
+# of the raw correspondence's graph, and
 # how far one step of evolution carries the aligned graph of V into the anti-aligned graph
 # (half the in-window mismatch) and out of both windows, and in total. The operators are
 # centered (vacuum expectation subtracted) on each lattice, so the map compared is the one
@@ -141,7 +142,7 @@ function main(args)
         end
         for label in ("‖M − I‖ (normalization)", "‖K_f V − V K_c‖", "max leakage^{1/2}",
                       "bound (Proposition 6)", "defect (window_defect)",
-                      "Krein square ‖M² − I‖", "graph: to anti-aligned", "graph: out of windows",
+                      "|Krein square| ‖M² − I‖", "graph: to anti-aligned", "graph: out of windows",
                       "graph: total departure")
             p += 1
             println(@sprintf("  %-24s %s", label, fmt(est[p], err[p])))

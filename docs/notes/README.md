@@ -17,11 +17,12 @@ mass gap. Three pieces of work belong together:
    construct those maps; that is the renormalization-group problem itself.
 3. `lattice/`: glueball spectroscopy in four-dimensional SU(3), measuring the lattice counterparts of
    the note's quantities. The state a smeared operator creates is a one-dimensional presentation of the
-   glueball, and its ground-state fraction f bounds the defect: δ ≳ (E₁ − E₀)·√(1/f − 1).
+   glueball; if the rest of the channel lies at least g above the glueball, its ground-state fraction f
+   bounds the defect from below, sharply: δ ≥ g·√(f(1 − f)) (Remark 5).
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 2814 tests
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 2914 tests
     julia --project=lattice lattice/test/runner_checks.jl              # the fine-run program, 19 checks
     julia docs/notes/check_spectral_transfer.jl                        # 6563 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
@@ -184,8 +185,9 @@ with the operation that exchanges each matched coarse description with its fine 
 readings of the printed numbers (`graph_departure`; all checked on exact models in the tests):
 
 - Normalization. For the raw correspondence A = V M induced by blocking, ‖M − I‖ is the largest change
-  of length of a unit coarse window vector, and ‖M² − I‖ the largest Krein square ‖Ax‖² − ‖x‖² of the
-  raw graph (form J = diag(I, −I)). Both vanish exactly when the raw map is isometric on the window; the
+  of length of a unit coarse window vector, and ‖M² − I‖ the largest absolute imbalance of squared
+  lengths, |‖x‖² − ‖Ax‖²| for unit x: the largest absolute Krein square of the raw graph {(x, Ax)} with
+  J = diag(I, −I), coarse first. Both vanish exactly when the raw map is isometric on the window; the
   polar graph is neutral by construction, and these numbers say how much normalization had to change.
 - Evolution. One step of S carries the aligned graph partly into the anti-aligned graph, with amplitude
   ‖P₋SP₊‖ = ‖K_c − V*K_f V‖/2, half the in-window mismatch, and partly out of both windows, with
@@ -193,11 +195,23 @@ readings of the printed numbers (`graph_departure`; all checked on exact models 
   two. A small in-window part with an appreciable outside part says the two descriptions agree on what
   the chosen operators retain while the operators miss part of the evolution.
 
+Control: comparing the coarse ensemble with itself (levels 4, 8; V = I) gives 0 into the anti-aligned
+graph and 0.122 both out of the windows and in total, the square root of the largest coarse leakage
+eigenvalue 0.0149. So a total departure near 0.12 can coexist with perfect agreement; disagreement
+inside the window is read from ‖K_f V − V K_c‖, whose pilot-size noise reference is 0.024 (0.012 for the
+anti-aligned amplitude, its half). These are reference values, not calibrated thresholds for the fine
+ensemble.
+
 Two cautions. Centering an operator, O → O − ⟨O⟩, removes the vacuum component of the state it creates;
 it is not the choice of the zero of energy, which the normalized correlators fix (they measure T/λ₀).
 The relative phase of the graph is a free choice in the doubled description: nothing in these runs
 prepares or detects it across lattices; what they test is whether the two descriptions stay paired
-under evolution. And pairing alone does not bound the fine gap: with coarse energies 0, 1 and fine
+under evolution. At finite periodic time extent the ensemble correlators are thermal traces, and
+reading them as vacuum matrix elements assumes vacuum dominance. Even one level gives an apparent
+leakage from the backward term: C(t) ∝ r^t + r^{N_t − t} with am = 0.967 and N_t = 16 gives √L ≈ 0.001
+at coarse lag 1, and the same at fine lag 2 with N_t = 32, the physical times being matched. This
+illustrates the scale; it does not bound every thermal contribution. And pairing alone does not bound
+the fine gap: with coarse energies 0, 1 and fine
 energies 0, 1, ε, pairing the first two levels exactly gives a neutral graph that commutes with
 evolution while the fine gap is ε. The omitted level is invisible to every comparison inside the
 window, which is why Propositions 1 and 2 need the omitted energy Λ, the bottom of the fine Hamiltonian
@@ -218,22 +232,22 @@ D.5 conclude Δ₀ − Σε_j > 0 from the convergence of the sum, which needs t
 addition; Corollary 3 requires such a margin uniformly as the finest spacing shrinks. The proof of
 Theorem 11.1 uses the lower operator bound (11.3) as an upper bound in (11.5).
 
-Parts of the measurement have precedents. The leakage matrix L = U*S²U − (U*SU)² of one lattice is,
+Parts of the measurement have precedents, two of them closest. Identifications between different
+Hilbert spaces that control spectra are the subject of quasi-unitary equivalence (O. Post, Spectral
+Analysis on Graph-like Spaces, Lecture Notes in Math. 2039, 2012; Post and Simmer, arXiv:2503.22611):
+‖M − I‖ and the window defect play the roles of near-unitarity and approximate intertwining there, and
+a detailed comparison is still to be made. The leakage matrix L = U*S²U − (U*SU)² of one lattice is,
 with the symmetric normalization β₁ = γ₁ = C(0)^{1/2}, the residual Δ₂ = A₁(2) − α₁α₁ after the first
 block-Lanczos iteration of Hackett and Wagman (Phys. Rev. D 112, 014514, 2025; arXiv:2412.04444,
 Eq. 21), used there for spectroscopy on one lattice; here one such matrix enters on each side of a
-blocking map. Two-lattice Monte Carlo renormalization group matching, a method of the 1980s, has been
+blocking map fixed by the physics. Two-lattice Monte Carlo renormalization group matching, a method of the 1980s, has been
 applied to SU(3) gauge theories (A. Hasenfratz, arXiv:0907.0919). The intertwining relation
 S_f W = W S_c has the form of the exact lumpability condition QC = Cq for Markov chains, whose
 approximate versions measure how far a coarse map preserves the dynamics (e.g. Ward, Timár and Simon,
 arXiv:2508.16304). Lang, Liegener and Thiemann (Hamiltonian renormalisation I–IX, arXiv:1711.05685 and
 sequels) derive the compression of the semigroup to the coarse space that blocking induces through
 Osterwalder–Schrader reconstruction, and when the embedded space is invariant; their work is analytic,
-for free and solvable models. Identifications between different Hilbert spaces that control spectra are
-the subject of quasi-unitary equivalence (O. Post, Spectral Analysis on Graph-like Spaces, Lecture
-Notes in Math. 2039, 2012; Post and Simmer, arXiv:2503.22611): ‖M − I‖ and the window defect play the
-roles of near-unitarity and approximate intertwining there, and a detailed comparison is still to be
-made. Isometric scaling maps between lattice Hilbert spaces with an inductive limit: Morinelli,
+for free and solvable models. Isometric scaling maps between lattice Hilbert spaces with an inductive limit: Morinelli,
 Morsella, Stottmeister and Tanimoto (Commun. Math. Phys. 2021), Stottmeister et al. (Phys. Rev. Lett.
 127, 230601, 2021), Brothier and Stottmeister for 1+1-dimensional Yang–Mills (arXiv:1907.05549).
 Effective transfer matrices on block variables estimated by Monte Carlo, with an overlap measure of
