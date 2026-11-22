@@ -91,7 +91,9 @@ Noise floor of the in-window mismatch (`examples/window_noise_floor.jl`): pairs 
 block-bootstrap resamples of 3000 configurations from this ensemble, whose true mismatch is zero, give an
 apparent mismatch whose 95th percentile is 0.017 for levels 4, 8 and 0.022 for levels 4, 8, 16, 24 (2000
 pairs; the review found the same with 4000). Levels 4 and 8 are the primary window, all four a
-sensitivity check.
+sensitivity check. For the 1000-configuration pilot against the full coarse ensemble (`--size2 1000`)
+the 95th percentile for levels 4 and 8 is 0.024, so a pilot mismatch near 0.02 is consistent with
+noise alone.
 
 The negative eigenvalues of the larger window are noise of the same size as its positive ones. The
 largest eigenvalue of a noisy matrix is also biased upward, so its square root, 0.105(20) or 0.122(17),
@@ -133,11 +135,11 @@ Protecting the measurements (after review of a9dcaad):
 - `su3_project` returns the straight path when det of the polar part is within 10⁻⁸ of −1 in phase,
   where the principal cube root jumps by a center element and roundoff picks the side; a configuration
   built to put a path sum on the cut is now blocked covariantly (without the band 17 of 40 random gauge
-  transformations changed the blocked link by √3 in norm). On 983 040 path sums from thermalized
-  β = 6.054 configurations (8³ × 16), |arg det| stayed below 1.39 at α = 0.3; at α = 0.6 it reached
-  3.02, and 1 in 10⁵ path sums had |arg det| > 2. The band, 2 × 10⁻⁸ wide, should then be entered about
-  10⁻⁴ times among the 1.2 × 10⁹ path sums at α = 0.6 in the whole run. The progress line reports the
-  count of fallbacks.
+  transformations changed the blocked link by √3 in norm). In a sample of 983 040 path sums from
+  thermalized β = 6.054 configurations (8³ × 16) none reached the band: |arg det| stayed below 1.39 at
+  α = 0.3 and below 3.02 at α = 0.6. That does not bound the rate over the 10⁹ path sums of the run;
+  the progress line and the checkpoint carry the count of fallbacks, and a nonzero count means the
+  safeguard was used.
 - `lattice/test/runner_checks.jl` runs the program on small lattices: two hard kills and resumes give
   output byte-identical to an uninterrupted chain; a seed-10 checkpoint is refused on a seed-11 file,
   as are a file with a changed committed row, a truncated file and a conflicting physics option; and
