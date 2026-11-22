@@ -386,10 +386,12 @@ block-Lanczos iteration of Hackett and Wagman (Phys. Rev. D 112, 014514, 2025; a
 Eq. 21), used there for spectroscopy on one lattice; here one such matrix enters on each side of a
 blocking map fixed by the physics. Two-lattice Monte Carlo renormalization group matching, a method of the 1980s, has been
 applied to SU(3) gauge theories (A. Hasenfratz, arXiv:0907.0919). Matching two lattice spacings through
-glueball correlations was itself discussed then, with blocked loop observables preferred because the
-long-distance glueball signal was statistically hard, and with the remark that blocking a fine Wilson
-action need not reproduce a coarse Wilson action (P. B. Mackenzie, Fermilab-Conf-84/048-T, 1984; the
-preprint could not be retrieved from here, so this summary is not checked). The question was seen; the
+glueball correlations was itself considered then: glueball correlation functions or the heavy-quark
+potential could in principle be used, but their long-wavelength properties are statistically hard, so
+blocked loop expectation values were matched instead; and no blocking kernel is expected to lead to
+exactly the Wilson action at finite spacing, since that would make the Wilson action free of
+finite-spacing errors (P. B. Mackenzie, Monte Carlo renormalization group calculations for SU(2)
+lattice gauge theory, FERMILAB-Conf-84/48-T, 1984). The question was seen; the
 aim then was to tune the coarse action, with observables chosen for that. The intertwining relation
 S_f W = W S_c has the form of the lumpability condition QC = Cq for Markov chains, and Ward et al.
 (Commun. Phys., 2022, doi:10.1038/s42005-022-00834-1) measure the failure of approximate lumping by
