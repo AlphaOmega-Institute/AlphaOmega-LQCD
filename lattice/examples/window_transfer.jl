@@ -10,7 +10,8 @@
 #          --window 4,8      stout levels spanning the window (values, not indices)
 #          --bin 10          configurations per bin, on both lattices
 #          --drop 0          fine configurations dropped at the start
-# A file still being written can be analysed: an incomplete last line is dropped.
+# A file still being written can be analysed: only lines ending in a newline are read
+# (`read_measurements`), and every row read is checked.
 # For each blocking parameter α and each variant (fixed origin, zero momentum) the script
 # reports the coarse compression K_c and leakage L_c at coarse lag 1, the fine ones K_f and
 # L_f at fine lag 2, the alignment V induced by the correspondence O ↦ O∘B (polar part of
@@ -19,25 +20,16 @@
 # (`window_defect`). The correlators are vacuum subtracted on each lattice, so the map
 # compared is the one between centered excitations. Errors: delete-one jackknife over the
 # bins of each lattice, the two independent variances added; all α and both variants are
-# computed from the same fine bins, so they are resampled together.
+# computed from the same fine bins, so they are resampled together. When both variants
+# are present, the differences fixed − zero of the mismatch, the bound and the defect are
+# reported for each α with paired errors (same configurations, same bins).
 
 using LatticeYM, Printf, LinearAlgebra
 
 function read_file(path)
-    header = ""
-    rows = Vector{Vector{Float64}}()
-    for line in eachline(path)
-        isempty(strip(line)) && continue
-        startswith(line, "#") ? (header = line) : push!(rows, parse.(Float64, split(line)))
-    end
-    if length(rows) >= 2 && length(rows[end]) != length(rows[end-1])
-        @warn "$path: dropping an incomplete last line (file still being written?)"
-        pop!(rows)
-    end
-    widths = unique(length.(rows))
-    length(widths) == 1 || error("$path: rows of different widths $widths")
-    kv = Dict(split(p, "=")[1] => split(p, "=")[2] for p in split(header[3:end]) if occursin("=", p))
-    return kv, permutedims(reduce(hcat, rows))
+    _, kv, X, dropped = read_measurements(path)
+    dropped && @warn "$path: ignoring an unfinished last line (file still being written?)"
+    return kv, X
 end
 
 binned_products(O, b) = ((P, M) = correlator_products(O); (bin_means(P, b), bin_means(M, b)))
@@ -115,14 +107,24 @@ function main(args)
     end
     nfb = size(fine[1][1], 1)
 
-    f(ic, jf) = vcat([window_quantities(meanC(Pc, Mc, ic), meanC(Pf, Mf, jf)) for (Pf, Mf) in fine]...)
+    n = length(wlev)
+    per = 4n + 5
+    paired = variants == ["fixed", "zero"]
+    function f(ic, jf)
+        q = [window_quantities(meanC(Pc, Mc, ic), meanC(Pf, Mf, jf)) for (Pf, Mf) in fine]
+        v = vcat(q...)
+        if paired                     # fixed − zero: mismatch, bound, defect
+            for ia in eachindex(alphas)
+                append!(v, q[2ia-1][[4n+2, 4n+4, 4n+5]] .- q[2ia][[4n+2, 4n+4, 4n+5]])
+            end
+        end
+        return v
+    end
     est, err = two_sample_jackknife(f, size(Pc, 1), nfb)
 
     println("coarse: β = $(kc["beta"]), $(Lc)³ × $Tc, $(size(Xc, 1)) configurations; ",
             "fine: β = $(kf["beta"]), $(Lf)³ × $Tf blocked to $(Lf ÷ 2)³, $(size(Xf, 1)) configurations")
     println("window: stout levels $wlev (ρ = $(kc["rho"])), bins of $b; centered excitations")
-    n = length(wlev)
-    per = 4n + 5
     for (ia, α) in enumerate(alphas), (iv, var) in enumerate(variants)
         p = ((ia - 1) * length(variants) + (iv - 1)) * per
         println("\nα = $α, $var")
@@ -134,6 +136,14 @@ function main(args)
                       "bound (Proposition 6)", "defect (window_defect)")
             p += 1
             println(@sprintf("  %-24s %s", label, fmt(est[p], err[p])))
+        end
+    end
+    if paired
+        println("\nfixed origin − zero momentum (paired errors: same configurations and bins)")
+        for (ia, α) in enumerate(alphas)
+            p = nvar * per + 3(ia - 1)
+            println("  α = $α   Δ‖K_f V − V K_c‖ ", fmt(est[p+1], err[p+1]), "   Δbound ", fmt(est[p+2], err[p+2]),
+                    "   Δdefect ", fmt(est[p+3], err[p+3]))
         end
     end
 end

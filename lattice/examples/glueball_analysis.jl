@@ -15,18 +15,9 @@
 using LatticeYM, Printf, LinearAlgebra
 
 function read_data(path)
-    header = ""
-    rows = Vector{Vector{Float64}}()
-    for line in eachline(path)
-        isempty(strip(line)) && continue
-        if startswith(line, "#")
-            header = line
-        else
-            push!(rows, parse.(Float64, split(line)))
-        end
-    end
-    kv = Dict(split(p, "=")[1] => split(p, "=")[2] for p in split(header[3:end]) if occursin("=", p))
-    return kv, permutedims(reduce(hcat, rows))
+    _, kv, X, dropped = read_measurements(path)
+    dropped && @warn "$path: ignoring an unfinished last line (file still being written?)"
+    return kv, X
 end
 
 fmt(x, e) = isfinite(x) && isfinite(e) ? @sprintf("%.4f(%s)", x, lpad(round(Int, e * 1e4), 1)) : "   —   "

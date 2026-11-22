@@ -43,7 +43,7 @@ To compare two lattice spacings, block a fine lattice and measure the same opera
 with the coarse data (`docs/notes/spectral_transfer.tex`, Proposition 6):
 
 ```sh
-julia --project=lattice -t auto lattice/examples/blocked_glueball.jl --checkpoint fine.ckpt > fine.txt
+julia --project=lattice -t auto lattice/examples/blocked_glueball.jl --out fine.txt --checkpoint fine.ckpt
 julia --project=lattice lattice/examples/window_transfer.jl data.txt fine.txt --window 4,8
 ```
 
@@ -80,13 +80,20 @@ and the string tension.
 | Stout smearing | Links stay in SU(3); time links unchanged; unit and pure-gauge fields stay so; ρ = 0 is the identity; smearing commutes with random gauge transformations to 1e-12; spatial plaquettes increase |
 | Glueball operators | Slice average equals the spatial plane plaquettes; each smearing level matches direct smearing; gauge invariant |
 | Smeared Wilson loops | `wilson_loops_rt` equals `wilson_loop` averaged over spatial directions; W(1,1) equals the space-time plaquettes; gauge invariant |
-| SU(3) projection | `su3_project` lands in SU(3), fixes SU(3) matrices and their positive multiples, and satisfies su3_project(G A H†) = G su3_project(A) H† to 1e-11; row Gram–Schmidt fails that test |
+| SU(3) projection | `su3_project` lands in SU(3), fixes SU(3) matrices and their positive multiples, and satisfies su3_project(G A H†) = G su3_project(A) H† to 1e-11; row Gram–Schmidt fails that test. When det of the polar part is −1 (the branch cut of the cube root) the fallback is returned for every gauge-equivalent input; with no band the principal root jumps by a center phase (norm √3) between gauge-equivalent inputs; just outside the band the projection is used |
 | Spatial blocking | Halved spatial extents; links in SU(3); α = 0 gives the product of two links; the unit field stays unit; blocking commutes with gauge transformations restricted to coarse sites; operators on blocked fields are gauge invariant |
-| Blocking origins | Each origin maps coarse sites to the right fine sites and is gauge covariant; a one-site translation changes the fixed-origin operator but leaves the eight-origin average unchanged; singular path sums fall back to the straight path |
+| Blocking origins | Each origin maps coarse sites to the right fine sites and is gauge covariant; a one-site translation changes the fixed-origin operator but leaves the eight-origin average unchanged; singular path sums fall back to the straight path; a configuration built to put one path sum on the determinant cut uses the fallback for that link only and is blocked covariantly |
+| Measurement files | `read_measurements` ignores an unfinished last line (an exponent cut short, or a line of full width or ending in a valid number), refuses unparsable tokens, rows of the wrong width, a second header and a missing header; `fnv1a` matches published test vectors and composes over pieces; `file_prefix_hash` equals the hash of the file's first bytes |
 | Operator windows | `window_defect` equals ‖S_f W − W S_c‖ on exact models; `window_compression` reproduces U*SU and U*S(1 − P)SU on exact models, for lag 1 and 2; `induced_alignment` gives the polar factorization; the Proposition 6 bound holds; `ground_state_fractions` is exact for two-state correlators at t₀ = 0, 1, 2, with and without periodic images |
 | Correlator analysis | Effective masses of exact cosh correlators; GEVP recovers both energies of an exact two-state correlator at several (t₀, t); `correlator_matrix` against a direct implementation; binned products reproduce it; the jackknife error of a mean equals the standard error; `transfer_residual` equals ‖(I − P_ψ)Tψ‖ for random positive transfer matrices |
 
 The statistical tests allow 4.5 standard errors, with errors that include autocorrelation.
+
+`lattice/test/runner_checks.jl` (a few minutes) runs `examples/blocked_glueball.jl` itself on small
+lattices: hard kills and resumes reproduce an uninterrupted chain byte for byte; a fresh run will not
+overwrite existing files; a checkpoint is refused on another run's output, on a file with a changed or
+missing committed row, and with a conflicting physics option; and reads of the growing output return
+only rows of the finished file.
 
 To check the tests would catch real mistakes, each of these bugs was planted by hand, and each made the suite fail:
 

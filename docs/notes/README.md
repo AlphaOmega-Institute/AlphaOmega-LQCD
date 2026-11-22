@@ -21,7 +21,8 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 2218 tests
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 2454 tests
+    julia --project=lattice lattice/test/runner_checks.jl              # the fine-run program, 19 checks
     julia docs/notes/check_spectral_transfer.jl                        # 6563 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
     gunzip -k lattice/results/glueball_b570_L8T16.txt.gz           # 3000 configurations, 2.6 MB
@@ -110,14 +111,62 @@ a(5.7)/a(6.054) = 2.0015; 16³ × 32 blocked once to 8³ × 32; blocking paramet
 same configurations; stout levels 4, 8, 16, 24. Each α is measured in two variants: the fixed blocking
 origin, and the zero-momentum projection (operator amplitudes averaged over the eight origins before the
 correlators are formed). Target 3000 configurations, with the first 1000 inspected as a pilot while the
-same chain continues. With `--out`, `--checkpoint` and `--resume`, an interrupted run continues exactly,
-and the output file is first cut back to the checkpoint so that no line is duplicated. The analysis
-drops an incomplete last line, so the file can be analysed while it is being written. Cost: the
+same chain continues. Cost: the
 measurement smears 24 blocked lattices per configuration (3 α × 8 origins) up to 24 stout steps, which
 costs more than the sweeps: 20 s per configuration on the four threads used here while other jobs ran
 (perhaps 13–15 s alone), against 4.5 s for the fixed-origin measurement alone. Time it first on the
 machine that runs it, with `--confs 25`. `--levels 4,8` (the primary window only) roughly halves the
 cost.
+
+Protecting the measurements (after review of a9dcaad):
+
+- A checkpoint, written every 25 configurations and at the last one, records the length of the output
+  written so far and its FNV-1a hash, besides the fields and the random state; the output is flushed
+  and synced to disk first. On `--resume` the output must begin with exactly those bytes (same header,
+  same rows), so a checkpoint cannot be joined to another run's file or to a modified one; anything
+  after them is cut off in place, without rewriting the committed rows, and the run appends. Physics
+  options come from the checkpoint, and any given again must agree. A fresh run refuses to overwrite an
+  existing output or checkpoint file. `--checkpoint` and `--resume` require `--out`.
+- The analysis scripts read only lines ending in a newline (`read_measurements`), check every row read
+  (all tokens numbers, constant width, no second header), and ignore an unfinished last line, so the
+  file can be analysed while it is written. The writer now emits each row in one write.
+- `su3_project` returns the straight path when det of the polar part is within 10⁻⁸ of −1 in phase,
+  where the principal cube root jumps by a center element and roundoff picks the side; a configuration
+  built to put a path sum on the cut is now blocked covariantly (without the band 17 of 40 random gauge
+  transformations changed the blocked link by √3 in norm). On 983 040 path sums from thermalized
+  β = 6.054 configurations (8³ × 16), |arg det| stayed below 1.39 at α = 0.3; at α = 0.6 it reached
+  3.02, and 1 in 10⁵ path sums had |arg det| > 2. The band, 2 × 10⁻⁸ wide, should then be entered about
+  10⁻⁴ times among the 1.2 × 10⁹ path sums at α = 0.6 in the whole run. The progress line reports the
+  count of fallbacks.
+- `lattice/test/runner_checks.jl` runs the program on small lattices: two hard kills and resumes give
+  output byte-identical to an uninterrupted chain; a seed-10 checkpoint is refused on a seed-11 file,
+  as are a file with a changed committed row, a truncated file and a conflicting physics option; and
+  reads of the growing file always return rows of the finished one.
+
+Running it. In a clone, make a separate run directory at the reviewed commit (later updates to the
+branch then do not touch it), time it, run the pilot to a checkpoint boundary, and extend the same
+chain if the pilot warrants it:
+
+    git fetch origin <branch>
+    git worktree add --detach ../lqcd-fine-run <commit>
+    cd ../lqcd-fine-run
+    julia --project=lattice -t N lattice/examples/blocked_glueball.jl --confs 25 --therm 2 > /dev/null
+    caffeinate -i julia --project=lattice -t N lattice/examples/blocked_glueball.jl --confs 1000 \
+          --out fine_b6054.txt --checkpoint fine_b6054.ckpt               # pilot (caffeinate: macOS)
+    caffeinate -i julia --project=lattice -t N lattice/examples/blocked_glueball.jl --confs 3000 \
+          --resume fine_b6054.ckpt --out fine_b6054.txt                   # after an interruption, or to extend
+
+with N the thread count that timed fastest.
+
+Pilot analysis, at any time during the run:
+
+    gunzip -k lattice/results/glueball_b570_L8T16.txt.gz              # once
+    julia --project=lattice lattice/examples/window_transfer.jl lattice/results/glueball_b570_L8T16.txt \
+          fine_b6054.txt --window 4,8
+
+It ends with the fixed-origin minus zero-momentum differences of the mismatch, the bound and the defect
+for each α, with paired errors (same configurations and bins): how much the choice of blocking grid
+changes the conclusion.
 
 ## Status
 
@@ -152,7 +201,11 @@ cost.
 
 ## Points for review, most important first
 
-New in this round:
+Reliability patch (this round): the checkpoint record and resume checks, `read_measurements`, the
+branch-cut band of `su3_project` and its tests, `lattice/test/runner_checks.jl`, and the paired
+fixed − zero differences in `window_transfer.jl`, all described under "Protecting the measurements".
+
+Previous round:
 
 1. Proposition 6 and Remark 7: the bound and the equality for the defect itself, the alignment induced
    by blocking as the polar part of the operator-state correspondence, centered excitations, and the
@@ -164,7 +217,7 @@ New in this round:
 4. `examples/blocked_glueball.jl` and `examples/window_transfer.jl`: the two-ensemble jackknife and the
    use of fine lag 2 against coarse lag 1.
 
-From the previous round:
+Earlier:
 
 1. Propositions 1 and 2 of the note: the proofs, and the windowed form with W = W₀Q.
 2. Corollary 3 and Remark 4: whether the reduction of the gap to summable windowed defects and omitted

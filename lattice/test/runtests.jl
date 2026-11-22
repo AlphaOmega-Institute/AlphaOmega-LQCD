@@ -406,6 +406,102 @@ end
     @test su3_project(A, U) ≈ su3_project(A)                               # fallback unused
 end
 
+@testset "su3_project at the determinant branch cut" begin
+    rng = Xoshiro(76)
+    on(X) = opnorm(Matrix(X))
+    V, F = haar_su3(rng), haar_su3(rng)
+    B = randn(rng, ComplexF64, 3, 3)
+    P = B' * B + I                                       # positive definite
+    A = Mat3(-Matrix(V) * P)                             # polar part −V: det = −1, on the cut
+    n0 = LatticeYM.SU3_FALLBACKS[]
+    @test su3_project(A, F) == F
+    @test LatticeYM.SU3_FALLBACKS[] == n0 + 1
+    @test_throws ArgumentError su3_project(A)
+    # with no band (cut_tol < 0, the principal root always) roundoff picks either cube root,
+    # so gauge-equivalent inputs project to links differing by a center phase, norm √3
+    d = map(1:200) do _
+        G, H = haar_su3(rng), haar_su3(rng)
+        on(G' * su3_project(G * A * H'; cut_tol = -1) * H - su3_project(A; cut_tol = -1))
+    end
+    @test any(x -> abs(x - sqrt(3)) < 1e-9, d) && all(x -> x < 1e-9 || abs(x - sqrt(3)) < 1e-9, d)
+    # with the band every gauge-equivalent input gets the transformed fallback
+    for _ in 1:200
+        G, H = haar_su3(rng), haar_su3(rng)
+        @test on(su3_project(G * A * H', G * F * H') - G * F * H') < 1e-12
+    end
+    # just outside the band the projection is used, and is covariant
+    A2 = Mat3(cis((π - 1e-6) / 3) * Matrix(V) * P)
+    n1 = LatticeYM.SU3_FALLBACKS[]
+    @test on(su3_project(A2, F) - V) < 1e-12
+    G, H = haar_su3(rng), haar_su3(rng)
+    @test on(su3_project(G * A2 * H', G * F * H') - G * V * H') < 1e-11
+    @test LatticeYM.SU3_FALLBACKS[] == n1
+
+    # a lattice configuration with a blocked path sum on the cut, at α = 0.6: unit links except
+    # U_1(x0) = diag(e^{iφ}, e^{0.1i}, e^{−i(φ+0.1)}) and U_2(x0) = U_3(x0) = e^{2πi/3}, so the path
+    # sum of the coarse link (1, x0) is U_1(x0) + 2α e^{iπ/3}; φ solves det(polar part) = −1
+    α = 0.6
+    w = 2α * cis(π / 3)
+    dp(φ) = prod(z -> (z + w) / abs(z + w), (cis(φ), cis(0.1), cis(-φ - 0.1)))
+    a, b = 1.9, 2.1
+    @assert imag(dp(a)) * imag(dp(b)) < 0 && real(dp((a + b) / 2)) < 0
+    for _ in 1:100
+        m = (a + b) / 2
+        imag(dp(a)) * imag(dp(m)) <= 0 ? (b = m) : (a = m)
+    end
+    φ = (a + b) / 2
+    @test abs(dp(φ) + 1) < 1e-14
+    g = cold_start(Lattice((8, 8, 8, 4)))
+    li = LinearIndices(g.lat.dims)
+    x0 = li[1, 1, 1, 1]
+    g.U[1, x0] = Mat3(Matrix(Diagonal([cis(φ), cis(0.1), cis(-φ - 0.1)])))
+    g.U[2, x0] = g.U[3, x0] = cis(2π / 3) * ONE3
+    n2 = LatticeYM.SU3_FALLBACKS[]
+    bl = block_spatial(g, α)
+    @test LatticeYM.SU3_FALLBACKS[] == n2 + 1                 # this one link, and no other
+    @test bl.lat.coords[:, 1] == [1, 1, 1, 1] && bl.U[1, 1] == g.U[1, x0]   # its straight path
+    for _ in 1:10
+        G = [haar_su3(rng) for _ in 1:nsites(g.lat)]
+        gb = block_spatial(gauge_transform!(copy(g), G), α)
+        Gc = [G[li[2bl.lat.coords[1, X] - 1, 2bl.lat.coords[2, X] - 1, 2bl.lat.coords[3, X] - 1, bl.lat.coords[4, X]]]
+              for X in 1:nsites(bl.lat)]
+        bg = gauge_transform!(copy(bl), Gc)
+        @test maximum(maximum(abs, (gb.U[i] - bg.U[i]).e) for i in eachindex(gb.U)) < 1e-11
+    end
+end
+
+@testset "measurement files: complete lines only, every row checked, prefix hash" begin
+    path = joinpath(mktempdir(), "m.txt")
+    head = "# beta=6.0 L=4 levels=1,2"
+    body = head * "\n1.0 2.0 3.0\n4.0 5.0 6.0\n"
+    write(path, body)
+    h, kv, X, dropped = read_measurements(path)
+    @test h == head && kv["beta"] == "6.0" && kv["levels"] == "1,2"
+    @test X == [1.0 2.0 3.0; 4.0 5.0 6.0] && !dropped
+    # a writer caught mid-line: an exponent cut short, or a line that happens to have the
+    # full width or to end in a valid number, is not read
+    for tail in ("7.0 8.0 1.2e-", "7.0 8.0 1.2", "7.0 8.0 9.0 1.2", "7")
+        write(path, body * tail)
+        _, _, X, dropped = read_measurements(path)
+        @test size(X) == (2, 3) && dropped
+    end
+    # every complete row is checked, and two runs joined together are refused
+    for bad in ("4.0 5.0e- 6.0\n7.0 8.0 9.0\n", "4.0 5.0\n7.0 8.0 9.0\n", head * "\n7.0 8.0 9.0\n", "4.0 x 6.0\n")
+        write(path, head * "\n1.0 2.0 3.0\n" * bad)
+        @test_throws ErrorException read_measurements(path)
+    end
+    write(path, "1.0 2.0\n")
+    @test_throws ErrorException read_measurements(path)          # no header
+    # the FNV-1a prefix hash: published test vectors, pieces, and file prefixes
+    @test fnv1a("") == 0xcbf29ce484222325 && fnv1a("a") == 0xaf63dc4c8601ec8c && fnv1a("foobar") == 0x85944171f73967e8
+    write(path, body)
+    bytes = read(path)
+    @test file_prefix_hash(path, length(bytes)) == fnv1a(bytes) == fnv1a(body)
+    @test file_prefix_hash(path, 10) == fnv1a(bytes[1:10])
+    @test fnv1a(bytes[11:end], fnv1a(bytes[1:10])) == fnv1a(bytes)
+    @test_throws ErrorException file_prefix_hash(path, length(bytes) + 1)
+end
+
 @testset "blocking origins and the zero-momentum projection" begin
     g, rng = rough_field((8, 8, 8, 6), 74)
     li = LinearIndices(g.lat.dims)

@@ -77,29 +77,51 @@ function stout_spatial(g::GaugeField, ρ::Real, n::Integer)
 end
 
 """
-    su3_project(A[, fallback]; tol = 1e-10)
+    SU3_FALLBACKS
+
+Number of times `su3_project` has returned its fallback (singular matrix or
+determinant at the branch cut) in this Julia process. Atomic, so it can be read
+during a threaded run.
+"""
+const SU3_FALLBACKS = Threads.Atomic{Int}(0)
+
+function _su3_fallback(fallback, why)
+    fallback === nothing && throw(ArgumentError("su3_project: $why"))
+    Threads.atomic_add!(SU3_FALLBACKS, 1)
+    return fallback
+end
+
+"""
+    su3_project(A[, fallback]; tol = 1e-10, cut_tol = 1e-8)
 
 Project a 3×3 matrix onto SU(3) through its polar decomposition:
-W = A (A†A)^{-1/2}, then W times a cube root of conj(det W). For G, H in SU(3),
+W = A (A†A)^{-1/2}, then W times the principal cube root of conj(det W),
+cis(−θ/3) with θ = angle(det W) ∈ (−π, π]. For G, H in SU(3),
 `su3_project(G A H') = G su3_project(A) H'`, so the projection is covariant at
 both ends of a path. (`reunitarize`, row Gram–Schmidt, is covariant only under
 right multiplication.)
 
-If A is numerically singular (smallest eigenvalue of A†A below `tol` times the
-largest), the polar part is not determined. Then `fallback` is returned, which
-must be an SU(3) matrix transforming like A (for blocking, the straight path);
-without a fallback an ArgumentError is thrown. The test is on the eigenvalue
-ratio, which is gauge invariant, so the choice keeps the projection covariant.
+Two cases have no covariant answer, and there `fallback` is returned, which must be
+an SU(3) matrix transforming like A (for blocking, the straight path); without a
+fallback an ArgumentError is thrown. Each use increments `SU3_FALLBACKS`.
+- A is numerically singular: the smallest eigenvalue of A†A is below `tol` times
+  the largest, so the polar part is not determined.
+- det W is within `cut_tol` of −1 in phase (|θ| ≥ π − cut_tol). There the
+  principal cube root jumps by a center element, e^{∓iπ/3}, and roundoff decides
+  which one is taken, so gauge-equivalent inputs could project to links differing
+  by a center phase.
+Both tests use gauge-invariant quantities (the eigenvalue ratio of A†A, det W), so
+the choice is the same for every gauge-equivalent input up to roundoff, which
+matters only within ~1e-15 of a band edge.
 """
-function su3_project(A::Mat3, fallback::Union{Mat3,Nothing} = nothing; tol::Real = 1e-10)
+function su3_project(A::Mat3, fallback::Union{Mat3,Nothing} = nothing; tol::Real = 1e-10, cut_tol::Real = 1e-8)
     M = Matrix(A)
     F = eigen(Hermitian(M' * M))
-    if !(F.values[1] > tol * F.values[end])
-        fallback === nothing && throw(ArgumentError("su3_project: numerically singular matrix"))
-        return fallback
-    end
+    F.values[1] > tol * F.values[end] || return _su3_fallback(fallback, "numerically singular matrix")
     W = M * F.vectors * Diagonal(1 ./ sqrt.(F.values)) * F.vectors'
-    return Mat3(cis(-angle(det(W)) / 3) * W)
+    θ = angle(det(W))
+    abs(θ) < π - cut_tol || return _su3_fallback(fallback, "det of the polar part is at the branch cut (≈ −1)")
+    return Mat3(cis(-θ / 3) * W)
 end
 
 """

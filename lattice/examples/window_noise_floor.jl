@@ -23,13 +23,8 @@ function main(args)
         opt[key] = args[i+1]
         i += 2
     end
-    header, rows = "", Vector{Vector{Float64}}()
-    for line in eachline(path)
-        isempty(strip(line)) && continue
-        startswith(line, "#") ? (header = line) : push!(rows, parse.(Float64, split(line)))
-    end
-    kv = Dict(split(p, "=")[1] => split(p, "=")[2] for p in split(header[3:end]) if occursin("=", p))
-    X = permutedims(reduce(hcat, rows))
+    _, kv, X, dropped = read_measurements(path)
+    dropped && @warn "$path: ignoring an unfinished last line (file still being written?)"
     levels, T = parse.(Int, split(kv["levels"], ",")), parse(Int, kv["T"])
     wlev = parse.(Int, split(opt["window"], ","))
     w = [findfirst(==(l), levels) for l in wlev]
