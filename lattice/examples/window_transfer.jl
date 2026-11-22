@@ -17,8 +17,12 @@
 # L_f at fine lag 2, the alignment V induced by the correspondence O ↦ O∘B (polar part of
 # G_f^{1/2} G_c^{-1/2}), the normalization mismatch ‖M − I‖, the in-window mismatch
 # ‖K_f V − V K_c‖, the larger leakage, the bound of Proposition 6, and the defect itself
-# (`window_defect`). The correlators are vacuum subtracted on each lattice, so the map
-# compared is the one between centered excitations. Errors: delete-one jackknife over the
+# (`window_defect`). It then reads the window map in the doubled space H_c ⊕ H_f
+# (`graph_departure`): the Krein square ‖M² − I‖ of the raw correspondence's graph, and
+# how far one step of evolution carries the aligned graph of V into the anti-aligned graph
+# (half the in-window mismatch) and out of both windows, and in total. The operators are
+# centered (vacuum expectation subtracted) on each lattice, so the map compared is the one
+# between centered excitations. Errors: delete-one jackknife over the
 # bins of each lattice, the two independent variances added; all α and both variants are
 # computed from the same fine bins, so they are resampled together. When both variants
 # are present, the differences fixed − zero of the mismatch, the bound and the defect are
@@ -43,9 +47,11 @@ function window_quantities(Cc, Cf)
     λc, λf = eigvals(Symmetric(Lc)), eigvals(Symmetric(Lf))
     leak = sqrt(max(maximum(λc), maximum(λf), 0.0))
     mis = opnorm(Kf * V - V * Kc)
+    anti, out, tot = graph_departure(Kf, Lf, Kc, Lc, V)
     return vcat(sort(eigvals(Symmetric(Kc)); rev = true), sort(eigvals(Symmetric(Kf)); rev = true),
                 sort(λc), sort(λf),
-                [opnorm(M - I), mis, leak, mis + leak, window_defect(Kf, Lf, Kc, Lc, V)])
+                [opnorm(M - I), mis, leak, mis + leak, window_defect(Kf, Lf, Kc, Lc, V),
+                 opnorm(M^2 - I), anti, out, tot])
 end
 
 function two_sample_jackknife(f, nc, nf)
@@ -108,14 +114,15 @@ function main(args)
     nfb = size(fine[1][1], 1)
 
     n = length(wlev)
-    per = 4n + 5
+    per = 4n + 9
     paired = variants == ["fixed", "zero"]
+    pix = [4n+2, 4n+4, 4n+5, 4n+9]  # mismatch, bound, defect, total departure from the aligned graph
     function f(ic, jf)
         q = [window_quantities(meanC(Pc, Mc, ic), meanC(Pf, Mf, jf)) for (Pf, Mf) in fine]
         v = vcat(q...)
-        if paired                     # fixed − zero: mismatch, bound, defect
+        if paired                     # fixed − zero
             for ia in eachindex(alphas)
-                append!(v, q[2ia-1][[4n+2, 4n+4, 4n+5]] .- q[2ia][[4n+2, 4n+4, 4n+5]])
+                append!(v, q[2ia-1][pix] .- q[2ia][pix])
             end
         end
         return v
@@ -133,7 +140,9 @@ function main(args)
             p += m
         end
         for label in ("‖M − I‖ (normalization)", "‖K_f V − V K_c‖", "max leakage^{1/2}",
-                      "bound (Proposition 6)", "defect (window_defect)")
+                      "bound (Proposition 6)", "defect (window_defect)",
+                      "Krein square ‖M² − I‖", "graph: to anti-aligned", "graph: out of windows",
+                      "graph: total departure")
             p += 1
             println(@sprintf("  %-24s %s", label, fmt(est[p], err[p])))
         end
@@ -141,9 +150,9 @@ function main(args)
     if paired
         println("\nfixed origin − zero momentum (paired errors: same configurations and bins)")
         for (ia, α) in enumerate(alphas)
-            p = nvar * per + 3(ia - 1)
+            p = nvar * per + length(pix) * (ia - 1)
             println("  α = $α   Δ‖K_f V − V K_c‖ ", fmt(est[p+1], err[p+1]), "   Δbound ", fmt(est[p+2], err[p+2]),
-                    "   Δdefect ", fmt(est[p+3], err[p+3]))
+                    "   Δdefect ", fmt(est[p+3], err[p+3]), "   Δdeparture ", fmt(est[p+4], err[p+4]))
         end
     end
 end

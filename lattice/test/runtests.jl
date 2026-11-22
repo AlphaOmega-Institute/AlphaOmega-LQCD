@@ -547,4 +547,41 @@ end
     end
 end
 
+@testset "the window map in the doubled space: reflection, graphs, normalization" begin
+    rng = Xoshiro(77)
+    psd(n) = (A = randn(rng, n, n); M = A * A'; Symmetric(M / opnorm(M)))
+    isq(G) = (F = eigen(Symmetric(G)); F.vectors * Diagonal(1 ./ sqrt.(F.values)) * F.vectors')
+    for _ in 1:40
+        nf, nc, k, T = 18, 10, rand(rng, 1:4), 10
+        Sf, Sc = psd(nf), psd(nc)
+        F, Cs = randn(rng, nf, k), randn(rng, nc, k)
+        Cf = cat((F' * Sf^t * F for t in 0:T-1)...; dims = 3)
+        Cc = cat((Cs' * Sc^t * Cs for t in 0:T-1)...; dims = 3)
+        Kf, Lf, Gf = window_compression(Cf, 1)
+        Kc, Lc, Gc = window_compression(Cc, 1)
+        V, M = induced_alignment(Gf, Gc)
+        Uf, Uc = F * isq(F' * F), Cs * isq(Cs' * Cs)          # orthonormal window frames
+        W = Uf * V * Uc'
+        # coarse ⊕ fine: doubled evolution and the polar reflection
+        S = [Sc zeros(nc, nf); zeros(nf, nc) Sf]
+        R = [zeros(nc, nc) W'; W zeros(nf, nf)]
+        @test opnorm(S * R - R * S) ≈ opnorm(Sf * W - W * Sc) rtol = 1e-10
+        Gp, Gm = [Uc; Uf * V] / sqrt(2), [Uc; -Uf * V] / sqrt(2)  # aligned and anti-aligned graphs
+        @test R * Gp ≈ Gp && R * Gm ≈ -Gm
+        Pp = Gp * Gp'
+        Pw = [Uc * Uc' zeros(nc, nf); zeros(nf, nc) Uf * Uf']   # both windows = P₊ + P₋
+        @test Pw ≈ Pp + Gm * Gm'
+        anti, out, tot = graph_departure(Kf, Lf, Kc, Lc, V)
+        @test anti ≈ opnorm(Gm' * S * Gp) rtol = 1e-8
+        @test anti ≈ opnorm(Kf * V - V * Kc) / 2 rtol = 1e-8
+        @test out ≈ opnorm((I - Pw) * S * Gp) rtol = 1e-7 atol = 1e-9
+        @test tot ≈ opnorm((I - Pp) * S * Gp) rtol = 1e-8
+        # raw correspondence A = V M: largest change of length, and largest Krein square of its graph
+        A = V * M
+        x = svd(M).V
+        @test opnorm(M - I) ≈ maximum(abs(norm(A * x[:, j]) - 1) for j in 1:k) rtol = 1e-10
+        @test opnorm(M^2 - I) ≈ opnorm(A' * A - I) rtol = 1e-10
+    end
+end
+
 end

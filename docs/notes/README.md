@@ -21,7 +21,7 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 2454 tests
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 2814 tests
     julia --project=lattice lattice/test/runner_checks.jl              # the fine-run program, 19 checks
     julia docs/notes/check_spectral_transfer.jl                        # 6563 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
@@ -166,9 +166,71 @@ Pilot analysis, at any time during the run:
     julia --project=lattice lattice/examples/window_transfer.jl lattice/results/glueball_b570_L8T16.txt \
           fine_b6054.txt --window 4,8
 
-It ends with the fixed-origin minus zero-momentum differences of the mismatch, the bound and the defect
-for each α, with paired errors (same configurations and bins): how much the choice of blocking grid
-changes the conclusion.
+It ends with the fixed-origin minus zero-momentum differences of the mismatch, the bound, the defect and
+the departure from the aligned graph (below) for each α, with paired errors (same configurations and
+bins): how much the choice of blocking grid changes the conclusion.
+
+## The window map in the doubled space
+
+Put the coarse and fine spaces side by side, H_c ⊕ H_f, with the doubled evolution S = S_c ⊕ S_f and,
+for the window map W = U_f V U_c*, the polar reflection R = [0 W*; W 0] of the Universal Model (§3). On
+the matched windows R is an involution; its +1 and −1 eigenspaces are the aligned graph Γ₊ = {(x, Wx)}
+and the anti-aligned graph Γ₋ = {(x, −Wx)}. Multiplying the blocks gives
+
+    ‖[S, R]‖ = ‖S_f W − W S_c‖,
+
+so the defect of Proposition 6 (`window_defect`) measures how far Euclidean evolution fails to commute
+with the operation that exchanges each matched coarse description with its fine partner. Two further
+readings of the printed numbers (`graph_departure`; all checked on exact models in the tests):
+
+- Normalization. For the raw correspondence A = V M induced by blocking, ‖M − I‖ is the largest change
+  of length of a unit coarse window vector, and ‖M² − I‖ the largest Krein square ‖Ax‖² − ‖x‖² of the
+  raw graph (form J = diag(I, −I)). Both vanish exactly when the raw map is isometric on the window; the
+  polar graph is neutral by construction, and these numbers say how much normalization had to change.
+- Evolution. One step of S carries the aligned graph partly into the anti-aligned graph, with amplitude
+  ‖P₋SP₊‖ = ‖K_c − V*K_f V‖/2, half the in-window mismatch, and partly out of both windows, with
+  ‖(I − P_c − P_f)SP₊‖ = λ_max((L_c + V*L_f V)/2)^{1/2}; the total departure ‖(I − P₊)SP₊‖ combines the
+  two. A small in-window part with an appreciable outside part says the two descriptions agree on what
+  the chosen operators retain while the operators miss part of the evolution.
+
+Two cautions. Centering an operator, O → O − ⟨O⟩, removes the vacuum component of the state it creates;
+it is not the choice of the zero of energy, which the normalized correlators fix (they measure T/λ₀).
+The relative phase of the graph is a free choice in the doubled description: nothing in these runs
+prepares or detects it across lattices; what they test is whether the two descriptions stay paired
+under evolution. And pairing alone does not bound the fine gap: with coarse energies 0, 1 and fine
+energies 0, 1, ε, pairing the first two levels exactly gives a neutral graph that commutes with
+evolution while the fine gap is ε. The omitted level is invisible to every comparison inside the
+window, which is why Propositions 1 and 2 need the omitted energy Λ, the bottom of the fine Hamiltonian
+on the complement of the window.
+
+## Related work
+
+Closest in structure: Faizal and Shabir, arXiv:2606.19362 (Fortschr. Phys. 74, 2026), use partial
+isometries V_k between successive scales with V_k Ω_{k+1} = Ω_k, an interlacing identity
+T_{k+1} = V_k* T_k^b V_k − D_k + E_k, the step inequality Δ_{k+1} ≥ Δ_k − ε_k and summable defects. They
+claim a construction of four-dimensional SU(N) Yang–Mills with a mass gap; we know of no independent
+assessment. On our reading of their Section 5, the step inequality bounds the gap of the coarser lattice
+by that of the finer one, whereas a continuum statement needs the reverse direction, a lower bound for
+ever finer lattices, with the defects beaten in units of the finest lattice spacing (our Corollary 3 and
+its uniform margin); this reading is offered for review. Identifications between different Hilbert
+spaces that control spectra are the subject of quasi-unitary equivalence (O. Post, Spectral Analysis on
+Graph-like Spaces, Lecture Notes in Math. 2039, 2012; Post and Simmer, arXiv:2503.22611): ‖M − I‖ and the
+window defect play the roles of near-unitarity and approximate intertwining there, and a detailed
+comparison is still to be made. Coarse-grained Hamiltonians induced by blocking through
+Osterwalder–Schrader reconstruction: Lang, Liegener and Thiemann, Hamiltonian renormalisation I–IX
+(arXiv:1711.05685 and sequels), analytic, for free and solvable models. Isometric scaling maps between
+lattice Hilbert spaces with an inductive limit: Morinelli, Morsella, Stottmeister and Tanimoto (Commun.
+Math. Phys. 2021), Stottmeister et al. (Phys. Rev. Lett. 127, 230601, 2021), and Brothier and
+Stottmeister for 1+1-dimensional Yang–Mills (arXiv:1907.05549). Effective transfer matrices on block
+variables estimated by Monte Carlo, with an overlap measure of quality, on one lattice: Hasenbusch, Pinn
+and Rummukainen (Phys. Rev. D 49, 495, 1994). Standard lattice practice compares blocked observables
+(Monte Carlo renormalization group, fixed-point actions, blocked and smeared glueball operators,
+gradient flow as a continuous blocking, e.g. Carosso, Hasenfratz and Neil, arXiv:1806.01385) but does
+not measure how well blocking intertwines the dynamics relative to the gap. Rigorous background:
+Bałaban's ultraviolet stability for lattice Yang–Mills (expounded by Dimock), the strong-coupling gap of
+Osterwalder and Seiler. What seems new here is the measurement: the exact defect from correlator
+matrices, the alignment induced by blocking, two lattice spacings of SU(3), against the gap. This rests
+on a web search and reading of the closest papers, not a systematic citation search.
 
 ## Status
 
@@ -203,7 +265,11 @@ changes the conclusion.
 
 ## Points for review, most important first
 
-Reliability patch (this round): the checkpoint record and resume checks, `read_measurements`, the
+This round: the doubled-space reading and `graph_departure` (the identity ‖[S, R]‖ = ‖S_fW − WS_c‖ and
+the three departure formulas), and the related-work section, in particular the reading of
+arXiv:2606.19362.
+
+Reliability patch (previous round): the checkpoint record and resume checks, `read_measurements`, the
 branch-cut band of `su3_project` and its tests, `lattice/test/runner_checks.jl`, and the paired
 fixed − zero differences in `window_transfer.jl`, all described under "Protecting the measurements".
 

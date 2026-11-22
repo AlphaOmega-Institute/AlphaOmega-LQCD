@@ -315,6 +315,31 @@ function window_defect(Kf, Lf, Kc, Lc, V)
     return opnorm([D (-V * psqrt(Lc)); (psqrt(Lf) * V) zeros(n, n)])
 end
 
+_ppart(L) = (F = eigen(Symmetric(_herm(L))); F.vectors * Diagonal(max.(F.values, 0.0)) * F.vectors')
+
+"""
+    graph_departure(Kf, Lf, Kc, Lc, V) -> (antialigned, outside, total)
+
+The window map read in the doubled space H_c ⊕ H_f. With W = U_f V U_c*, the polar
+reflection R = [0 W*; W 0] has the aligned graph Γ₊ = {(x, Wx)} and the anti-aligned graph
+Γ₋ = {(x, −Wx)} (x in the coarse window) as its +1 and −1 eigenspaces, and
+‖[S_c ⊕ S_f, R]‖ = ‖S_f W − W S_c‖, the quantity of `window_defect`. The evolution
+S = S_c ⊕ S_f carries Γ₊ partly into Γ₋ and partly out of both windows. In operator norm:
+- `antialigned` = ‖P₋ S P₊‖ = ‖K_c − V*K_f V‖ / 2, half the in-window mismatch;
+- `outside` = ‖(I − P_c − P_f) S P₊‖ = λ_max((L_c + V*L_f V) / 2)^{1/2};
+- `total` = ‖(I − P₊) S P₊‖ = λ_max((K_c − V*K_f V)² / 4 + (L_c + V*L_f V) / 2)^{1/2}.
+P₊, P₋, P_c, P_f project onto Γ₊, Γ₋ and the two windows. Negative leakage eigenvalues
+(noise) are set to zero, as in `window_defect`.
+"""
+function graph_departure(Kf, Lf, Kc, Lc, V)
+    D = Kc - V' * Kf * V
+    Lsum = (_ppart(Lc) + V' * _ppart(Lf) * V) / 2
+    antialigned = opnorm(D) / 2
+    outside = sqrt(max(eigmax(Symmetric(_herm(Lsum))), 0.0))
+    total = sqrt(max(eigmax(Symmetric(_herm(D' * D / 4 + Lsum))), 0.0))
+    return antialigned, outside, total
+end
+
 """
     ground_state_fractions(C, ops; t0 = 0, periodic = true) -> (f, E0)
 
