@@ -14,8 +14,10 @@ written down in the guide before the run.
 Blocking fixes which coarse operator a fine operator represents. Evolving a coarse state over one step
 and then translating it, or translating it first and evolving the fine state over the same physical
 time, should agree if the map preserves the dynamics. We measure the largest disagreement over a window
-of operators, exactly, from correlators of two independently simulated lattices, and split it into a
-part forced by the spectra, a part from the pairing itself, and evolution out of the window. On
+of operators, exactly, from correlators of two independently simulated lattices. Three quantities have
+distinct meanings, though their norms do not add: the minimum mismatch over all alignments (a floor set
+by the spectra), the mismatch of the alignment blocking actually selects, and evolution out of the
+window, which enters the full defect through an exact block-matrix formula. On
 β = 5.7 against 6.054 the physical pairing reveals what the spectra hide: both fine window eigenvalues
 lie below the coarse ones, yet the blocking-fixed pairing rotates the leading direction by about 25°
 and creates a direction in which the fine evolution decays more slowly. We state the one-sided criterion
@@ -24,6 +26,9 @@ the slow states the chosen operators do not see.
 
 ## 1. Introduction
 
+- The two orders of "block and evolve", and the measured consequence up front: both sorted fine
+  eigenvalues lie below their coarse partners, yet the physical pairing gives a direction with slower
+  fine decay (a 25° rotation). Why comparing masses leaves something out.
 - The question: does a map between two lattice descriptions preserve what happens to the states it
   pairs? A physics question in its own right, and the hypothesis of renormalization-group arguments for
   a mass gap (gap transfer along a chain of maps).
@@ -40,12 +45,13 @@ the slow states the chosen operators do not see.
   Hackett and Wagman).
 - Alignment fixed by blocking: polar part V of G_f^{1/2} G_c^{-1/2}; normalization M.
 - Exact defect of the window map (Proposition 6), and the bound; spectral floor by Weyl's inequality.
-- Doubled-space reading: polar reflection R, ‖[S, R]‖ = ‖S_f W − W S_c‖; near-neutrality (‖M − I‖,
-  Krein square) against near-invariance (transfer into the anti-aligned graph and out of the windows).
+- Doubled-space reading, briefly (derivation in an appendix): polar reflection R,
+  ‖[S, R]‖ = ‖S_f W − W S_c‖; near-neutrality against near-invariance.
 - One-sided criterion: the 2 × 2 lemma, positivity floor L ≤ qK, the q needed for a reference gap,
   the matrix form k ≤ λ_max(K_c + D₊).
-- Gap transfer along a chain (note, Corollary 3): direction, omitted energy, uniform margin; relation
-  to the related work (Faizal and Shabir; quasi-unitary equivalence, Post and Simmer).
+- Gap transfer along a chain: direction, omitted energy, uniform margin; the operator form carried from
+  rung to rung (proof in an appendix); relation to the related work (Faizal and Shabir; quasi-unitary
+  equivalence, Post and Simmer).
 
 ## 3. Lattice setup
 
@@ -71,8 +77,9 @@ the slow states the chosen operators do not see.
 
 ## 5. Results: β = 6.054 against β = 6.546
 
-- The prediction, as written before the run; the results; whether the angle, ε₊ and the leakage shrink
-  with the spectral separation.
+- The prediction and analysis plan, as written before the fine data; the results at one coarse step
+  and at the first pair's physical interval; whether the angle, ε₊ and the leakage shrink with the
+  spectral separation.
 
 ## 6. Discussion
 
@@ -87,7 +94,9 @@ the slow states the chosen operators do not see.
 
 ## Appendices
 
-- Proofs: Proposition 6 (equality), the one-sided lemma, the positivity floor, the matrix-form bound.
+- Proofs: Proposition 6 (equality), the one-sided lemma, the positivity floor, the matrix-form bound,
+  the operator-valued step for a chain.
+- The doubled-space derivation.
 - Code and data availability: repository, data files, commands; reproduction.
 - Disclosure of the use of AI assistance, following the venue's policy.
 

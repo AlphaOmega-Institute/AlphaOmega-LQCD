@@ -576,6 +576,39 @@ end
     @test isnan(leakage_q_floor([1.0 0; 0 -0.1], [0.1 0; 0 0.1]))
 end
 
+@testset "operator-valued one-sided step and q_needed_matrix" begin
+    rng = Xoshiro(80)
+    for _ in 1:200
+        n, k = 14, rand(rng, 1:4)
+        Ω = normalize(randn(rng, n))
+        Pp = I - Ω * Ω'
+        A = Pp * randn(rng, n, n) * Pp
+        R = A * A'
+        R = R / opnorm(R) * 0.9
+        T = Ω * Ω' + R
+        U = Matrix(qr(Pp * randn(rng, n, k)).Q)[:, 1:k]
+        Qb = nullspace([Ω U]')
+        T2 = T^2
+        C = U' * T2 * U
+        L = U' * T2 * (Qb * Qb') * T2 * U
+        q = opnorm(Qb' * T2 * Qb)
+        X = [U Qb]
+        γ = 10.0^(4rand(rng) - 2)                 # T² ≤ (C + L/γ) ⊕ (q + γ) I on the vacuum complement
+        Bm = [C + L / γ zeros(k, size(Qb, 2)); zeros(size(Qb, 2), k) (q + γ) * I]
+        @test eigmin(Symmetric(Bm - X' * T2 * X)) > -1e-10
+        s = q + 0.05 + rand(rng) * 0.5
+        qn = q_needed_matrix(s, C, L)
+        if isfinite(qn) && q <= qn                 # the test passes, so T² ≤ s
+            @test opnorm(X' * T2 * X) <= s + 1e-10
+        end
+        if isfinite(qn)                            # the matrix form never needs a smaller q than the scalar form
+            @test qn >= q_needed(s, eigmax(Symmetric(C)), eigmax(Symmetric(L))) - 1e-10
+        end
+    end
+    @test q_needed_matrix(0.4, fill(0.3, 1, 1), fill(0.01, 1, 1)) ≈ q_needed(0.4, 0.3, 0.01) rtol = 1e-10
+    @test isnan(q_needed_matrix(0.3, fill(0.35, 1, 1), fill(0.01, 1, 1)))
+end
+
 @testset "correlated cosh fit" begin
     rng = Xoshiro(79)
     for m in (0.4, 0.66, 1.0), T in (16, 32)

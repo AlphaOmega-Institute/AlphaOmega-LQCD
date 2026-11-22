@@ -398,6 +398,34 @@ function q_needed(s, k, ℓ2)
 end
 
 """
+    q_needed_matrix(s, C, L)
+
+Matrix form of `q_needed`. If the window block of T² is bounded by C, the leakage matrix is L and
+the omitted block is bounded by q, completing the square gives, for every γ > 0,
+T² ≤ (C + L/γ) ⊕ (q + γ) I_Q, so with γ = s − q the test C + L/(s − q) ≤ s implies T² ≤ s on the
+vacuum's complement. Returns the largest q < s that passes (bisection; λ_max(C + L/(s − q))
+increases with q), or NaN if λ_max(C) ≥ s. It keeps the directions of C and L, so it is at least as
+large as `q_needed(s, λ_max(C), λ_max(L))`. Negative eigenvalues of L (noise) are set to zero.
+"""
+function q_needed_matrix(s, C, L)
+    Ch = Hermitian(_herm(C))
+    Lp = Hermitian(_ppart(L))
+    eigmax(Ch) < s || return NaN
+    eigmax(Lp) <= 0 && return float(s)
+    ok(q) = eigmax(Hermitian(Ch + Lp / (s - q))) <= s
+    lo, hi = s - 1.0, s
+    while !ok(lo)
+        lo = s - 2 * (s - lo)
+        s - lo > 1e12 && return NaN
+    end
+    for _ in 1:200
+        mid = (lo + hi) / 2
+        ok(mid) ? (lo = mid) : (hi = mid)
+    end
+    return lo
+end
+
+"""
     leakage_q_floor(K, L)
 
 Lower bound on q = ‖QTQ‖ that positivity of T implies: the block form of T ≥ 0 gives

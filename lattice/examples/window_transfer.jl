@@ -10,15 +10,19 @@
 #          --window 4,8      stout levels spanning the window (values, not indices)
 #          --bin 10          configurations per bin, on both lattices
 #          --drop 0          fine configurations dropped at the start
-#          --mref m          reference gap for the one-sided bound: the coarse mass over the
-#                            matched interval, in coarse units, s = e^{−m} (default: the top
-#                            coarse window eigenvalue, s = λ_max(K_c))
+#          --lag 1           coarse lag ℓ; the fine lag is 2ℓ (ℓ = 2 compares over twice the
+#                            physical time; the compressions and leakages are recomputed from the
+#                            correlators at those lags, K(2τ) = K(τ)² + L(τ), not by squaring K)
+#          --mref m          reference mass for the one-sided bound, per coarse step, in coarse
+#                            units: s = e^{−ℓ m} (default: the top coarse window eigenvalue,
+#                            s = λ_max(K_c)). With --mref, the defect and ε₊ are also printed
+#                            relative to the reference gap 1 − s
 #          --qgrid 0.1,0.2,0.3   omitted tops q at which the one-sided bound μ(q) is printed
 # A file still being written can be analysed: only lines ending in a newline are read
 # (`read_measurements`), and every row read is checked.
 # For each blocking parameter α and each variant (fixed origin, zero momentum) the script
-# reports the coarse compression K_c and leakage L_c at coarse lag 1, the fine ones K_f and
-# L_f at fine lag 2, the alignment V induced by the correspondence O ↦ O∘B (polar part of
+# reports the coarse compression K_c and leakage L_c at coarse lag ℓ (default 1), the fine ones K_f and
+# L_f at fine lag 2ℓ, the alignment V induced by the correspondence O ↦ O∘B (polar part of
 # G_f^{1/2} G_c^{-1/2}), the normalization mismatch ‖M − I‖, the in-window mismatch
 # ‖K_f V − V K_c‖, the larger leakage, the bound of Proposition 6, and the defect itself
 # (`window_defect`). It then reads the window map in the doubled space H_c ⊕ H_f
@@ -56,9 +60,9 @@ binned_products(O, b) = ((P, M) = correlator_products(O); (bin_means(P, b), bin_
 meanC(Pb, Mb, ix) = correlator_from_means(dropdims(sum(Pb[ix, :, :, :]; dims = 1); dims = 1) ./ length(ix),
                                           vec(sum(Mb[ix, :]; dims = 1)) ./ length(ix))
 
-function window_quantities(Cc, Cf, sref, qgrid)
-    Kc, Lc, Gc = window_compression(Cc, 1)
-    Kf, Lf, Gf = window_compression(Cf, 2)
+function window_quantities(Cc, Cf, sref, qgrid, lag)
+    Kc, Lc, Gc = window_compression(Cc, lag)
+    Kf, Lf, Gf = window_compression(Cf, 2lag)
     V, M = induced_alignment(Gf, Gc)
     λc, λf = eigvals(Symmetric(Lc)), eigvals(Symmetric(Lf))
     leak = sqrt(max(maximum(λc), maximum(λf), 0.0))
@@ -73,13 +77,17 @@ function window_quantities(Cc, Cf, sref, qgrid)
     Dp = FD.vectors * Diagonal(max.(FD.values, 0.0)) * FD.vectors'
     km = eigmax(Hermitian(Kc + Dp))
     θ = acosd(min(1.0, abs(dot(eigen(Hermitian(Kc)).vectors[:, end], V' * eigen(Hermitian(Kf)).vectors[:, end]))))
+    def = window_defect(Kf, Lf, Kc, Lc, V)
+    rel = sref === nothing ? [NaN, NaN] : [def, εp] ./ (1 - s)
+    qmd = q_needed_matrix(s, Kf, Lf)                       # fine window measured directly, matrix form
+    qmc = q_needed_matrix(s, Kc + Dp, V' * Lf * V)         # inferred from the coarse lattice, matrix form
     return vcat(sort(eigvals(Symmetric(Kc)); rev = true), sort(eigvals(Symmetric(Kf)); rev = true),
                 sort(λc), sort(λf),
-                [opnorm(M - I), mis, leak, mis + leak, window_defect(Kf, Lf, Kc, Lc, V),
+                [opnorm(M - I), mis, leak, mis + leak, def,
                  opnorm(M^2 - I), anti, out, tot],
                 [dl[end], dl[1], εp, leakage_q_floor(Kf, Lf), s, q_needed(s, kd, ℓ2), q_needed(s, kc, ℓ2)],
                 [one_sided_bound(kd, ℓ2, q) for q in qgrid], [one_sided_bound(kc, ℓ2, q) for q in qgrid],
-                [θ, km, q_needed(s, km, ℓ2)])
+                [θ, km, q_needed(s, km, ℓ2), qmd, qmc], rel)
 end
 
 function two_sample_jackknife(f, nc, nf)
@@ -97,7 +105,7 @@ fmt(x, e) = !isfinite(x) ? "   —   " : isfinite(e) ? @sprintf("%.4f(%d)", x, r
 
 function main(args)
     cpath, fpath = args[1], args[2]
-    opt = Dict("window" => "4,8", "bin" => "10", "drop" => "0", "mref" => "", "qgrid" => "0.1,0.2,0.3")
+    opt = Dict("window" => "4,8", "bin" => "10", "drop" => "0", "mref" => "", "qgrid" => "0.1,0.2,0.3", "lag" => "1")
     i = 3
     while i <= length(args)
         key = lstrip(args[i], '-')
@@ -107,7 +115,8 @@ function main(args)
     end
     wlev = parse.(Int, split(opt["window"], ","))
     b, drop = parse(Int, opt["bin"]), parse(Int, opt["drop"])
-    sref = isempty(opt["mref"]) ? nothing : exp(-parse(Float64, opt["mref"]))
+    lag = parse(Int, opt["lag"])
+    sref = isempty(opt["mref"]) ? nothing : exp(-lag * parse(Float64, opt["mref"]))
     qgrid = parse.(Float64, split(opt["qgrid"], ","))
     kc, Xc = read_file(cpath)
     kf, Xf = read_file(fpath)
@@ -145,11 +154,11 @@ function main(args)
 
     n = length(wlev)
     ng = length(qgrid)
-    per = 4n + 19 + 2ng
+    per = 4n + 23 + 2ng
     paired = variants == ["fixed", "zero"]
     pix = [4n+2, 4n+4, 4n+5, 4n+9, 4n+12]  # mismatch, bound, defect, total departure, ε₊
     function f(ic, jf)
-        q = [window_quantities(meanC(Pc, Mc, ic), meanC(Pf, Mf, jf), sref, qgrid) for (Pf, Mf) in fine]
+        q = [window_quantities(meanC(Pc, Mc, ic), meanC(Pf, Mf, jf), sref, qgrid, lag) for (Pf, Mf) in fine]
         v = vcat(q...)
         if paired                     # fixed − zero
             for ia in eachindex(alphas)
@@ -162,11 +171,11 @@ function main(args)
 
     println("coarse: β = $(kc["beta"]), $(Lc)³ × $Tc, $(size(Xc, 1)) configurations; ",
             "fine: β = $(kf["beta"]), $(Lf)³ × $Tf blocked to $(Lf ÷ 2)³, $(size(Xf, 1)) configurations")
-    println("window: stout levels $wlev (ρ = $(kc["rho"])), bins of $b; centered excitations")
+    println("window: stout levels $wlev (ρ = $(kc["rho"])), bins of $b; centered excitations; coarse lag $lag, fine lag $(2lag)")
     for (ia, α) in enumerate(alphas), (iv, var) in enumerate(variants)
         p = ((ia - 1) * length(variants) + (iv - 1)) * per
         println("\nα = $α, $var")
-        for (label, m) in (("eig K_c (coarse lag 1)", n), ("eig K_f (fine lag 2)", n), ("eig L_c", n), ("eig L_f", n))
+        for (label, m) in (("eig K_c (coarse lag $lag)", n), ("eig K_f (fine lag $(2lag))", n), ("eig L_c", n), ("eig L_f", n))
             println(@sprintf("  %-24s", label), join([fmt(est[p+j], err[p+j]) for j in 1:m], "  "))
             p += m
         end
@@ -190,6 +199,9 @@ function main(args)
         line("  angle of leading directions (°)", [@sprintf("%.1f(%.1f)", est[o+1], err[o+1])])
         line("  k = λ_max(K_c + D₊)", [fmt(est[o+2], err[o+2])])
         line("  q needed, k = λ_max(K_c + D₊)", [fmt(est[o+3], err[o+3])])
+        line("  q needed, matrix form, fine", [fmt(est[o+4], err[o+4])])
+        line("  q needed, matrix form, coarse", [fmt(est[o+5], err[o+5])])
+        line("  defect / (1 − s), ε₊ / (1 − s)", [fmt(est[o+6], err[o+6]), fmt(est[o+7], err[o+7])])
     end
     if paired
         println("\nfixed origin − zero momentum (paired errors: same configurations and bins)")

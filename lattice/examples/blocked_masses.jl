@@ -7,7 +7,10 @@
 # Options: --ops 4,8         stout levels (values) of the GEVP basis, on both lattices
 #          --bin 10          configurations per bin
 #          --t0 0            GEVP reference time, in each lattice's own units
-#          --ratio 2.0015    a_coarse / a_fine (Necco–Sommer for β = 5.7 and 6.054)
+#          --ratio 2.0015    a_coarse / a_fine (Necco–Sommer: 2.0015 for β = 5.7 and 6.054,
+#                            1.9997 for β = 6.054 and 6.546)
+#          --franges 2:8,3:8,4:8   fine fit ranges (a:b or a:step:b, comma-separated)
+#          --cranges 1:4,2:4       coarse fit ranges
 # For each α and variant (fixed origin, zero momentum) of the fine file: the cosh effective
 # mass of the GEVP ground-state correlator at fine times t = 0 … 7, in fine units and in coarse
 # units (× ratio); the mass per fine step over the intervals 2j → 2j+2 (one mass per interval,
@@ -18,8 +21,12 @@
 # step, with their difference (the ensembles are independent, so the errors add in quadrature).
 # Finally, correlated fits A cosh(m (t − T/2)) of the GEVP ground-state correlator (vector fixed
 # on the full ensemble, jackknife covariance) over fine t ∈ [2, 8], [3, 8], [4, 8] and coarse
-# t ∈ [1, 4], [2, 4], so that the first interval is removed in turn; the matched pairs are fine
-# [2, 8] with coarse [1, 4] and fine [4, 8] with coarse [2, 4]. Masses per fine step.
+# t ∈ [1, 4], [2, 4] by default, so that the first interval is removed in turn. A fine range is
+# matched with a coarse one when it covers the same physical interval, its first and last times
+# twice the coarse ones (fine [2, 8] or 2:2:8 with coarse [1, 4], fine [4, 16] or 4:2:16 with coarse
+# [2, 8], …); for each matched pair the difference and the
+# ratio m_f/m_c − 1 are printed. Each fit reports χ²/dof and the condition number κ of its
+# covariance matrix. Masses per fine step.
 # Errors: delete-one jackknife over bins.
 
 using LatticeYM, Printf, LinearAlgebra
@@ -75,12 +82,14 @@ function fits(O, b, t0, ranges)
         m, _, χ = cosh_fit(cfull, cov, ts, T)
         mj = [cosh_fit(c, cov, ts, T)[1] for c in cj]
         err = sqrt((nb - 1) / nb * sum((mj .- sum(mj) / nb) .^ 2))
-        push!(out, (ts = ts, m = m, err = err, chi2dof = χ / (length(ts) - 2)))
+        push!(out, (ts = ts, m = m, err = err, chi2dof = χ / (length(ts) - 2), κ = cond(cov)))
     end
     return out
 end
 
-fitcell(f, s = 1.0) = rpad(fmt(s * f.m, s * f.err) * @sprintf(" χ²/dof %.2f", f.chi2dof), 30)
+fitcell(f, s = 1.0) = rpad(fmt(s * f.m, s * f.err) * @sprintf(" χ²/dof %.2f κ %.0e", f.chi2dof, f.κ), 38)
+rangelabel(ts) = step(ts) == 1 ? "[$(first(ts)), $(last(ts))]" : "[$(first(ts)):$(step(ts)):$(last(ts))]"
+parseranges(str) = [(p = parse.(Int, split(r, ":")); length(p) == 2 ? (p[1]:p[2]) : (p[1]:p[2]:p[3])) for r in split(str, ",")]
 
 function report(est, err, tmax, jmax, lag, ops, scale, unit, other)
     row(label, s) = println(@sprintf("  %-30s", label), join([fmt(s * est[t+1], s * err[t+1]) for t in 0:tmax], " "))
@@ -97,7 +106,8 @@ end
 
 function main(args)
     fpath = args[1]
-    opt = Dict("ops" => "4,8", "bin" => "10", "t0" => "0", "ratio" => "2.0015", "coarse" => "")
+    opt = Dict("ops" => "4,8", "bin" => "10", "t0" => "0", "ratio" => "2.0015", "coarse" => "",
+               "franges" => "", "cranges" => "")
     i = 2
     while i <= length(args)
         key = lstrip(args[i], '-')
@@ -122,7 +132,8 @@ function main(args)
     jf = min(3, (Tf ÷ 2) ÷ 2 - 1)
     matched = []
     tfmax = min(8, Tf ÷ 2)
-    franges = [t:tfmax for t in (2, 3, 4) if tfmax - t + 1 >= 3]
+    franges = isempty(opt["franges"]) ? [t:tfmax for t in (2, 3, 4) if tfmax - t + 1 >= 3] : parseranges(opt["franges"])
+    all(r -> last(r) <= Tf ÷ 2 && length(r) >= 3, franges) || error("fine fit ranges must have at least 3 times, up to T/2 = $(Tf ÷ 2)")
     ffits = []
     println("fine: β = $(kf["beta"]), $(kf["L"])³ × $Tf blocked to $(kf["blocked"])³, $(size(Xf, 1)) configurations; ",
             "GEVP on stout levels $ops, t0 = $t0, bins of $b; a_c/a_f = $ratio")
@@ -157,23 +168,23 @@ function main(args)
     end
 
     tcmax = min(4, Tc ÷ 2)
-    cranges = [t:tcmax for t in (1, 2) if tcmax - t + 1 >= 3]
+    cranges = isempty(opt["cranges"]) ? [t:tcmax for t in (1, 2) if tcmax - t + 1 >= 3] : parseranges(opt["cranges"])
+    all(r -> last(r) <= Tc ÷ 2 && length(r) >= 3, cranges) || error("coarse fit ranges must have at least 3 times, up to T/2 = $(Tc ÷ 2)")
     cfits = fits(operators(Xc, 1, [findfirst(==(l), clev) for l in ops], Tc), b, t0, cranges)
     println("\ncorrelated fits A cosh(m (t − T/2)), mass per fine step (fine units)")
-    println(@sprintf("  %-26s", "coarse"), join([rpad("[$(first(f.ts)), $(last(f.ts))] ", 8) * fitcell(f, 1 / ratio) for f in cfits], "  "))
+    println(@sprintf("  %-26s", "coarse"), join([rpad(rangelabel(f.ts) * " ", 10) * fitcell(f, 1 / ratio) for f in cfits], "  "))
     for (label, ff) in ffits
-        println(@sprintf("  %-26s", label), join([rpad("[$(first(f.ts)), $(last(f.ts))] ", 8) * fitcell(f) for f in ff], "  "))
+        println(@sprintf("  %-26s", label), join([rpad(rangelabel(f.ts) * " ", 10) * fitcell(f) for f in ff], "  "))
     end
-    pairs = [(2, 1), (4, 2)]
-    println("\nmatched fit ranges (fine [2, 8] with coarse [1, 4], fine [4, 8] with coarse [2, 4]): fine − coarse")
+    println("\nmatched fit ranges (same physical interval): fine − coarse, and m_f/m_c − 1")
     for (label, ff) in ffits
         cells = String[]
-        for (tf0, tc0) in pairs
-            i = findfirst(f -> first(f.ts) == tf0, ff)
-            j = findfirst(f -> first(f.ts) == tc0, cfits)
-            (i === nothing || j === nothing) && continue
-            f, c = ff[i], cfits[j]
-            push!(cells, rpad("from fine t = $tf0: " * fmt(f.m - c.m / ratio, sqrt(f.err^2 + (c.err / ratio)^2)), 32))
+        for f in ff, c in cfits
+            (first(f.ts) == 2first(c.ts) && last(f.ts) == 2last(c.ts)) || continue
+            mc, ec = c.m / ratio, c.err / ratio
+            r = f.m / mc - 1
+            er = (r + 1) * sqrt((f.err / f.m)^2 + (ec / mc)^2)
+            push!(cells, rpad("fine $(rangelabel(f.ts)): Δ " * fmt(f.m - mc, sqrt(f.err^2 + ec^2)) * ", ratio − 1 " * fmt(r, er), 56))
         end
         println(@sprintf("  %-26s", label), join(cells, "  "))
     end

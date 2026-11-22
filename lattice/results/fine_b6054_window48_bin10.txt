@@ -1,5 +1,5 @@
 coarse: β = 5.7, 8³ × 16, 3000 configurations; fine: β = 6.054, 16³ × 32 blocked to 8³, 3000 configurations
-window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations
+window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations; coarse lag 1, fine lag 2
 
 α = 0.0, fixed
   eig K_c (coarse lag 1)  0.3392(49)  0.0636(45)
@@ -26,6 +26,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations
     angle of leading directions (°)   24.5(3.3)
     k = λ_max(K_c + D₊)               0.3392(49)
     q needed, k = λ_max(K_c + D₊)     0.1565(836)
+    q needed, matrix form, fine       0.3522(92)
+    q needed, matrix form, coarse     0.1676(819)
+    defect / (1 − s), ε₊ / (1 − s)    0.5347(144)  0.0000(0)
 
 α = 0.0, zero
   eig K_c (coarse lag 1)  0.3392(49)  0.0636(45)
@@ -52,6 +55,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations
     angle of leading directions (°)   35.3(1.3)
     k = λ_max(K_c + D₊)               0.3398(48)
     q needed, k = λ_max(K_c + D₊)     -0.0681(1040)
+    q needed, matrix form, fine       0.3060(144)
+    q needed, matrix form, coarse     0.0811(906)
+    defect / (1 − s), ε₊ / (1 − s)    0.4601(162)  0.0160(92)
 
 α = 0.3, fixed
   eig K_c (coarse lag 1)  0.3392(49)  0.0636(45)
@@ -78,6 +84,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations
     angle of leading directions (°)   23.2(1.2)
     k = λ_max(K_c + D₊)               0.3392(49)
     q needed, k = λ_max(K_c + D₊)     -0.0241(990)
+    q needed, matrix form, fine       0.3059(160)
+    q needed, matrix form, coarse     -0.0156(960)
+    defect / (1 − s), ε₊ / (1 − s)    0.4120(160)  0.0000(0)
 
 α = 0.3, zero
   eig K_c (coarse lag 1)  0.3392(49)  0.0636(45)
@@ -104,6 +113,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations
     angle of leading directions (°)   25.2(1.0)
     k = λ_max(K_c + D₊)               0.3453(46)
     q needed, k = λ_max(K_c + D₊)     0.1212(1216)
+    q needed, matrix form, fine       0.3218(256)
+    q needed, matrix form, coarse     0.1531(1136)
+    defect / (1 − s), ε₊ / (1 − s)    0.3364(197)  0.0645(92)
 
 α = 0.6, fixed
   eig K_c (coarse lag 1)  0.3392(49)  0.0636(45)
@@ -130,6 +142,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations
     angle of leading directions (°)   23.0(1.1)
     k = λ_max(K_c + D₊)               0.3400(48)
     q needed, k = λ_max(K_c + D₊)     -0.0175(1019)
+    q needed, matrix form, fine       0.3018(183)
+    q needed, matrix form, coarse     -0.0152(1005)
+    defect / (1 − s), ε₊ / (1 − s)    0.3901(166)  0.0128(91)
 
 α = 0.6, zero
   eig K_c (coarse lag 1)  0.3392(49)  0.0636(45)
@@ -156,6 +171,9 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations
     angle of leading directions (°)   24.8(1.0)
     k = λ_max(K_c + D₊)               0.3464(45)
     q needed, k = λ_max(K_c + D₊)     0.1462(1248)
+    q needed, matrix form, fine       0.3264(269)
+    q needed, matrix form, coarse     0.1674(1174)
+    defect / (1 − s), ε₊ / (1 − s)    0.3264(201)  0.0721(92)
 
 fixed origin − zero momentum (paired errors: same configurations and bins)
   α = 0.0   Δ‖K_f V − V K_c‖ 0.0492(37)   Δbound 0.0408(216)   Δdefect 0.0464(63)   Δdeparture 0.0179(56)   Δε₊ -0.0100(57)

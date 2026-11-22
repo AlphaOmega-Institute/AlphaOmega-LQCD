@@ -22,7 +22,7 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 3909 tests
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 4471 tests
     julia --project=lattice lattice/test/runner_checks.jl              # the fine-run program, 19 checks
     julia docs/notes/check_spectral_transfer.jl                        # 6563 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
@@ -385,6 +385,40 @@ pair, then on this pair
 No prediction is made for the alignment angle (24.8° on the first pair), the one-sided error ε₊ or the
 leakage; whether they shrink with the spectral separation is the open question this run is for.
 
+Analysis plan, fixed before the fine data were examined (the coarse ensemble had been checked; the fine
+run was in progress):
+- Primary comparison: α = 0.6 with zero momentum, window {4, 8}, one coarse step (coarse lag 1, fine
+  lag 2). The 0.03 target concerns the leading window eigenvalues and so also how much weight the
+  operators put on higher states; agreement of the masses alone does not guarantee it.
+- Mass endpoint: r = m_f/m_c − 1 in common units, from the principal fit ranges below. An uncertainty
+  interval contained in [−0.05, 0.05] supports agreement to 5%; an interval spanning zero and extending
+  beyond that band leaves the question unresolved.
+- Caveats. Athenodorou and Teper find at β = 6.235 scalar masses 0.4773(53), 0.4969(29), 0.4965(41) at
+  L√σ ≈ 2.7, 3.9, 5.1, a 4% shift between the smallest and middle boxes; our two boxes are matched to
+  each other near 3.2, which helps the internal comparison, but their tables do not calibrate a 5%
+  tolerance at our volume. The ratio 1.9997 is the value of the Necco–Sommer interpolation, whose
+  individual scale determinations are accurate to about 0.5–1%; the predicted 0.003 is illustrative.
+- Common physical time with the first pair: the new pair is also analysed at coarse lag 2 and fine lag 4
+  (`--lag 2`), recomputing compressions and leakages from the correlators (K(2τ) = K(τ)² + L(τ)).
+  Reported there: the leading-direction angle with its error and the separation of the first two
+  eigenvalues (a nearly degenerate leading direction can rotate within errors); ε₊ and the defect raw,
+  as rates per coarse step for the native comparison, and relative to the reference gap 1 − e^{−m_ref τ}
+  with the declared m_ref = 0.655 per β = 6.054 step (our fitted value from the first pair) for both
+  pairs' comparisons on this lattice, `--mref 0.655`. The same number of stout steps smooths over a
+  shorter physical distance on the finer lattice; the comparison tests the recipes as specified.
+- Masses (`blocked_masses.jl --ratio 1.9997`): principal fit fine [4, 16] against coarse [2, 8] (the
+  physical range of the first pair's principal fit); delayed start fine [8, 16] against coarse [4, 8];
+  even-time check fine 4:2:16 against coarse [2, 8] (seven points; at bins of 50 the fine ensemble has
+  only 20 blocks, too few for a 13-point covariance); and the short ranges fine [2, 8] against coarse
+  [1, 4] to show the influence of early times. The condition number of each covariance is reported.
+
+Analysis commands, once both files are in hand:
+
+    julia --project=lattice lattice/examples/window_transfer.jl coarse_b6054.txt fine_b6546.txt --window 4,8 --mref 0.655
+    julia --project=lattice lattice/examples/window_transfer.jl coarse_b6054.txt fine_b6546.txt --window 4,8 --mref 0.655 --lag 2
+    julia --project=lattice lattice/examples/blocked_masses.jl fine_b6546.txt --coarse coarse_b6054.txt --ratio 1.9997 \
+          --franges 4:16,8:16,4:2:16,2:8 --cranges 2:8,4:8,1:4
+
 Commands (time each first with a few configurations):
 
     julia --project=lattice -t 12 lattice/examples/glueball.jl --beta 6.054 --L 16 --T 32 --therm 500 \
@@ -392,8 +426,6 @@ Commands (time each first with a few configurations):
     julia --project=lattice -t 12 lattice/examples/blocked_glueball.jl --beta 6.546 --L 32 --T 64 \
           --therm 1000 --skip 8 --alphas 0.3,0.6 --levels 4,8,16,24 --seed 6546 --confs 1000 \
           --out fine_b6546.txt --checkpoint fine_b6546.ckpt
-    julia --project=lattice lattice/examples/window_transfer.jl coarse_b6054.txt fine_b6546.txt \
-          --window 4,8 --mref <coarse mass over one coarse step>
 
 ## One-sided bound
 
@@ -428,6 +460,25 @@ inferred from the coarse lattice. In words, q ≤ 0.277 means that every normali
 the window retains at most that much autocorrelation over one interval. An omitted state could be
 smooth and have the right symmetry; the question is whether the chosen operators see it. `window_transfer.jl` prints these quantities with jackknife errors
 (`--mref 0.973` for this reference).
+
+Operator form, for a chain. A full operator bound can be carried from rung to rung. On the vacuum's
+complement, with a_c = 2a_f, suppose the previous rung gives T_c ≤ B_c, and the signed in-window
+discrepancy is bounded, V*U_f*T_f²U_f V − U_c*T_c U_c ≤ E (the exact D₊ is one choice). Then the fine
+window block obeys U_f*T_f²U_f ≤ C = V(U_c*B_c U_c + E)V*. With Q the rest of the complement,
+L = U_f*T_f²QT_f²U_f the measured leakage and an independent QT_f²Q ≤ q, completing the square in the
+off-diagonal block gives, for every γ > 0,
+
+    T_f² ≤ (C + L/γ) ⊕ (q + γ) I_Q,
+
+and the operator square root preserves the inequality, a full bound B_f for the next rung that keeps
+the directions of E and L. For a target mass m_* with s = e^{−a_c m_*} > q, γ = s − q gives the window
+test C + L/(s − q) ≤ s, which implies T_f ≤ e^{−a_f m_*}; a uniform gap needs one m_* through every
+refinement, volume and sector claimed. `q_needed_matrix` returns the largest q passing the test; on the
+first pair (α = 0.6, zero momentum) it gives 0.326(27) with the fine window measured directly and
+0.167(117) inferred from the coarse lattice (scalar forms 0.326 and 0.146). Carrying the matrix across
+the shared β = 6.054 lattice, where the first pair ends on blocked operators and the second starts on
+unblocked ones, needs the cross-Gram matrix between the two operator families on the same
+configurations, a targeted extra measurement at β = 6.054.
 
 What an argument about the vacuum would have to supply. Not a smallness of the window's correlators:
 a state orthogonal to every tested operator, with transfer eigenvalue arbitrarily close to 1, leaves
@@ -593,7 +644,8 @@ near-invariance is what told us to measure the two apart.
 
 ## Points for review, most important first
 
-Newest: the prediction for the next pair ("Next pair"), and in the full run the alignment angle and
+Newest: the analysis plan fixed before the fine data of the next pair ("Next pair"), and the operator
+form of the one-sided step ("One-sided bound"). Before that: the prediction for the next pair, and in the full run the alignment angle and
 the matrix-form bound. Before that: the full run ("Full run at β = 6.054"): the persistence of the mass difference over
 matched intervals and in correlated fits, the one-sided reversal between the recipes with paired
 errors, the bin-size and four-level checks, and the data in `lattice/results/`. Before that: the one-sided bound ("One-sided bound"): the 2 × 2 lemma, the positivity floor on q, the q
