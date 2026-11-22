@@ -1,6 +1,8 @@
 # Paper outline (working)
 
-Status: outline only. Numbers refer to the review guide, `docs/notes/README.md`, and to the files in
+Status: a LaTeX draft of the methods and first-pair results is in `blockmap.tex` (`blockmap.pdf`); the
+second pair's section holds its design, predictions and endpoints, with results to follow. This outline
+remains the plan. Numbers refer to the review guide, `docs/notes/README.md`, and to the files in
 `lattice/results/`. The second lattice pair (β = 6.054 against 6.546) is planned; its prediction is
 written down in the guide before the run.
 

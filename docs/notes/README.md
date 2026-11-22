@@ -657,7 +657,9 @@ near-invariance is what told us to measure the two apart.
 
 ## Points for review, most important first
 
-Newest: the analysis plan fixed before the fine data of the next pair ("Next pair"), and the operator
+Newest: a draft of the methods paper, `docs/paper/blockmap.tex` (introduction, framework, setup,
+first-pair results, the second pair's design and predictions; doubled-space appendix and second-pair
+results to follow). Before that: the analysis plan fixed before the fine data of the next pair ("Next pair"), and the operator
 form of the one-sided step ("One-sided bound"). Before that: the prediction for the next pair, and in the full run the alignment angle and
 the matrix-form bound. Before that: the full run ("Full run at β = 6.054"): the persistence of the mass difference over
 matched intervals and in correlated fits, the one-sided reversal between the recipes with paired
