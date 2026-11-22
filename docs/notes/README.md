@@ -233,9 +233,10 @@ interlacing identity T_{k+1} = V_k* T_k^b V_k − D_k + E_k, and summable defect
 finer one. Corollary 3 runs the other way, a lower bound for ever finer lattices, and needs what theirs
 does not: a lower bound on the energy of the fine states that blocking omits. Without it the inference
 fails: with fine energies 0, ε, 1 and blocking retaining 0 and 1, the retained dynamics agree exactly
-at matched times while the fine gap is ε. Two steps do not hold as printed. Theorem 5.6 and Corollary
-D.5 conclude Δ₀ − Σε_j > 0 from the convergence of the sum, which needs the margin Σε_j < Δ₀ in
-addition; Corollary 3 requires such a margin uniformly as the finest spacing shrinks. The proof of
+at matched times while the fine gap is ε. Two points about the statements. The hypotheses of Theorem 5.6
+and Corollary D.5 give the telescoping bound Δ₀ − Σε_j; strict positivity needs the additional margin
+Σε_j < Δ₀, which the proof of Corollary D.5 invokes, attributing it to a sufficiently large blocking
+factor. Corollary 3 requires such a margin uniformly as the finest spacing shrinks. And the proof of
 Theorem 11.1 uses the lower operator bound (11.3) as an upper bound in (11.5).
 
 Parts of the measurement have precedents, two of them closest. Identifications between different
@@ -248,9 +249,10 @@ block-Lanczos iteration of Hackett and Wagman (Phys. Rev. D 112, 014514, 2025; a
 Eq. 21), used there for spectroscopy on one lattice; here one such matrix enters on each side of a
 blocking map fixed by the physics. Two-lattice Monte Carlo renormalization group matching, a method of the 1980s, has been
 applied to SU(3) gauge theories (A. Hasenfratz, arXiv:0907.0919). The intertwining relation
-S_f W = W S_c has the form of the exact lumpability condition QC = Cq for Markov chains, whose
-approximate versions measure how far a coarse map preserves the dynamics (e.g. Ward, Timár and Simon,
-arXiv:2508.16304). Lang, Liegener and Thiemann (Hamiltonian renormalisation I–IX, arXiv:1711.05685 and
+S_f W = W S_c has the form of the lumpability condition QC = Cq for Markov chains, and Ward et al.
+(Commun. Phys., 2022, doi:10.1038/s42005-022-00834-1) measure the failure of approximate lumping by
+‖QC − Cq‖, the algebraic form of the defect; there the coarse generator is chosen to minimize it,
+whereas here the coarse dynamics come from an independently simulated lattice. Lang, Liegener and Thiemann (Hamiltonian renormalisation I–IX, arXiv:1711.05685 and
 sequels) derive the compression of the semigroup to the coarse space that blocking induces through
 Osterwalder–Schrader reconstruction, and when the embedded space is invariant; their work is analytic,
 for free and solvable models. Isometric scaling maps between lattice Hilbert spaces with an inductive limit: Morinelli,
