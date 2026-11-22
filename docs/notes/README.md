@@ -22,7 +22,7 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 3113 tests
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 3887 tests
     julia --project=lattice lattice/test/runner_checks.jl              # the fine-run program, 19 checks
     julia docs/notes/check_spectral_transfer.jl                        # 6563 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
@@ -265,6 +265,53 @@ here, a factor 2 from β = 6.054 means β ≈ 6.55 (β = 6.4 is only 1.66, and a
 larger than the present one). The question the 3000-configuration run addresses: how much of the
 one-step discrepancy persists in the long-time scalar decay?
 
+## One-sided bound
+
+For a lower bound on the fine gap only one direction of disagreement matters: whether the fine
+evolution could decay more slowly than the coarse one. Let 0 ≤ T ≤ 1 be the fine transfer matrix over
+the matched interval with TΩ = Ω, P the window (orthogonal to Ω), Q the rest of Ω's complement, and
+
+    k = λ_max(PTP),   ℓ² = ‖QTP‖² = λ_max(L_f),   q = ‖QTQ‖.
+
+Writing a unit ψ ⊥ Ω as u + v (u = Pψ, v = Qψ) gives ⟨ψ, Tψ⟩ ≤ k‖u‖² + 2ℓ‖u‖‖v‖ + q‖v‖², hence
+
+    λ₂(T) ≤ μ = (k + q)/2 + √(((k − q)/2)² + ℓ²),
+
+the top eigenvalue of [k ℓ; ℓ q] (`one_sided_bound`). If q is well below k the leakage enters at
+second order, μ ≈ k + ℓ²/(k − q); as q approaches k it enters at first order. To infer the fine window
+from the coarse lattice only the one-sided part of the intertwining is needed: with
+D = V*K_f V − K_c and ε₊ = max(0, λ_max(D)), k ≤ λ_max(K_c) + ε₊. Two constraints frame the omitted
+top q:
+
+- Positivity of T gives QTP = (QTQ)^{1/2} C (PTP)^{1/2} with ‖C‖ ≤ 1, so L_f ≤ q K_f and
+  q ≥ λ_max(K_f^{-1/2} L_f K_f^{-1/2}) (`leakage_q_floor`). The data bound q from below; a gap
+  certificate needs it bounded from above.
+- μ ≤ s holds exactly when k < s and q ≤ s − ℓ²/(s − k) (`q_needed`).
+
+Pilot (window {4, 8}, α = 0.6, zero momentum, central values): the eigenvalues of D are −0.1670 and
++0.0422, so most of the symmetric mismatch is in the harmless direction and ε₊ ≈ 0.042. The positivity
+floor is q ≥ 0.0146/0.2331 ≈ 0.063 from the largest leakage, about 0.18 from the full matrix (noisy).
+Certifying a fine gap equal to the coarse reference over the matched interval, s = e^{−0.973} ≈ 0.378,
+needs q ≤ 0.277 with the directly measured k = 0.2331; with the coarse-derived k = 0.3392 + 0.0422 =
+0.3814 > s no q suffices. The difference between the two shows what is lost when the fine window must be
+inferred from the coarse lattice. `window_transfer.jl` prints these quantities with jackknife errors
+(`--mref 0.973` for this reference).
+
+What an argument about the vacuum would have to supply. Not a smallness of the window's correlators:
+a state orthogonal to every tested operator, with transfer eigenvalue arbitrarily close to 1, leaves
+every window correlator at every time unchanged while q approaches 1, and a tiny overlap barely changes
+a finite-time measurement. What is needed is a quantitative lower bound on how much of every
+low-energy state, including linear combinations, the blocked operators capture; and since Q mixes
+energy eigenstates, the operator to bound is Q e^{−τH} Q itself, not the exponential of a minimum mean
+energy on Q. A result in the zero-momentum scalar sector controls that sector's gap; the full theory
+needs the other sectors. Finite-range decompositions in rigorous renormalization exist even for the
+massless Gaussian field, so they are a precedent for the form of such statements, not a substitute: the
+missing step is the connection to this omitted Hilbert space. On the scalar dip: selective softening
+of the scalar near the bulk endpoint of the fundamental–adjoint plane was found in mixed-action
+simulations (Heller, hep-lat/9508009); the present two-ensemble run tests consistency of the mismatch
+with a finite-spacing shift of the scalar mass, and attributing it to the endpoint would require
+varying the action.
+
 ## The window map in the doubled space
 
 Put the coarse and fine spaces side by side, H_c ⊕ H_f, with the doubled evolution S = S_c ⊕ S_f and,
@@ -397,7 +444,8 @@ measurement exposes that difference; Corollary 3 says why its size matters.
 
 ## Points for review, most important first
 
-Newest: the pilot results at β = 6.054 ("Pilot at β = 6.054"): the spectral reading of the mismatch,
+Newest: the one-sided bound ("One-sided bound"): the 2 × 2 lemma, the positivity floor on q, the q
+needed for a reference gap, and what a vacuum argument would have to supply. Before that: the pilot results at β = 6.054 ("Pilot at β = 6.054"): the spectral reading of the mismatch,
 the mass comparison and its interpretation, and the scope statement. Before that: the doubled-space
 reading and `graph_departure` (the identity ‖[S, R]‖ = ‖S_fW − WS_c‖ and
 the three departure formulas), and the related-work section, in particular the reading of

@@ -342,6 +342,41 @@ function graph_departure(Kf, Lf, Kc, Lc, V)
 end
 
 """
+    one_sided_bound(k, ℓ2, q)
+
+Upper bound μ ≥ λ₂(T) on the top eigenvalue of a transfer operator 0 ≤ T ≤ 1 above its vacuum,
+from a window P orthogonal to the vacuum: k is the top of PTP, ℓ2 = ‖QTP‖² the squared leakage,
+and q the top of QTQ, where Q projects onto the rest of the vacuum's complement. Writing a unit
+ψ ⊥ Ω as u + v with u = Pψ, v = Qψ gives ⟨ψ, Tψ⟩ ≤ k‖u‖² + 2ℓ‖u‖‖v‖ + q‖v‖², so λ₂(T) is at most
+the top eigenvalue of [k ℓ; ℓ q]: μ = (k + q)/2 + √(((k − q)/2)² + ℓ²). Negative ℓ2 (noise) is
+treated as zero.
+"""
+one_sided_bound(k, ℓ2, q) = (k + q) / 2 + sqrt(((k - q) / 2)^2 + max(ℓ2, 0.0))
+
+"""
+    q_needed(s, k, ℓ2)
+
+The largest q for which `one_sided_bound(k, ℓ2, q) ≤ s`: [k ℓ; ℓ q] ≤ s exactly when k < s and
+q ≤ s − ℓ²/(s − k). NaN when k ≥ s (no q suffices); a negative value also means none does.
+"""
+q_needed(s, k, ℓ2) = k < s ? s - max(ℓ2, 0.0) / (s - k) : NaN
+
+"""
+    leakage_q_floor(K, L)
+
+Lower bound on q = ‖QTQ‖ that positivity of T implies: the block form of T ≥ 0 gives
+QTP = (QTQ)^{1/2} C (PTP)^{1/2} with ‖C‖ ≤ 1, so the leakage matrix L = (QTP)*(QTP) obeys
+L ≤ q K with K = PTP, and q ≥ λ_max(K^{-1/2} L K^{-1/2}). Window coordinates; NaN unless K is
+positive definite (noise can make it indefinite).
+"""
+function leakage_q_floor(K, L)
+    F = eigen(Hermitian(_herm(K)))
+    F.values[1] > 0 || return NaN
+    R = F.vectors * Diagonal(1 ./ sqrt.(F.values)) * F.vectors'
+    return eigmax(Hermitian(_herm(R * L * R')))
+end
+
+"""
     ground_state_fractions(C, ops; t0 = 0, periodic = true) -> (f, E0)
 
 Variational estimate of |⟨G|O_k|0⟩|² / C_kk(0) for every operator k, from the

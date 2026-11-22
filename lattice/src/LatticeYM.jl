@@ -24,7 +24,7 @@ export bin_means, jackknife, correlator_matrix, correlator_products, correlator_
 export cosh_mass, effective_masses, gevp, transfer_residual
 export su3_project, block_spatial
 export window_compression, induced_alignment, window_defect_bound, window_defect, ground_state_fractions
-export graph_departure
+export graph_departure, one_sided_bound, q_needed, leakage_q_floor
 export fnv1a, file_prefix_hash, read_measurements
 
 include("su3.jl")

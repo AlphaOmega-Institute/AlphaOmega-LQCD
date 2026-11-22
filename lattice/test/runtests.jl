@@ -547,6 +547,33 @@ end
     end
 end
 
+@testset "one-sided gap bound, positivity floor on q, q needed" begin
+    rng = Xoshiro(78)
+    for _ in 1:200
+        n, k = 12, rand(rng, 1:3)
+        Ω = normalize(randn(rng, n))
+        Pperp = I - Ω * Ω'
+        A = Pperp * randn(rng, n, n) * Pperp
+        R = A * A'
+        R = R / opnorm(R) * rand(rng, 0.2:0.01:0.95)            # spectrum on Ω⊥ below 1
+        T = Ω * Ω' + R                                          # 0 ≤ T ≤ 1, TΩ = Ω
+        U = Matrix(qr(Pperp * randn(rng, n, k)).Q)[:, 1:k]      # window ⊥ Ω
+        Q = Pperp - U * U'
+        K = U' * T * U
+        L = U' * T^2 * U - K^2                                  # = (QTU)*(QTU)
+        kk, ℓ2, q = eigmax(Symmetric(K)), opnorm(Q * T * U)^2, opnorm(Q * T * Q)
+        @test ℓ2 ≈ eigmax(Symmetric((L + L') / 2)) rtol = 1e-8 atol = 1e-12
+        λ2 = opnorm(R)
+        @test λ2 <= one_sided_bound(kk, ℓ2, q) + 1e-12
+        @test leakage_q_floor(K, L) <= q + 1e-10                # L ≤ qK
+        s = kk + rand(rng) * (1 - kk)
+        qn = q_needed(s, kk, ℓ2)
+        qn >= 0 && @test one_sided_bound(kk, ℓ2, qn) ≈ s rtol = 1e-10
+    end
+    @test isnan(q_needed(0.3, 0.4, 0.01))
+    @test isnan(leakage_q_floor([1.0 0; 0 -0.1], [0.1 0; 0 0.1]))
+end
+
 @testset "cosh_mass over one step and over longer intervals" begin
     for m in (0.3, 0.7, 1.4), T in (16, 32), lag in (1, 2, 3)
         c = [cosh(m * (t - T / 2)) for t in 0:T-1]

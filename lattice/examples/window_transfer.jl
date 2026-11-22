@@ -10,6 +10,10 @@
 #          --window 4,8      stout levels spanning the window (values, not indices)
 #          --bin 10          configurations per bin, on both lattices
 #          --drop 0          fine configurations dropped at the start
+#          --mref m          reference gap for the one-sided bound: the coarse mass over the
+#                            matched interval, in coarse units, s = e^{−m} (default: the top
+#                            coarse window eigenvalue, s = λ_max(K_c))
+#          --qgrid 0.1,0.2,0.3   omitted tops q at which the one-sided bound μ(q) is printed
 # A file still being written can be analysed: only lines ending in a newline are read
 # (`read_measurements`), and every row read is checked.
 # For each blocking parameter α and each variant (fixed origin, zero momentum) the script
@@ -23,7 +27,14 @@
 # how far one step of evolution carries the aligned graph of V into the anti-aligned graph
 # (half the in-window mismatch) and out of both windows, and in total. The operators are
 # centered (vacuum expectation subtracted) on each lattice, so the map compared is the one
-# between centered excitations. Errors: delete-one jackknife over the
+# between centered excitations.
+# One-sided diagnostic (docs/notes/README.md, "One-sided bound"): the signed extremal eigenvalues
+# of V*K_f V − K_c and ε₊ = max(0, λ_max), the only part that can make the fine evolution decay
+# more slowly than the coarse one; the floor on the omitted top q = ‖QTQ‖ that positivity of the
+# fine transfer matrix implies, q ≥ λ_max(K_f^{-1/2} L_f K_f^{-1/2}); the largest q for which the
+# bound μ = top of [k ℓ; ℓ q] stays below the reference s, with k the fine window top measured
+# directly or inferred from the coarse lattice as λ_max(K_c) + ε₊ (ℓ² = λ_max(L_f)); and μ(q) on
+# the grid for both choices of k. All are computed in every jackknife replicate. Errors: delete-one jackknife over the
 # bins of each lattice, the two independent variances added; all α and both variants are
 # computed from the same fine bins, so they are resampled together. When both variants
 # are present, the differences fixed − zero of the mismatch, the bound and the defect are
@@ -41,7 +52,7 @@ binned_products(O, b) = ((P, M) = correlator_products(O); (bin_means(P, b), bin_
 meanC(Pb, Mb, ix) = correlator_from_means(dropdims(sum(Pb[ix, :, :, :]; dims = 1); dims = 1) ./ length(ix),
                                           vec(sum(Mb[ix, :]; dims = 1)) ./ length(ix))
 
-function window_quantities(Cc, Cf)
+function window_quantities(Cc, Cf, sref, qgrid)
     Kc, Lc, Gc = window_compression(Cc, 1)
     Kf, Lf, Gf = window_compression(Cf, 2)
     V, M = induced_alignment(Gf, Gc)
@@ -49,10 +60,17 @@ function window_quantities(Cc, Cf)
     leak = sqrt(max(maximum(λc), maximum(λf), 0.0))
     mis = opnorm(Kf * V - V * Kc)
     anti, out, tot = graph_departure(Kf, Lf, Kc, Lc, V)
+    dl = eigvals(Hermitian((V' * Kf * V - Kc + (V' * Kf * V - Kc)') / 2))
+    εp = max(dl[end], 0.0)
+    kd, kc = eigmax(Hermitian(Kf)), eigmax(Hermitian(Kc)) + εp
+    ℓ2 = max(maximum(λf), 0.0)
+    s = sref === nothing ? eigmax(Hermitian(Kc)) : sref
     return vcat(sort(eigvals(Symmetric(Kc)); rev = true), sort(eigvals(Symmetric(Kf)); rev = true),
                 sort(λc), sort(λf),
                 [opnorm(M - I), mis, leak, mis + leak, window_defect(Kf, Lf, Kc, Lc, V),
-                 opnorm(M^2 - I), anti, out, tot])
+                 opnorm(M^2 - I), anti, out, tot],
+                [dl[end], dl[1], εp, leakage_q_floor(Kf, Lf), s, q_needed(s, kd, ℓ2), q_needed(s, kc, ℓ2)],
+                [one_sided_bound(kd, ℓ2, q) for q in qgrid], [one_sided_bound(kc, ℓ2, q) for q in qgrid])
 end
 
 function two_sample_jackknife(f, nc, nf)
@@ -66,11 +84,11 @@ function two_sample_jackknife(f, nc, nf)
     return full, sqrt.(var)
 end
 
-fmt(x, e) = @sprintf("%.4f(%d)", x, round(Int, e * 1e4))
+fmt(x, e) = !isfinite(x) ? "   —   " : isfinite(e) ? @sprintf("%.4f(%d)", x, round(Int, e * 1e4)) : @sprintf("%.4f(—)", x)
 
 function main(args)
     cpath, fpath = args[1], args[2]
-    opt = Dict("window" => "4,8", "bin" => "10", "drop" => "0")
+    opt = Dict("window" => "4,8", "bin" => "10", "drop" => "0", "mref" => "", "qgrid" => "0.1,0.2,0.3")
     i = 3
     while i <= length(args)
         key = lstrip(args[i], '-')
@@ -80,6 +98,8 @@ function main(args)
     end
     wlev = parse.(Int, split(opt["window"], ","))
     b, drop = parse(Int, opt["bin"]), parse(Int, opt["drop"])
+    sref = isempty(opt["mref"]) ? nothing : exp(-parse(Float64, opt["mref"]))
+    qgrid = parse.(Float64, split(opt["qgrid"], ","))
     kc, Xc = read_file(cpath)
     kf, Xf = read_file(fpath)
     Xf = Xf[drop+1:end, :]
@@ -115,11 +135,12 @@ function main(args)
     nfb = size(fine[1][1], 1)
 
     n = length(wlev)
-    per = 4n + 9
+    ng = length(qgrid)
+    per = 4n + 16 + 2ng
     paired = variants == ["fixed", "zero"]
     pix = [4n+2, 4n+4, 4n+5, 4n+9]  # mismatch, bound, defect, total departure from the aligned graph
     function f(ic, jf)
-        q = [window_quantities(meanC(Pc, Mc, ic), meanC(Pf, Mf, jf)) for (Pf, Mf) in fine]
+        q = [window_quantities(meanC(Pc, Mc, ic), meanC(Pf, Mf, jf), sref, qgrid) for (Pf, Mf) in fine]
         v = vcat(q...)
         if paired                     # fixed − zero
             for ia in eachindex(alphas)
@@ -147,6 +168,15 @@ function main(args)
             p += 1
             println(@sprintf("  %-24s %s", label, fmt(est[p], err[p])))
         end
+        line(label, vals) = println(@sprintf("  %-36s", label), join(vals, "  "))
+        line("one-sided: eig(V*K_fV − K_c)", [fmt(est[p+1], err[p+1]), fmt(est[p+2], err[p+2])])
+        line("  ε₊ = max(0, λ_max)", [fmt(est[p+3], err[p+3])])
+        line("  q floor from positivity", [fmt(est[p+4], err[p+4])])
+        line("  reference s", [fmt(est[p+5], err[p+5])])
+        line("  q needed, k = fine window top", [fmt(est[p+6], err[p+6])])
+        line("  q needed, k = coarse top + ε₊", [fmt(est[p+7], err[p+7])])
+        line("  μ(q), fine k, q = $(join(qgrid, ", "))", [fmt(est[p+7+j], err[p+7+j]) for j in 1:ng])
+        line("  μ(q), coarse k", [fmt(est[p+7+ng+j], err[p+7+ng+j]) for j in 1:ng])
     end
     if paired
         println("\nfixed origin − zero momentum (paired errors: same configurations and bins)")
