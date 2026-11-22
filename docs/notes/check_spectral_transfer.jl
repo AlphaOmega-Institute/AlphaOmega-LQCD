@@ -116,5 +116,9 @@ end
         lhs = opnorm(Sf * W - W * Sc)
         rhs = opnorm(Kf * V - V * Kc) + max(sqrt(opnorm(Lf)), sqrt(opnorm(Lc)))
         @test lhs <= rhs + 1e-10
+        # the equality of Proposition 6
+        psq(L) = (E = eigen(Hermitian(L)); E.vectors * Diagonal(sqrt.(max.(E.values, 0.0))) * E.vectors')
+        D = Kf * V - V * Kc
+        @test lhs ≈ opnorm([D (-V * psq(Lc)); (psq(Lf) * V) zeros(k, k)]) rtol = 1e-8
     end
 end

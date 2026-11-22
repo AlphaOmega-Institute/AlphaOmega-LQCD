@@ -88,14 +88,14 @@ All inequalities of Propositions~\ref{prop:shadow} and~\ref{prop:gap}, including
 \section{Along a renormalization-group trajectory}
 
 \begin{corollary}\label{cor:chain}
-Let lattices $k=0$ (finest) to $K$ (coarsest) have spacings $a_k=2^ka_0$ and Hamiltonians $H_k$ in lattice units. Let $W_k:\K_{k+1}\to\K_k$ be partial isometries as above, whose initial projections $Q_{k+1}$ are spectral projections of $H_{k+1}$ for intervals containing its simple ground state and its first excited level, with defects $\delta_k=\|H_kW_k-W_k\tfrac12H_{k+1}\|$, the coarse energies converted to fine lattice units. Write $m_k=\Delta_k/a_k$ for the gap of $H_k$ in physical units. If the hypotheses of Proposition~\ref{prop:gap} hold at every step, with error $\varepsilon_k$, then
+Let lattices $k=0$ (finest) to $K$ (coarsest) have spacings $a_k=2^ka_0$ and Hamiltonians $H_k$ in lattice units. Let $W_k:\K_{k+1}\to\K_k$ be partial isometries as above, whose initial projections $Q_{k+1}$ are spectral projections of $H_{k+1}$ for intervals containing its simple ground state, with defects $\delta_k=\|H_kW_k-W_k\tfrac12H_{k+1}\|$, the coarse energies converted to fine lattice units. Write $m_k=\Delta_k/a_k$ for the gap of $H_k$ in physical units. If the hypotheses of Proposition~\ref{prop:gap} hold at every step, with error $\varepsilon_k$, then
 \[
  m_0\ \ge\ m_K-\sum_{k<K}\frac{\delta_k+\varepsilon_k}{a_k} .
 \]
 \end{corollary}
 
 \begin{proof}
-Apply Proposition~\ref{prop:gap} with $H_f=H_k$ and $H_c=\tfrac12H_{k+1}$. Because $Q_{k+1}$ contains the ground state and the first excited level of $H_{k+1}$, the window gap is $\tfrac12\Delta_{k+1}$, and Proposition~\ref{prop:gap} gives $\Delta_k\ge\tfrac12\Delta_{k+1}-\delta_k-\varepsilon_k$. Divide by $a_k=a_{k+1}/2$ and sum.
+Apply Proposition~\ref{prop:gap} with $H_f=H_k$ and $H_c=\tfrac12H_{k+1}$. Because $Q_{k+1}$ is a spectral projection containing the simple ground state of $H_{k+1}$, the window has no spectrum within $\tfrac12\Delta_{k+1}$ above its ground (exactly that gap if the first excited level is also retained), so Proposition~\ref{prop:gap} applies with $\Delta_c=\tfrac12\Delta_{k+1}$ and gives $\Delta_k\ge\tfrac12\Delta_{k+1}-\delta_k-\varepsilon_k$. Divide by $a_k=a_{k+1}/2$ and sum.
 \end{proof}
 
 The hypothesis on $Q_{k+1}$ cannot be dropped. Take coarse energies $0,4,5$ and a window that keeps only $4$ and $5$, mapped exactly to fine energies $2$ and $2.5$, with the omitted fine level at $10$. After the rescaling the defect is zero, and Proposition~\ref{prop:gap} correctly gives the fine gap $0.5$, but the rescaled full coarse gap is $2$.
@@ -132,9 +132,10 @@ The quantities above refer to one lattice. To test a change of scale, compare a 
 $K_i$ is the evolution inside window $i$ and $L_i$ the squared leakage out of it.
 
 \begin{proposition}\label{prop:windows}
-For every unitary $V$ on $\mathbb C^n$, the partial isometry $W=U_fVU_c^*$ satisfies
+Let $V$ be unitary on $\mathbb C^n$, $W=U_fVU_c^*$ and $D=K_fV-VK_c$. Then
 \[
- \|S_fW-WS_c\|\ \le\ \|K_fV-VK_c\|+\max\bigl\{\|L_f\|^{1/2},\|L_c\|^{1/2}\bigr\} .
+ \|S_fW-WS_c\|=\left\|\begin{pmatrix}D&-VL_c^{1/2}\\ L_f^{1/2}V&0\end{pmatrix}\right\|
+ \ \le\ \|D\|+\max\bigl\{\|L_f\|^{1/2},\|L_c\|^{1/2}\bigr\} .
 \]
 \end{proposition}
 
@@ -143,13 +144,19 @@ Write $S_fU_f=U_fK_f+(I-P_f)S_fU_f$ and, by self-adjointness, $U_c^*S_c=K_cU_c^*
 \[
  S_fW-WS_c=U_f(K_fV-VK_c)U_c^*+(I-P_f)S_fU_fVU_c^*-U_fVU_c^*S_c(I-P_c) .
 \]
-With respect to $\Ran P_c\oplus\Ran(I-P_c)$ and $\Ran P_f\oplus\Ran(I-P_f)$ the first term is the diagonal block $A$, and the other two are the off-diagonal blocks $B=(I-P_f)S_fU_fVU_c^*$ and $C=-U_fVU_c^*S_c(I-P_c)$. Hence the norm is at most $\|A\|+\max\{\|B\|,\|C\|\}$. Here $\|A\|=\|K_fV-VK_c\|$, $\|B\|^2=\|V^*L_fV\|=\|L_f\|$ and $\|C\|^2=\|L_c\|$.
+With respect to $\Ran P_c\oplus\Ran(I-P_c)$ and $\Ran P_f\oplus\Ran(I-P_f)$ the first term is the diagonal block $A$, and the other two are the off-diagonal blocks $B=(I-P_f)S_fU_fVU_c^*$ and $C=-U_fVU_c^*S_c(I-P_c)$. Hence the norm is at most $\|A\|+\max\{\|B\|,\|C\|\}$. Here $\|A\|=\|D\|$, $\|B\|^2=\|V^*L_fV\|=\|L_f\|$ and $\|C\|^2=\|L_c\|$. For the equality, take the polar decompositions $(I-P_i)S_iU_i=Y_iL_i^{1/2}$, with $Y_i$ isometric on $\Ran L_i^{1/2}$. Then $B=Y_fL_f^{1/2}VU_c^*$ and $C=-U_fVL_c^{1/2}Y_c^*$, so
+\[
+ S_fW-WS_c=\begin{pmatrix}U_f&0\\0&Y_f\end{pmatrix}\begin{pmatrix}D&-VL_c^{1/2}\\ L_f^{1/2}V&0\end{pmatrix}\begin{pmatrix}U_c^*&0\\0&Y_c^*\end{pmatrix},
+\]
+and the outer factors are isometric on the relevant ranges, so they preserve the norm.
 \end{proof}
 
 If the windows are spanned by the states $F=(f_1,\dots,f_n)$ and $C=(c_1,\dots,c_n)$ that $n$ operators create from the vacuum, with Gram matrices $G_f=F^*F$ and $G_c=C^*C$, the frames $U_f=FG_f^{-1/2}$ and $U_c=CG_c^{-1/2}$ give $K_i=G_i^{-1/2}\mathcal C_i(\ell_i)G_i^{-1/2}$ and $K_i^2+L_i=G_i^{-1/2}\mathcal C_i(2\ell_i)G_i^{-1/2}$, where $\mathcal C_i(t)$ is the connected correlator matrix and $\ell_f=2$, $\ell_c=1$. The fine lags $0,2,4$ and the coarse lags $0,1,2$ suffice.
 
 \begin{remark}[The alignment induced by blocking]
-The unitary $V$ must be specified by the physics, not chosen to make the bound small. A blocking map $B$ from fine to coarse link configurations turns each coarse operator $O$ into the fine operator $O\circ B$. The induced map of operator states, $c_k\mapsto f_k$, is $W_0=U_fG_f^{1/2}G_c^{-1/2}U_c^*$. Its polar decomposition separates two kinds of mismatch, as in the polar formalism: the polar part $U_fVU_c^*$, with $V$ the unitary factor of $G_f^{1/2}G_c^{-1/2}$, is the presentation used in Proposition~\ref{prop:windows}, and the positive factor $|G_f^{1/2}G_c^{-1/2}|$ measures how far the normalizations of the operator states disagree. If the coarse action were the exact blocked action, the correlators of $O\circ B$ at fine lag $2t$ would equal those of $O$ at coarse lag $t$, so $G_f=G_c$, $K_f=K_c$, $L_f=L_c$ and $V=I$: the defect would reduce to leakage.
+The unitary $V$ must be specified by the physics, not chosen to make the bound small. A blocking map $B$ from fine to coarse link configurations turns each coarse operator $O$ into the fine operator $O\circ B$. The induced map of operator states, $c_k\mapsto f_k$, is $W_0=U_fG_f^{1/2}G_c^{-1/2}U_c^*$. Its polar decomposition separates two kinds of mismatch, as in the polar formalism: the polar part $U_fVU_c^*$, with $V$ the unitary factor of $G_f^{1/2}G_c^{-1/2}$, is the presentation used in Proposition~\ref{prop:windows}, and the positive factor $|G_f^{1/2}G_c^{-1/2}|$ measures how far the normalizations of the operator states disagree. If the coarse action were the exact blocked action, the correlators of $O\circ B$ at fine lag $2t$ would equal those of $O$ at coarse lag $t$, so $G_f=G_c$, $K_f=K_c$, $L_f=L_c$ and $V=I$: the defect would reduce to leakage. Because each ensemble's vacuum mean is subtracted, the operator states are the centered excitations $(O-\langle O\rangle)|0\rangle$, and the map compared is the correspondence between centered excitations.
+
+A blocking with a fixed origin is invariant only under translations by two fine sites, so fine momenta $\pi/a_f$ fold onto zero coarse momentum. Averaging the blocked operator amplitudes over the $2^{D-1}$ origins, before forming correlators, projects onto zero fine momentum. Measuring both separates a mismatch in the rest-frame channel from the part that folding contributes.
 \end{remark}
 
 \begin{remark}[What a measurement of the bound shows]

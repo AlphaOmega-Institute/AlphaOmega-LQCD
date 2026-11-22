@@ -301,6 +301,21 @@ window_defect_bound(Kf, Lf, Kc, Lc, V) =
     opnorm(Kf * V - V * Kc) + sqrt(max(eigmax(Symmetric(_herm(Lf))), eigmax(Symmetric(_herm(Lc))), 0.0))
 
 """
+    window_defect(Kf, Lf, Kc, Lc, V)
+
+The defect ‖S_f W − W S_c‖ of the window map W = U_f V U_c* itself, from the same
+correlator data: the norm of [D  −V√Lc; √Lf V  0] with D = Kf V − V Kc. It follows from
+the polar decompositions of the two leakage maps (I − P_i) S_i U_i = Y_i √L_i, and is at
+most `window_defect_bound`. Negative leakage eigenvalues (noise) are set to zero.
+"""
+function window_defect(Kf, Lf, Kc, Lc, V)
+    psqrt(L) = (F = eigen(Symmetric(_herm(L))); F.vectors * Diagonal(sqrt.(max.(F.values, 0.0))) * F.vectors')
+    n = size(Kf, 1)
+    D = Kf * V - V * Kc
+    return opnorm([D (-V * psqrt(Lc)); (psqrt(Lf) * V) zeros(n, n)])
+end
+
+"""
     ground_state_fractions(C, ops; t0 = 0, periodic = true) -> (f, E0)
 
 Variational estimate of |⟨G|O_k|0⟩|² / C_kk(0) for every operator k, from the

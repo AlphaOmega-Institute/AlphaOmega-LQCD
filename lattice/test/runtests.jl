@@ -395,4 +395,60 @@ end
     end
 end
 
+
+@testset "su3_project fallback for singular path sums" begin
+    rng = Xoshiro(73)
+    M = randn(rng, ComplexF64, 3, 2) * randn(rng, ComplexF64, 2, 3)       # rank two
+    U = haar_su3(rng)
+    @test su3_project(Mat3(M), U) == U
+    @test_throws ArgumentError su3_project(Mat3(M))
+    A = Mat3(randn(rng, ComplexF64, 3, 3))
+    @test su3_project(A, U) ≈ su3_project(A)                               # fallback unused
+end
+
+@testset "blocking origins and the zero-momentum projection" begin
+    g, rng = rough_field((8, 8, 8, 6), 74)
+    li = LinearIndices(g.lat.dims)
+    b = block_spatial(g, 0.0; origin = (1, 0, 1))
+    X = 23
+    c = b.lat.coords[:, X]
+    x = li[2c[1], 2c[2] - 1, 2c[3], c[4]]
+    @test maximum(abs, (b.U[2, X] - g.U[2, x] * g.U[2, g.lat.fwd[2, x]]).e) < 1e-12
+    G = [haar_su3(rng) for _ in 1:nsites(g.lat)]
+    gb = block_spatial(gauge_transform!(copy(g), G), 0.3; origin = (0, 1, 1))
+    bb = block_spatial(g, 0.3; origin = (0, 1, 1))
+    Gc = [G[li[2bb.lat.coords[1, X] - 1, 2bb.lat.coords[2, X], 2bb.lat.coords[3, X], bb.lat.coords[4, X]]]
+          for X in 1:nsites(bb.lat)]
+    bg = gauge_transform!(copy(bb), Gc)
+    @test maximum(maximum(abs, (gb.U[i] - bg.U[i]).e) for i in eachindex(gb.U)) < 1e-11
+    # translating the fine field by one site changes the fixed-origin operator, but not the
+    # average over the eight origins
+    shifted = GaugeField(g.lat, [g.U[μ, g.lat.bwd[1, x]] for μ in 1:4, x in 1:nsites(g.lat)])
+    origins = vec([(a, b, c) for a in 0:1, b in 0:1, c in 0:1])
+    zero_mom(h) = sum(glueball_operators(block_spatial(h, 0.3; origin = o), 0.1, [0, 2]) for o in origins) ./ 8
+    fixed(h) = glueball_operators(block_spatial(h, 0.3), 0.1, [0, 2])
+    @test zero_mom(shifted) ≈ zero_mom(g) atol = 1e-12
+    @test !isapprox(fixed(shifted), fixed(g); atol = 1e-6)
+end
+
+@testset "window_defect equals the defect of the window map" begin
+    rng = Xoshiro(75)
+    psd(n) = (A = randn(rng, n, n); M = A * A'; Symmetric(M / opnorm(M)))
+    isq(G) = (F = eigen(Symmetric(G)); F.vectors * Diagonal(1 ./ sqrt.(F.values)) * F.vectors')
+    for _ in 1:40
+        nf, nc, k, T = 18, 10, rand(rng, 1:4), 10
+        Sf, Sc = psd(nf), psd(nc)
+        F, Cs = randn(rng, nf, k), randn(rng, nc, k)
+        Cf = cat((F' * Sf^t * F for t in 0:T-1)...; dims = 3)
+        Cc = cat((Cs' * Sc^t * Cs for t in 0:T-1)...; dims = 3)
+        Kf, Lf, Gf = window_compression(Cf, 1)
+        Kc, Lc, Gc = window_compression(Cc, 1)
+        V, _ = induced_alignment(Gf, Gc)
+        W = F * isq(F' * F) * V * isq(Cs' * Cs) * Cs'
+        exact = opnorm(Sf * W - W * Sc)
+        @test window_defect(Kf, Lf, Kc, Lc, V) ≈ exact rtol = 1e-8
+        @test exact <= window_defect_bound(Kf, Lf, Kc, Lc, V) + 1e-10
+    end
+end
+
 end

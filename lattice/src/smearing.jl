@@ -77,50 +77,67 @@ function stout_spatial(g::GaugeField, ρ::Real, n::Integer)
 end
 
 """
-    su3_project(A)
+    su3_project(A[, fallback]; tol = 1e-10)
 
 Project a 3×3 matrix onto SU(3) through its polar decomposition:
 W = A (A†A)^{-1/2}, then W times a cube root of conj(det W). For G, H in SU(3),
 `su3_project(G A H') = G su3_project(A) H'`, so the projection is covariant at
 both ends of a path. (`reunitarize`, row Gram–Schmidt, is covariant only under
-right multiplication.) `A` must be invertible.
+right multiplication.)
+
+If A is numerically singular (smallest eigenvalue of A†A below `tol` times the
+largest), the polar part is not determined. Then `fallback` is returned, which
+must be an SU(3) matrix transforming like A (for blocking, the straight path);
+without a fallback an ArgumentError is thrown. The test is on the eigenvalue
+ratio, which is gauge invariant, so the choice keeps the projection covariant.
 """
-function su3_project(A::Mat3)
+function su3_project(A::Mat3, fallback::Union{Mat3,Nothing} = nothing; tol::Real = 1e-10)
     M = Matrix(A)
     F = eigen(Hermitian(M' * M))
+    if !(F.values[1] > tol * F.values[end])
+        fallback === nothing && throw(ArgumentError("su3_project: numerically singular matrix"))
+        return fallback
+    end
     W = M * F.vectors * Diagonal(1 ./ sqrt.(F.values)) * F.vectors'
     return Mat3(cis(-angle(det(W)) / 3) * W)
 end
 
 """
-    block_spatial(g, α) -> GaugeField
+    block_spatial(g, α; origin = (0, …, 0)) -> GaugeField
 
 One blocking step in the spatial directions. The coarse lattice has spatial
 extents L_i/2 (which must be even) and the same time extent; coarse site X sits
-on fine site x with x_i = 2X_i − 1. A coarse spatial link is the SU(3)
+on fine site x with x_i = 2X_i − 1 + origin_i, origin_i ∈ {0, 1}. The eight
+origins give the eight coarse sublattices; a slice average over one of them is
+invariant only under translations by two fine sites, and the average over all
+eight is the zero-momentum projection. A coarse spatial link is the SU(3)
 projection of the straight path U_μ(x) U_μ(x+μ̂) plus α times the 2(D−2) bent
 paths of length four from x to x+2μ̂ through x ± ν̂ (ν spatial, ν ≠ μ). Every path
 runs from x to x+2μ̂, so with `su3_project` the blocked links transform under
 the gauge transformation restricted to coarse sites. Time links are copied
-from the fine site and are not blocked. Untwisted lattices only.
+from the fine site and are not blocked. If a path sum is numerically singular
+the straight path is used (see `su3_project`). Untwisted lattices only.
 """
-function block_spatial(g::GaugeField{D}, α::Real) where {D}
+function block_spatial(g::GaugeField{D}, α::Real; origin = ntuple(_ -> 0, D - 1)) where {D}
     lat, U = g.lat, g.U
     all(==(1), lat.z) || throw(ArgumentError("block_spatial supports untwisted lattices only"))
     cdims = ntuple(d -> d == D ? lat.dims[d] : lat.dims[d] ÷ 2, D)
     all(d -> iseven(lat.dims[d]) && iseven(cdims[d]), 1:D-1) ||
         throw(ArgumentError("spatial extents must be multiples of 4"))
+    (length(origin) == D - 1 && all(o -> o in (0, 1), origin)) ||
+        throw(ArgumentError("origin must have D−1 entries in {0, 1}"))
     clat = Lattice(cdims)
     li = LinearIndices(lat.dims)
     Uc = Matrix{Mat3}(undef, D, nsites(clat))
     αf = Float64(α)
     Threads.@threads for X in 1:nsites(clat)
-        x = li[CartesianIndex(ntuple(d -> d == D ? clat.coords[d, X] : 2clat.coords[d, X] - 1, D))]
+        x = li[CartesianIndex(ntuple(d -> d == D ? clat.coords[d, X] : 2clat.coords[d, X] - 1 + origin[d], D))]
         Uc[D, X] = U[D, x]
         for μ in 1:D-1
             xμ = lat.fwd[μ, x]
             x2μ = lat.fwd[μ, xμ]
-            A = U[μ, x] * U[μ, xμ]
+            straight = U[μ, x] * U[μ, xμ]
+            A = straight
             for ν in 1:D-1
                 ν == μ && continue
                 xp = lat.fwd[ν, x]                     # through x + ν̂
@@ -128,7 +145,7 @@ function block_spatial(g::GaugeField{D}, α::Real) where {D}
                 xm = lat.bwd[ν, x]                     # through x − ν̂
                 A = A + αf * (U[ν, xm]' * U[μ, xm] * U[μ, lat.fwd[μ, xm]] * U[ν, lat.bwd[ν, x2μ]])
             end
-            Uc[μ, X] = su3_project(A)
+            Uc[μ, X] = su3_project(A, straight)
         end
     end
     return GaugeField(clat, Uc)

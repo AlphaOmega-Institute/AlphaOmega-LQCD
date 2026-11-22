@@ -21,8 +21,8 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 2131 tests
-    julia docs/notes/check_spectral_transfer.jl                        # 6263 checks
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 2218 tests
+    julia docs/notes/check_spectral_transfer.jl                        # 6563 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
     gunzip -k lattice/results/glueball_b570_L8T16.txt.gz           # 3000 configurations, 2.6 MB
     julia --project=lattice lattice/examples/glueball_analysis.jl lattice/results/glueball_b570_L8T16.txt \
@@ -86,21 +86,34 @@ how precisely these quantities can be measured. Coarse leakage, signed eigenvalu
 | 4, 8, 16, 24 | −0.0100(50), −0.0071(44), 0.0038(44), 0.0111(42) | 0.0111(42) | 0.352(5), 0.088(5), 0.024(5), 0.005(5) |
 | 4, 8 | 0.0039(44), 0.0149(42) | 0.0149(42) | 0.339(5), 0.064(5) |
 
+Noise floor of the in-window mismatch (`examples/window_noise_floor.jl`): pairs of independent
+block-bootstrap resamples of 3000 configurations from this ensemble, whose true mismatch is zero, give an
+apparent mismatch whose 95th percentile is 0.017 for levels 4, 8 and 0.022 for levels 4, 8, 16, 24 (2000
+pairs; the review found the same with 4000). Levels 4 and 8 are the primary window, all four a
+sensitivity check.
+
 The negative eigenvalues of the larger window are noise of the same size as its positive ones. The
 largest eigenvalue of a noisy matrix is also biased upward, so its square root, 0.105(20) or 0.122(17),
 is an estimate dominated by noise, not a bound. Two standard errors above it gives 0.14–0.15.
 
 Budget. In transfer-matrix units the gap of the window {vacuum, glueball} is 1 − 0.35 ≈ 0.65, so the
-Proposition 2 scale is about 0.65/2√2 ≈ 0.23. With leakage up to 0.15, the in-window mismatch
-‖K_f V − V K_c‖ must stay below about 0.08 for the measured defect to fall under that scale. The
+Proposition 2 scale is about 0.65/2√2 ≈ 0.23. With leakage up to 0.15, an in-window mismatch below about
+0.08 keeps even the upper bound of Proposition 6 under that scale; this budget is conservative, because
+the analysis also computes the defect itself (the equality in Proposition 6), which can stay under the
+scale with a larger mismatch. The
 eigenvalues of K_c are measured to ±0.005, and the fine lattice, at the same physical volume and with
 lags 0, 2, 4, should reach similar precision with a similar number of configurations. So the fine run can
 resolve the comparison if the mismatch is above about 0.02.
 
-Proposed fine run (not yet done): β = 6.054, where the Necco–Sommer interpolation gives twice the r₀/a of
-β = 5.7; 16³ × 32 blocked once to 8³ × 32; blocking parameters α = 0, 0.3, 0.6; the same stout levels.
-Measured cost: 4.5 s per configuration on four threads, so 2000–3000 configurations take 2.5–3.75 hours.
-A tiny smoke run of the whole pipeline (`blocked_glueball.jl`, then `window_transfer.jl`) works.
+Fine run (to be done on a faster machine): β = 6.054, where the Necco–Sommer interpolation gives
+a(5.7)/a(6.054) = 2.0015; 16³ × 32 blocked once to 8³ × 32; blocking parameters α = 0, 0.3, 0.6 on the
+same configurations; stout levels 4, 8, 16, 24. Each α is measured in two variants: the fixed blocking
+origin, and the zero-momentum projection (operator amplitudes averaged over the eight origins before the
+correlators are formed). Target 3000 configurations, with the first 1000 inspected as a pilot while the
+same chain continues; `--checkpoint`/`--resume` make an interrupted run continue exactly. Cost:
+the measurement now smears 24 blocked lattices per configuration (3 α × 8 origins) up to 24 stout
+steps, which costs more than the sweeps: well over 13 s per configuration on the four threads used here
+(being re-timed). Time it first on the machine that runs it, with `--confs 25`.
 
 ## Status
 
@@ -137,10 +150,12 @@ A tiny smoke run of the whole pipeline (`blocked_glueball.jl`, then `window_tran
 
 New in this round:
 
-1. Proposition 6 and Remark 7: the bound, and the alignment induced by blocking as the polar part of the
-   operator-state correspondence c_k ↦ f_k, with the normalization mismatch as its positive part.
-2. `block_spatial` and `su3_project` (`lattice/src/smearing.jl`): paths, covariance at both ends, and
-   whether a two-link-plus-staples blocking is a reasonable first map.
+1. Proposition 6 and Remark 7: the bound and the equality for the defect itself, the alignment induced
+   by blocking as the polar part of the operator-state correspondence, centered excitations, and the
+   fixed-origin and zero-momentum variants of the blocked operators.
+2. `block_spatial` (now with an origin) and `su3_project` (with a covariant fallback, the straight path,
+   for numerically singular path sums), `window_defect`, and the dimension and row-width checks of
+   `window_transfer.jl`.
 3. The pilot and budget above: whether the fine run, as designed, can answer the question.
 4. `examples/blocked_glueball.jl` and `examples/window_transfer.jl`: the two-ensemble jackknife and the
    use of fine lag 2 against coarse lag 1.
