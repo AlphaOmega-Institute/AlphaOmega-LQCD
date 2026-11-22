@@ -203,16 +203,23 @@ inequality ‖V*K_f V − K_c‖ cannot fall below it for any unitary V.
   that blocking pairs do not evolve alike over one matched interval, and no change of the pairing can
   make them.
 - Most of the mismatch is spectral. The top eigenvalues, 0.339(5) coarse and 0.233(7) fine (α = 0.6,
-  zero momentum), are the decays of the GEVP ground-state correlators over the matched interval:
-  e^{−1.081} on the coarse lattice (t = 0 → 1) and e^{−(0.768 + 0.689)} on the fine one (t = 0 → 2).
+  zero momentum), are close to the decays of the GEVP ground-state correlators over the matched
+  interval, but not identical to them: the window maximizes the correlator at fine lag 2, the GEVP of
+  the mass analysis at lag 1. With periodic cosh ratios the lag-one combination decays by 0.3393 over
+  coarse t = 0 → 1 and by 0.2329 over fine t = 0 → 2 (window: 0.3392, 0.2331). At α = 0, zero
+  momentum, it gives 0.1399 against the window's 0.1436: for the better recipe the combination chosen
+  at one fine step is nearly optimal at two, for the cruder one it is not.
 - Averaging over the eight blocking origins lowers the defect at every α, by 0.038(9), 0.036(9) and
   0.029(8) (paired errors). α = 0.6 with zero momentum is the primary recipe; α = 0.3 is close enough
   that a paired comparison of the two is needed before preferring either.
 - Neutrality and invariance rank the recipes in opposite order at α = 0.6: the fixed origin gives the
-  more nearly isometric raw map (‖M − I‖ 0.143 against 0.249), the zero-momentum average the more nearly
-  invariant polar graph (mismatch 0.195 against 0.167).
-- Evolution out of the windows (≈ 0.12) is the same as in the coarse self-comparison: the windows
-  capture the evolution equally well on both lattices, and the disagreement lies inside them.
+  more nearly isometric raw map (‖M − I‖ 0.143 against 0.249), while the zero-momentum average tracks
+  the evolution better inside the window (mismatch 0.195 against 0.167, paired difference 0.0282(42),
+  6.7 errors). In the total departure from the aligned graph, which includes leakage, the improvement
+  is 0.0122(69), 1.8 errors.
+- The pilot resolves disagreement inside the windows. Out of the windows, the evolution (≈ 0.12) is
+  compatible in size with the coarse self-comparison; similar magnitudes leave open which states the
+  evolution reaches outside each window.
 - The gap criterion is undecided. The best defect, 0.218(15), is within one error of the provisional
   scale 0.23; some leakage eigenvalues come out negative, so the leakage-sensitive figures need a
   bin-size check; and the omitted energy on the fine lattice is not measured here.
@@ -220,7 +227,7 @@ inequality ‖V*K_f V − K_c‖ cannot fall below it for any unitary V.
 The masses (`blocked_masses.jl`, GEVP on levels 4 and 8, effective masses in fine units; coarse values
 converted with a_c/a_f = 2.0015):
 
-| fine t | α = 0.6, zero momentum | α = 0.3, zero momentum | coarse at the same physical time |
+| fine t | α = 0.6, zero momentum | α = 0.3, zero momentum | coarse, starting at the same physical time (spans fine t → t + 2) |
 |---|---|---|---|
 | 0 | 0.768(13) | 0.794(13) | 0.540(7) (coarse t = 0) |
 | 1 | 0.689(22) | 0.695(23) | |
@@ -232,9 +239,13 @@ Published reference (Athenodorou and Teper, arXiv:2007.06422, Table 1): a m₀ =
 (10³ × 16), against our 0.973(35) at β = 5.7, and 0.7045(65) at β = 5.99, 0.6365(43) at β = 6.0625,
 interpolating to about 0.645 at β = 6.054 in larger boxes than ours. In units of the string tension
 their m₀/√σ rises from 2.47 at β = 5.6924 to 3.27 at β = 6.0625 (continuum 3.405(21)): the scalar dip of
-the Wilson action. At fine t = 2 the fine effective mass is 0.17(4) above the coarse value at the
-matched time and agrees with the benchmark; at t = 3 and 4 it falls to 0.56(8) and 0.53(13), consistent
-both with the benchmark and with the coarse mass. A finite-spacing shift of the scalar mass, which
+the Wilson action. The rows of the table start at the same physical time but do not span the same
+interval: a fine effective mass at t covers t → t + 1, the coarse one about t → t + 2 in fine units.
+Over a matched interval, fine t = 2 → 4 against coarse t = 1 → 2, the central values are about 0.61 and
+0.486 in fine units (α = 0.6, zero momentum); the error of that difference needs the jackknife over the
+correlators and comes with the 3000-configuration analysis. The single fine effective masses fall from
+0.656(40) at t = 2 to 0.56(8) and 0.53(13) at t = 3 and 4, consistent both with the benchmark and with
+the coarse mass. A finite-spacing shift of the scalar mass, which
 would account for most of the eigenvalue difference, is suggested but not established at 1000
 configurations; resolving t = 3–5 is what the extension to 3000 is for. The decisive comparison is
 over matched intervals: the fine mass over t = 2 → 4 (one mass from C(2)/C(4), about 0.61 at 1000
@@ -243,12 +254,16 @@ interval later (`blocked_masses.jl` now prints this table). The printed overlaps
 with the leading variational state of the two-operator window, not with the true glueball, so
 excited-state contamination remains a possible part of the early-time excess.
 
-Scope. The result concerns the tested blocked operators over one matched interval. A shift of the
-scalar mass between the two spacings would obstruct any map that pairs the two scalar ground states
-exactly, and leaves open how well other maps or other states transfer. If β = 5.7 lies in the scalar
-dip, a test of Corollary 3 needs both lattices in the scaling region; with the scale used here, a
-factor 2 from β = 6.054 means β ≈ 6.55 (β = 6.4 is only 1.66, and a 32³ box there would be 21% larger
-than the present one).
+Scope. What is secure: no unitary alignment removes the observed one-step discrepancy within these
+operator windows. The result concerns the tested blocked operators over one matched interval. A shift
+of the scalar mass between the two spacings would obstruct a map that both pairs the two scalar ground
+states and intertwines their evolution over matched times; pairing two rays is always possible, and
+the constraint is that their decay rates agree. It leaves open how well other maps or other states
+transfer. A lattice pair further into the scaling region would make a cleaner scaling study, while the
+present pair can still test a finite-step inequality wherever its hypotheses hold. With the scale used
+here, a factor 2 from β = 6.054 means β ≈ 6.55 (β = 6.4 is only 1.66, and a 32³ box there would be 21%
+larger than the present one). The question the 3000-configuration run addresses: how much of the
+one-step discrepancy persists in the long-time scalar decay?
 
 ## The window map in the doubled space
 
