@@ -22,19 +22,21 @@
 \noindent
 Blocking fixes which coarse-lattice operator a fine-lattice operator represents. If the map preserves
 the dynamics, evolving a coarse state and then translating it, or translating it first and evolving the
-fine state over the same physical time, should agree. We measure the largest disagreement over a window
-of operators exactly from correlators of two independently simulated lattices, with the operator
-correspondence fixed by blocking and aligned by its polar decomposition. For SU(3) Yang--Mills theory
-with the Wilson action at $\beta=5.7$ and $6.054$, the 0$^{++}$ window eigenvalues of the blocked fine
-lattice lie below their coarse partners, so a comparison of spectra shows only faster fine decay, yet
-the blocking-fixed pairing rotates the leading direction by $24.8(1.0)^\circ$ and creates a direction in
-which the fine evolution decays more slowly, a one-sided discrepancy of $0.045(6)$. The leading spectral
-separation is accounted for by a known finite-spacing shift of the scalar mass. Different blocking
+fine state over the same physical time, should agree. We estimate the largest disagreement over a
+window of operators from correlators of two independently simulated lattices, through an identity that
+is exact for vacuum transfer moments, with the operator correspondence fixed by blocking and aligned by
+its polar decomposition. For SU(3) Yang--Mills theory with the Wilson action at $\beta=5.7$ and $6.054$,
+in the primary window of two smeared 0$^{++}$ operators, both eigenvalues of the blocked fine lattice
+lie below their coarse partners, so a comparison of spectra shows only faster fine decay. Yet the
+blocking-fixed pairing rotates the leading direction by $24.8(1.0)^\circ$, and in one paired direction the
+normalized one-step autocorrelation is $0.146(5)$ on the fine lattice against $0.101(6)$ on the coarse
+one, a one-sided discrepancy of $0.045(6)$. The fitted scalar masses, which show a known finite-spacing
+shift, reproduce the size of the leading spectral separation within uncertainty. Different blocking
 recipes rank in opposite order by the faithfulness of the initial pairing and by the tracking of the
-evolution, and again by the symmetric and the one-sided discrepancy. We state the one-sided criterion
-that a lower bound on a gap requires, show what correlators determine and what they cannot (an upper
-bound on slow states the chosen operators do not see), and record the design and predictions for a
-second pair, $\beta=6.054$ against $6.546$.
+evolution, and again by the symmetric and the one-sided discrepancy. We state a sufficient one-sided
+criterion for a gap, show what correlators determine and what they cannot (an upper bound on slow
+states the chosen operators do not see), and record the design and predictions for a second pair,
+$\beta=6.054$ against $6.546$.
 \end{abstract}
 
 \section{Introduction}
@@ -45,26 +47,35 @@ A spatial blocking step is such a map: it fixes, before any data are seen, which
 represents a given coarse one. It can then be asked whether the map preserves what happens to the
 states it pairs. Evolve a coarse state over one coarse time step and translate it to the fine lattice;
 or translate it first and evolve the fine state over the same physical interval. The distance between
-the two results, maximized over a window of operators, is the defect of the map.
+the two results, maximized over the states of a window of operators, measures how far the map fails to
+preserve the dynamics. A second maximization, over all coarse states with the map extended by zero
+outside the window, also counts states that start outside the coarse window and evolve into it; it is
+the defect $\|S_fW-WS_c\|$ of the window map. We report both: on the primary recipe of the first pair
+they are $0.180(11)$ and $0.203(13)$.
 
 The defect is not determined by the two spectra. Our clearest example is the first lattice pair studied
 here. In the window spanned by two smeared 0$^{++}$ operators, both eigenvalues of the blocked fine
 lattice's one-step transfer compression lie below their coarse partners ($0.2360$ and $0.0459$ against
 $0.3392$ and $0.0636$): paired in spectral order, the fine lattice decays faster in every direction. Paired
 as blocking prescribes, the leading direction is rotated by $24.8(1.0)^\circ$, and in one direction the fine
-evolution decays more slowly than the coarse one. A comparison of masses, or of spectra, cannot see this.
+evolution decays more slowly than the coarse one: the blocking-paired preparation that maximizes the
+signed discrepancy has normalized one-step autocorrelation $0.101(6)$ on the coarse lattice and $0.146(5)$
+on the fine one. This coexists with a heavier fitted fine glueball, because the paired preparation is not
+the ground state of either lattice. A comparison of masses, or of spectra, cannot see it.
 
 The question has been seen before. Monte Carlo renormalization-group matching between two lattice
 spacings was developed in the 1980s; glueball correlations were considered as matching observables but
 set aside because their long-distance signal is statistically hard, and blocked loop expectation values
-were matched instead \cite{Mackenzie1984,Swendsen1981}. The aim was to tune the coarse action, and it was
-noted that no blocking kernel yields exactly the Wilson action at finite spacing \cite{Mackenzie1984}. The
-two-lattice method has been revisited for SU(3) gauge theories \cite{Hasenfratz2009}. On one lattice, the
-residual of a correlator-matrix compression, which we call the leakage, is the first block-Lanczos
-residual of Hackett and Wagman \cite{HackettWagman2025}. What we add is the combination: a correspondence
-fixed by blocking, aligned by its polar part, and compared through correlators measured independently at
-two spacings, giving the full defect of that map, including evolution out of either window, and the part
-of the disagreement that is visible inside the paired windows.
+were matched instead \cite{Mackenzie1984,Swendsen1981}. The aim was to tune the coarse action, and no
+blocking kernel was expected to yield exactly the Wilson action at finite spacing, since that would make
+the Wilson action free of finite-spacing errors \cite{Mackenzie1984}. The two-lattice method has been
+revisited for SU(3) gauge theories \cite{Hasenfratz2009}. Effective transfer matrices on block variables
+have been estimated by Monte Carlo on one lattice \cite{HPR1994}. With symmetric normalization, our
+one-lattice leakage matrix is the Gram matrix of the first block residual in the block Lanczos method of
+Hackett and Wagman \cite{HackettWagman2025}. What we add is the combination: a correspondence fixed by
+blocking, aligned by its polar part, and compared through correlators measured independently at two
+spacings, giving the defect of that map, including evolution out of either window, and the part of the
+disagreement that is visible inside the paired windows.
 
 The defect is also the hypothesis of renormalization-group arguments for a mass gap, in which a gap is
 carried along a chain of maps between ever finer lattices. Only one direction of disagreement matters
@@ -90,9 +101,12 @@ compression and leakage at lag $\ell$ are
  K(\ell)&=G^{-1/2}C(\ell)G^{-1/2}=U^*T^\ell U,\\
  L(\ell)&=G^{-1/2}C(2\ell)G^{-1/2}-K(\ell)^2=U^*T^\ell(I-UU^*)T^\ell U\ \ge 0 .
 \end{align}
-$L$ measures how far one step of evolution carries the window out of itself. At finite periodic time
-extent the ensemble correlators are thermal traces, and the vacuum reading is an approximation; for a
-single level the backward term alone gives $\sqrt{L}\approx10^{-3}$ at the lattices used here.
+$L$ measures how far one step of evolution carries the window out of itself. These identities hold for
+vacuum transfer moments; the measured $K$ and $L$ are finite-sample estimates from periodic correlators,
+and negative eigenvalues of an estimated $L$ (noise) are set to zero before square roots are taken. At
+finite periodic time extent the ensemble correlators are thermal traces, and the vacuum reading is an
+approximation; for a single level the backward term alone gives $\sqrt{L}\approx10^{-3}$ at the lattices
+used here.
 
 \subsection{The correspondence fixed by blocking}
 
@@ -114,8 +128,14 @@ With $D=K_fV-VK_c$,
 \end{equation}
 \end{proposition}
 
-The proof (Appendix~\ref{app:proofs}) uses the polar decompositions of the leakage maps
-$(I-U_iU_i^*)S_iU_i$. Three quantities have distinct meanings, though their norms do not add. The minimum
+Here $W$ is extended by zero outside the coarse window, so the norm runs over all coarse inputs, and a
+state outside the window that evolves into it contributes through the block $-V\sqrt{L_c}$. Restricted
+to inputs in the coarse window the disagreement is
+\begin{equation}
+ \|(S_fW-WS_c)U_c\|=\lmax\bigl(D^*D+V^*L_fV\bigr)^{1/2},
+\end{equation}
+which is at most the defect. The proof (Appendix~\ref{app:proofs}) uses the polar decompositions of the
+leakage maps $(I-U_iU_i^*)S_iU_i$. Three quantities have distinct meanings, though their norms do not add. The minimum
 of $\|V'^*K_fV'-K_c\|$ over all unitary $V'$ is the largest difference between matched sorted eigenvalues
 of $K_f$ and $K_c$ \cite{Bhatia}, a floor set by the spectra. The alignment $V$ selected by blocking gives
 the in-window mismatch $\|K_fV-VK_c\|$. Evolution out of the windows enters the defect through $L_c,L_f$.
@@ -138,9 +158,9 @@ $T\Omega=\Omega$, let $P$ be a window orthogonal to $\Omega$ and $Q$ the rest of
 
 \begin{lemma}\label{lem:onesided}
 With $k=\lmax(PTP)$, $\ell^2=\|QTP\|^2$ and $q=\|QTQ\|$, the top of $T$ on $\Omega^\perp$ obeys
-$\lambda_2(T)\le\mu=\tfrac{k+q}{2}+\sqrt{(\tfrac{k-q}{2})^2+\ell^2}$, and $\mu\le s$ exactly when $k<s$ and
-$q\le s-\ell^2/(s-k)$. Positivity of $T$ implies $L\le qK$ in window coordinates, so
-$q\ge\lmax(K^{-1/2}LK^{-1/2})$.
+$\lambda_2(T)\le\mu=\tfrac{k+q}{2}+\sqrt{(\tfrac{k-q}{2})^2+\ell^2}$, and $\mu\le s$ exactly when $k\le s$,
+$q\le s$ and $\ell^2\le(s-k)(s-q)$. Positivity of $T$ implies $L\le qK$ in window coordinates, so
+$q\ge\lmax(K^{-1/2}LK^{-1/2})$ when $K>0$ (with the inverse taken on the support of $K$ otherwise).
 \end{lemma}
 
 The data bound $q$ from below; a gap certificate needs it bounded from above. When the fine window is
@@ -154,14 +174,19 @@ $L=U_f^*T_f^2QT_f^2U_f$ and $QT_f^2Q\le q$. Then for every $\gamma>0$
 \begin{equation}
  T_f^2\le\bigl(C+L/\gamma\bigr)\oplus(q+\gamma)I_Q,\qquad C=V(U_c^*B_cU_c+E)V^*,
 \end{equation}
-and if $s=e^{-a_cm_*}>q$ and $C+L/(s-q)\le s$, then $T_f\le e^{-a_fm_*}$.
+so that $T_f\le B_f=(C+L/\gamma)^{1/2}\oplus\sqrt{q+\gamma}\,I_Q$. If $s=e^{-a_cm_*}>q$ and $C+L/(s-q)\le s$,
+then $T_f\le e^{-a_fm_*}$.
 \end{proposition}
 
-The bound is a full operator inequality, so it can be carried to the next rung of a chain. A uniform
-gap needs one $m_*$ through every refinement, volume and sector claimed, and an independent upper bound
-on $q$ at every rung. In a chain the inequality must run from coarse to fine; a bound of the coarser
-gap by the finer one, as in recent work organized around block-spin maps and summable defects
-\cite{FaizalShabir2026}, does not constrain the continuum. Identifications between different Hilbert
+This is a sufficient criterion. $B_f$ is a full operator bound, so it can be carried to the next rung of a
+chain. A uniform gap needs one $m_*$ through every refinement, volume and sector claimed, and an
+independent upper bound on $q$ at every rung. Carrying the directional information across a shared
+lattice requires the same operator family on both sides of it: where one pair ends on blocked operators
+and the next starts on unblocked ones, as at $\beta=6.054$ below, the cross-Gram matrix between the two
+families on the same configurations is needed. In a chain the inequality must run from coarse to fine.
+In recent work organized around block-spin maps and summable defects \cite{FaizalShabir2026}, the
+one-step estimate (their Section~5, Eqs.~(5.35)--(5.36)) lower-bounds the coarser gap using the finer
+gap; by itself it cannot propagate a known coarse lower bound to finer lattices. Identifications between different Hilbert
 spaces that control spectra are the subject of quasi-unitary equivalence \cite{Post2012,PostSimmer};
 $\|M-I\|$ and the defect play the roles of near-unitarity and approximate intertwining there.
 
@@ -215,16 +240,20 @@ The coarse lattice gives $am_0=0.973(35)$ at $t=1$ and a correlated fit over $t\
 coarse units, consistent with $0.987(9)$ measured by Athenodorou and Teper at $\beta=5.6924$
 \cite{AthenodorouTeper2020}. The blocked fine lattice has a plateau at $a_fm_0\approx0.66$
 ($0.674(13)$, $0.658(24)$, $0.663(49)$ at $t=1,2,3$ for $\alpha=0.6$ with zero momentum), consistent with
-the published value of about $0.645$ at this coupling. Over matched physical intervals the masses
+about $0.645$, an interpolation to $\beta=6.054$ of published values ($0.6365(43)$ at $\beta=6.0625$
+\cite{AthenodorouTeper2020}). Over matched physical intervals the masses
 differ (Table~\ref{tab:masses}): a fit over fine $t\in[2,8]$ against coarse $t\in[1,4]$ gives a
 difference of $0.171(29)$ in fine units, $m_f/m_c-1=0.354(68)$ with 90\% interval $[0.242,0.466]$; with the
 first interval removed (fine $[4,8]$ against coarse $[2,4]$) the central value persists at lower
 significance, $0.150(79)$. In units of the string tension the coarse scalar is near $m_0/\sqrt\sigma\approx2.4$
 and the fine one near $3.3$: the scalar dip of the Wilson action near $\beta\approx5.7$, where the scalar
-softens selectively \cite{BhanotCreutz1981,Heller1995,AthenodorouTeper2020}. The fitted masses predict
-single-state decay factors over the matched interval that differ by $0.110$; the leading window
-eigenvalues differ by $0.103$. The finite-spacing shift of the scalar mass accounts for this leading
-separation, and we attribute nothing else to it.
+softens selectively \cite{BhanotCreutz1981,Heller1995,AthenodorouTeper2020}. Paired within each ensemble,
+the leading window eigenvalues differ by $0.1032(65)$ and the single-state decay factors of the fitted
+masses over the matched interval by $0.1100(181)$; observed minus predicted is $-0.0068(163)$. The
+individual window eigenvalues lie below their single-state predictions by $0.0404(120)$ (coarse) and
+$0.0336(110)$ (fine), offsets that largely cancel in the difference. The fitted scalar masses reproduce the
+size of the leading separation within uncertainty: quantitative support for the scalar-dip reading,
+which leaves its causal share open. We attribute nothing beyond the leading separation to it.
 
 \begin{table}[t]
 \centering
@@ -246,34 +275,43 @@ $t=j\to j+1$), in fine units.}
 
 \begin{table}[t]
 \centering
-\begin{tabular}{@{}lcccccc@{}}
+\small\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}lccccccc@{}}
 \toprule
-$\alpha$, blocking & $\|M-I\|$ & $\|K_fV-VK_c\|$ & floor & defect & departure & $\eps_+$ \\
+$\alpha$, blocking & $\|M-I\|$ & $\|K_fV-VK_c\|$ & floor & window inputs & defect & departure & $\eps_+$ \\
 \midrule
-0, fixed & 1.725(11) & 0.301(6) & 0.294 & 0.333(9) & 0.183(7) & 0 \\
-0, zero & 0.288(6) & 0.252(6) & 0.196 & 0.286(10) & 0.165(8) & 0.010(6) \\
-0.3, fixed & 0.273(5) & 0.208(6) & 0.172 & 0.256(10) & 0.156(9) & 0 \\
-0.3, zero & 0.180(4) & 0.173(6) & 0.110 & 0.209(12) & 0.129(11) & 0.040(6) \\
-0.6, fixed & 0.141(4) & 0.193(6) & 0.150 & 0.243(10) & 0.150(9) & 0.008(6) \\
-0.6, zero & 0.246(4) & 0.166(6) & 0.103 & 0.203(13) & 0.126(11) & 0.045(6) \\
+0, fixed & 1.725(11) & 0.301(6) & 0.294 & 0.314(7) & 0.333(9) & 0.183(7) & 0 \\
+0, zero & 0.288(6) & 0.252(6) & 0.196 & 0.268(8) & 0.286(10) & 0.165(8) & 0.010(6) \\
+0.3, fixed & 0.273(5) & 0.208(6) & 0.172 & 0.239(8) & 0.256(10) & 0.156(9) & 0 \\
+0.3, zero & 0.180(4) & 0.173(6) & 0.110 & 0.187(10) & 0.209(12) & 0.129(11) & 0.040(6) \\
+0.6, fixed & 0.141(4) & 0.193(6) & 0.150 & 0.225(9) & 0.243(10) & 0.150(9) & 0.008(6) \\
+0.6, zero & 0.246(4) & 0.166(6) & 0.103 & 0.180(11) & 0.203(13) & 0.126(11) & 0.045(6) \\
 \bottomrule
 \end{tabular}
 \caption{Window $\{4,8\}$ at one coarse step. ``Floor'': the minimum mismatch over alignments;
-``departure'': $\|(I-P_+)SP_+\|$ for the aligned graph; $\eps_+$: the positive part of
+``window inputs'': the disagreement maximized over coarse-window states; ``defect'': maximized over all
+coarse states; ``departure'': $\|(I-P_+)SP_+\|$ for the aligned graph; $\eps_+$: the positive part of
 $\lmax(V^*K_fV-K_c)$. The coarse window compared with itself gives a departure of $0.122$.}
 \label{tab:window}
 \end{table}
 
 Table~\ref{tab:window} collects the window quantities. The in-window mismatch, $0.17$--$0.30$, is far
-above the noise reference $0.024$ obtained by comparing resamples of the coarse ensemble with itself, and
-the window $\{4,8,16,24\}$ gives the same picture (mismatch $0.166(6)$, defect $0.197(13)$).
+above the noise reference: pairs of independent resamples of 3000 configurations of the coarse ensemble,
+whose true mismatch is zero, give an apparent mismatch with 95th percentile $0.017$. The window
+$\{4,8,16,24\}$ gives the same picture (mismatch $0.166(6)$, disagreement over window inputs $0.177(11)$,
+defect $0.197(13)$). The two maximizations differ by about $0.02$ for every recipe: states outside the
+coarse window that evolve into it add little to what the window states themselves show.
 
 \subsection{What the blocking map shows beyond the spectra}
 
 For $\alpha=0.6$ with zero momentum, both fine eigenvalues lie below the coarse ones, and pairing the
 eigenvectors in spectral order gives $\eps_+=0$ exactly. The blocking-fixed pairing gives
 $\eps_+=0.045(6)$, because the leading direction of $V^*K_fV$ is rotated by $24.8(1.0)^\circ$ from that of
-$K_c$ ($23.0(1.1)^\circ$ for the fixed origin, $25.2(1.0)^\circ$ for $\alpha=0.3$). At twice the matched
+$K_c$ ($23.0(1.1)^\circ$ for the fixed origin, $25.2(1.0)^\circ$ for $\alpha=0.3$). Concretely, in the
+direction that maximizes the signed discrepancy the blocking-paired preparation has normalized one-step
+autocorrelation $0.101(6)$ on the coarse lattice and $0.146(5)$ on the fine one. That preparation mixes
+the leading and subleading window states differently on the two lattices, so its fine autocorrelation
+can exceed the coarse one although both spectra point the other way. At twice the matched
 interval the angle stays at $23.0(3.0)^\circ$ while $\eps_+$ falls to $0.0092(62)$. Evolving twice inside
 each measured window, with $K_f^2$ and $K_c^2$ and the same alignment, predicts $0.0127(13)$; the measured
 value, which also allows evolution to leave the windows and return, differs by $-0.0035(60)$. The window
@@ -304,7 +342,8 @@ lattice came from replacing a matrix by its norm.
 
 Bins of 20 and 50 change no central value; the headline errors grow by at most about 8\%, and the
 largest growth in the full output is 23\%. The four-operator window reproduces the reversal of $\eps_+$
-($0.056(6)$ with zero momentum against $0.014(6)$ and $0.007(5)$ with the fixed origin).
+($0.056(6)$ with zero momentum against $0.014(6)$ and $0.007(5)$ with the fixed origin); its estimated
+leakage matrices have negative eigenvalues within errors, which the estimator sets to zero.
 
 \section{Second pair: \texorpdfstring{$\beta=6.054$}{beta = 6.054} against \texorpdfstring{$\beta=6.546$}{beta = 6.546}}\label{sec:pair2}
 
@@ -325,8 +364,9 @@ and short-range checks; a two-sided 90\% interval wholly inside $[-0.05,0.05]$ s
 outside it a discrepancy, partial overlap is unresolved. The new pair is also compared at the first pair's
 physical interval (coarse lag 2, fine lag 4), with the reference mass $0.655$ per $\beta=6.054$ step.
 Caveats: published scalar masses shift by about 4\% between $L\sqrt\sigma\approx2.7$ and $3.9$
-\cite{AthenodorouTeper2020}, so a 5\% tolerance is not calibrated at our volume, and the interpolated
-spacing ratio carries about 0.5--1\% uncertainty \cite{NeccoSommer2002}.
+\cite{AthenodorouTeper2020}, so a 5\% tolerance is not calibrated at our volume; and the spacing ratio
+is the value of an interpolation whose uncertainty we do not propagate \cite{NeccoSommer2002}, so the
+predicted $0.003$ is illustrative and the mass verdict is conditional on the ratio.
 
 \emph{Results.} [To be completed after the recorded analysis.]
 
@@ -342,10 +382,12 @@ shrinks when both lattices scale, and whether the second shrinks with it.
 For renormalization-group arguments the results sharpen three points. The inequality that carries a gap
 must run from coarse to fine. Errors should be carried as operator inequalities, not norms, since a norm
 charges a harmless direction as if it were the worst one. And the hypothesis that no correlator can
-supply is an upper bound on how slowly states outside the chosen windows can evolve: a state orthogonal
-to every tested operator, however slowly decaying, leaves every window correlator unchanged. What an
-independent argument would have to establish is a quantitative lower bound on how much of every
-low-energy state, including linear combinations, the blocked operators capture.
+supply is an upper bound on how slowly states outside the chosen windows can evolve. A slow eigenstate
+orthogonal to every window state is invisible to every window correlator: appending a decoupled
+eigenstate with transfer eigenvalue arbitrarily close to one leaves every measured correlator unchanged
+while the full gap shrinks. (An arbitrary orthogonal vector, by contrast, can evolve back into the
+window.) What an independent argument would have to establish is a quantitative lower bound on how much
+of every low-energy state, including linear combinations, the blocked operators capture.
 
 Limitations: one channel, finite and modest volumes, the Wilson action, finite-time windows of two or
 four operators, and statistical errors; the scale ratios come from an interpolation.
@@ -363,10 +405,13 @@ cannot.
 \section{Proofs}\label{app:proofs}
 
 \emph{Proposition~\ref{prop:defect}.} Write $Y_i\sqrt{L_i}$ for the polar decomposition of
-$(I-U_iU_i^*)S_iU_i$, with $Y_i$ a partial isometry into the complement of the window. Then
-$S_fW-WS_c=U_f(K_fV-VK_c)U_c^*+Y_f\sqrt{L_f}VU_c^*-U_fV\sqrt{L_c}Y_c^*$, whose matrix in the orthonormal
-systems $(U_f,Y_f)$ and $(U_c,Y_c)$ is the block matrix shown; the bound follows from the triangle
-inequality.
+$(I-U_iU_i^*)S_iU_i$, with $Y_i$ a partial isometry into the complement of the window that acts
+isometrically on the support of $L_i$. Then $S_fW-WS_c=U_f(K_fV-VK_c)U_c^*+Y_f\sqrt{L_f}VU_c^*-
+U_fV\sqrt{L_c}Y_c^*$. In the systems $(U_f,Y_f)$ and $(U_c,Y_c)$ this is the block matrix shown; it
+annihilates the part of the input space outside the support of $\sqrt{L_c}$ and has range in the
+corresponding output support, so the norms are equal also when the leakage matrices are singular. The
+bound follows from the triangle inequality, and the window-input formula from restricting to inputs
+$U_ca$.
 
 \emph{Spectral floor.} For Hermitian $A,B$ and unitary $V'$, $\|V'^*AV'-B\|\ge\max_i|\lambda_i^\downarrow(A)-
 \lambda_i^\downarrow(B)|$, with equality when $V'$ maps eigenvectors in order \cite{Bhatia}.
@@ -416,6 +461,7 @@ Code, data and analysis outputs are in the repository\\
 \bibitem{Mackenzie1984} P.~B. Mackenzie, Monte Carlo renormalization group calculations for SU(2) lattice gauge theory, FERMILAB-Conf-84/48-T (1984).
 \bibitem{Swendsen1981} R.~H. Swendsen, Phys.\ Rev.\ Lett.\ \textbf{47} (1981) 1775.
 \bibitem{Hasenfratz2009} A.~Hasenfratz, arXiv:0907.0919.
+\bibitem{HPR1994} M.~Hasenbusch, K.~Pinn and K.~Rummukainen, Phys.\ Rev.\ D \textbf{49} (1994) 495.
 \bibitem{HackettWagman2025} D.~C. Hackett and M.~L. Wagman, Phys.\ Rev.\ D \textbf{112} (2025) 014514, arXiv:2412.04444.
 \bibitem{FaizalShabir2026} M.~Faizal and A.~Shabir, Fortschr.\ Phys.\ \textbf{74} (2026) e70097, arXiv:2606.19362.
 \bibitem{Post2012} O.~Post, \emph{Spectral Analysis on Graph-like Spaces}, Lecture Notes in Math.\ 2039, Springer (2012).

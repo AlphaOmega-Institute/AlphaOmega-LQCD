@@ -22,7 +22,7 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 4473 tests
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 4553 tests
     julia --project=lattice lattice/test/runner_checks.jl              # the fine-run program, 19 checks
     julia docs/notes/check_spectral_transfer.jl                        # 6563 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
@@ -335,11 +335,20 @@ whose leakage is twice as large. Part of the earlier conclusion that coarse info
 came from replacing a matrix by its norm; for Corollary 3 this suggests carrying the defects from rung
 to rung as operator inequalities rather than as norms.
 
-The scalar dip and the leading separation. The correlated fits predict single-state decay factors
-e^{−0.969} = 0.380 and e^{−1.310} = 0.270 over the matched interval, a difference of 0.110; the leading
-window eigenvalues differ by 0.103. The finite-spacing shift of the scalar mass accounts for that leading
-separation; the full symmetric mismatch (0.166) and the defect (which includes leakage and the rotation
-above) are not attributed to it.
+The scalar dip and the leading separation. Paired within each ensemble, the leading window eigenvalues
+differ by 0.1032(65) and the single-state decay factors of the fitted masses over the matched interval
+by 0.1100(181); observed minus predicted is −0.0068(163). The individual eigenvalues lie below their
+single-state predictions by 0.0404(120) (coarse) and 0.0336(110) (fine), offsets that largely cancel. The
+fitted scalar masses reproduce the size of the leading separation within uncertainty, quantitative
+support for the scalar-dip reading that leaves its causal share open; the full symmetric mismatch
+(0.166) and the defect are not attributed to it.
+
+Two maximizations and a concrete direction. Maximized over coarse-window inputs only, the disagreement
+is λ_max(D*D + V*L_f V)^{1/2} (`window_defect_inputs`): 0.180(11) for the primary recipe, against the
+defect 0.203(13) over all coarse inputs, which also counts states outside the coarse window that evolve
+into it (0.314, 0.268, 0.239, 0.187, 0.225, 0.180 against 0.333, 0.286, 0.256, 0.209, 0.243, 0.203 for the
+six recipes). In the direction that maximizes the signed discrepancy, the blocking-paired preparation
+has normalized one-step autocorrelation 0.101(6) on the coarse lattice and 0.146(5) on the fine one.
 
 Lag dependence. At twice the matched interval (coarse lag 2, fine lag 4) the alignment angle stays at
 23.0(3.0)° while ε₊ falls from 0.0448(57) to 0.0092(62). Evolving twice inside each measured window,
@@ -657,7 +666,8 @@ near-invariance is what told us to measure the two apart.
 
 ## Points for review, most important first
 
-Newest: a draft of the methods paper, `docs/paper/blockmap.tex` (introduction, framework, setup,
+Newest: the draft revised after review (the two maximizations, the concrete 0.101/0.146 direction, the
+paired leading-separation check, the corrected lemma, precise attributions). Before that: a draft of the methods paper, `docs/paper/blockmap.tex` (introduction, framework, setup,
 first-pair results, the second pair's design and predictions; doubled-space appendix and second-pair
 results to follow). Before that: the analysis plan fixed before the fine data of the next pair ("Next pair"), and the operator
 form of the one-sided step ("One-sided bound"). Before that: the prediction for the next pair, and in the full run the alignment angle and

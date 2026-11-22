@@ -544,6 +544,9 @@ end
         exact = opnorm(Sf * W - W * Sc)
         @test window_defect(Kf, Lf, Kc, Lc, V) ≈ exact rtol = 1e-8
         @test exact <= window_defect_bound(Kf, Lf, Kc, Lc, V) + 1e-10
+        Uc = Cs * isq(Cs' * Cs)                                    # coarse-window inputs only
+        @test window_defect_inputs(Kf, Lf, Kc, V) ≈ opnorm((Sf * W - W * Sc) * Uc) rtol = 1e-7
+        @test window_defect_inputs(Kf, Lf, Kc, V) <= exact + 1e-10
     end
 end
 

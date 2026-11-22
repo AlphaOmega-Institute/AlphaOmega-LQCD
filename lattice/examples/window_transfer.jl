@@ -79,6 +79,7 @@ function window_quantities(Cc, Cf, sref, qgrid, lag)
     θ = acosd(min(1.0, abs(dot(eigen(Hermitian(Kc)).vectors[:, end], V' * eigen(Hermitian(Kf)).vectors[:, end]))))
     def = window_defect(Kf, Lf, Kc, Lc, V)
     rel = sref === nothing ? [NaN, NaN] : [def, εp] ./ (1 - s)
+    din = window_defect_inputs(Kf, Lf, Kc, V)
     qmd = q_needed_matrix(s, Kf, Lf)                       # fine window measured directly, matrix form
     qmc = q_needed_matrix(s, Kc + Dp, V' * Lf * V)         # inferred from the coarse lattice, matrix form
     return vcat(sort(eigvals(Symmetric(Kc)); rev = true), sort(eigvals(Symmetric(Kf)); rev = true),
@@ -87,7 +88,7 @@ function window_quantities(Cc, Cf, sref, qgrid, lag)
                  opnorm(M^2 - I), anti, out, tot],
                 [dl[end], dl[1], εp, leakage_q_floor(Kf, Lf), s, q_needed(s, kd, ℓ2), q_needed(s, kc, ℓ2)],
                 [one_sided_bound(kd, ℓ2, q) for q in qgrid], [one_sided_bound(kc, ℓ2, q) for q in qgrid],
-                [θ, km, q_needed(s, km, ℓ2), qmd, qmc], rel)
+                [θ, km, q_needed(s, km, ℓ2), qmd, qmc], rel, [din])
 end
 
 function two_sample_jackknife(f, nc, nf)
@@ -154,7 +155,7 @@ function main(args)
 
     n = length(wlev)
     ng = length(qgrid)
-    per = 4n + 23 + 2ng
+    per = 4n + 24 + 2ng
     paired = variants == ["fixed", "zero"]
     pix = [4n+2, 4n+4, 4n+5, 4n+9, 4n+12]  # mismatch, bound, defect, total departure, ε₊
     function f(ic, jf)
@@ -202,6 +203,7 @@ function main(args)
         line("  q needed, matrix form, fine", [fmt(est[o+4], err[o+4])])
         line("  q needed, matrix form, coarse", [fmt(est[o+5], err[o+5])])
         line("  defect / (1 − s), ε₊ / (1 − s)", [fmt(est[o+6], err[o+6]), fmt(est[o+7], err[o+7])])
+        line("defect, coarse-window inputs only", [fmt(est[o+8], err[o+8])])
     end
     if paired
         println("\nfixed origin − zero momentum (paired errors: same configurations and bins)")

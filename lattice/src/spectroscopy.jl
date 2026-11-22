@@ -351,6 +351,19 @@ end
 _ppart(L) = (F = eigen(Hermitian(_herm(L))); F.vectors * Diagonal(max.(F.values, 0.0)) * F.vectors')
 
 """
+    window_defect_inputs(Kf, Lf, Kc, V)
+
+The defect restricted to inputs in the coarse window: ‖(S_f W − W S_c) U_c‖ =
+λ_max(D*D + V*L_f V)^{1/2} with D = Kf V − V Kc. `window_defect` maximizes over all coarse inputs,
+including states outside the window that evolve into it (the block −V√Lc), so it is at least as
+large. Negative leakage eigenvalues (noise) are set to zero.
+"""
+function window_defect_inputs(Kf, Lf, Kc, V)
+    D = Kf * V - V * Kc
+    return sqrt(max(eigmax(Hermitian(_herm(D' * D + V' * _ppart(Lf) * V))), 0.0))
+end
+
+"""
     graph_departure(Kf, Lf, Kc, Lc, V) -> (antialigned, outside, total)
 
 The window map read in the doubled space H_c ⊕ H_f. With W = U_f V U_c*, the polar

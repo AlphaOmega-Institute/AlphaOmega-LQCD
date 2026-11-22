@@ -29,6 +29,7 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations; coarse
     q needed, matrix form, fine       0.3522(92)
     q needed, matrix form, coarse     0.1676(819)
     defect / (1 − s), ε₊ / (1 − s)    0.5347(144)  0.0000(0)
+  defect, coarse-window inputs only   0.3141(73)
 
 α = 0.0, zero
   eig K_c (coarse lag 1)  0.3392(49)  0.0636(45)
@@ -58,6 +59,7 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations; coarse
     q needed, matrix form, fine       0.3060(144)
     q needed, matrix form, coarse     0.0811(906)
     defect / (1 − s), ε₊ / (1 − s)    0.4601(162)  0.0160(92)
+  defect, coarse-window inputs only   0.2680(82)
 
 α = 0.3, fixed
   eig K_c (coarse lag 1)  0.3392(49)  0.0636(45)
@@ -87,6 +89,7 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations; coarse
     q needed, matrix form, fine       0.3059(160)
     q needed, matrix form, coarse     -0.0156(960)
     defect / (1 − s), ε₊ / (1 − s)    0.4120(160)  0.0000(0)
+  defect, coarse-window inputs only   0.2386(81)
 
 α = 0.3, zero
   eig K_c (coarse lag 1)  0.3392(49)  0.0636(45)
@@ -116,6 +119,7 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations; coarse
     q needed, matrix form, fine       0.3218(256)
     q needed, matrix form, coarse     0.1531(1136)
     defect / (1 − s), ε₊ / (1 − s)    0.3364(197)  0.0645(92)
+  defect, coarse-window inputs only   0.1867(103)
 
 α = 0.6, fixed
   eig K_c (coarse lag 1)  0.3392(49)  0.0636(45)
@@ -145,6 +149,7 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations; coarse
     q needed, matrix form, fine       0.3018(183)
     q needed, matrix form, coarse     -0.0152(1005)
     defect / (1 − s), ε₊ / (1 − s)    0.3901(166)  0.0128(91)
+  defect, coarse-window inputs only   0.2251(87)
 
 α = 0.6, zero
   eig K_c (coarse lag 1)  0.3392(49)  0.0636(45)
@@ -174,6 +179,7 @@ window: stout levels [4, 8] (ρ = 0.1), bins of 10; centered excitations; coarse
     q needed, matrix form, fine       0.3264(269)
     q needed, matrix form, coarse     0.1674(1174)
     defect / (1 − s), ε₊ / (1 − s)    0.3264(201)  0.0721(92)
+  defect, coarse-window inputs only   0.1797(106)
 
 fixed origin − zero momentum (paired errors: same configurations and bins)
   α = 0.0   Δ‖K_f V − V K_c‖ 0.0492(37)   Δbound 0.0408(216)   Δdefect 0.0464(63)   Δdeparture 0.0179(56)   Δε₊ -0.0100(57)
