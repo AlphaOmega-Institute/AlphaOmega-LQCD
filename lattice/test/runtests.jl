@@ -547,6 +547,16 @@ end
     end
 end
 
+@testset "cosh_mass over one step and over longer intervals" begin
+    for m in (0.3, 0.7, 1.4), T in (16, 32), lag in (1, 2, 3)
+        c = [cosh(m * (t - T / 2)) for t in 0:T-1]
+        for t in 0:T÷2-lag
+            @test cosh_mass(c[t+1] / c[t+lag+1], t, T; lag) ≈ m rtol = 1e-10
+        end
+    end
+    @test isnan(cosh_mass(0.9, 1, 16; lag = 2))
+end
+
 @testset "the window map in the doubled space: reflection, graphs, normalization" begin
     rng = Xoshiro(77)
     psd(n) = (A = randn(rng, n, n); M = A * A'; Symmetric(M / opnorm(M)))

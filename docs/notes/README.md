@@ -22,7 +22,7 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 2914 tests
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 3113 tests
     julia --project=lattice lattice/test/runner_checks.jl              # the fine-run program, 19 checks
     julia docs/notes/check_spectral_transfer.jl                        # 6563 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
@@ -236,7 +236,12 @@ the Wilson action. At fine t = 2 the fine effective mass is 0.17(4) above the co
 matched time and agrees with the benchmark; at t = 3 and 4 it falls to 0.56(8) and 0.53(13), consistent
 both with the benchmark and with the coarse mass. A finite-spacing shift of the scalar mass, which
 would account for most of the eigenvalue difference, is suggested but not established at 1000
-configurations; resolving t = 3–5 is what the extension to 3000 is for.
+configurations; resolving t = 3–5 is what the extension to 3000 is for. The decisive comparison is
+over matched intervals: the fine mass over t = 2 → 4 (one mass from C(2)/C(4), about 0.61 at 1000
+configurations) against the coarse mass over t = 1 → 2, and whether the difference persists one matched
+interval later (`blocked_masses.jl` now prints this table). The printed overlaps are squared overlaps
+with the leading variational state of the two-operator window, not with the true glueball, so
+excited-state contamination remains a possible part of the early-time excess.
 
 Scope. The result concerns the tested blocked operators over one matched interval. A shift of the
 scalar mass between the two spacings would obstruct any map that pairs the two scalar ground states

@@ -10,9 +10,13 @@
 #          --ratio 2.0015    a_coarse / a_fine (Necco–Sommer for β = 5.7 and 6.054)
 # For each α and variant (fixed origin, zero momentum) of the fine file: the cosh effective
 # mass of the GEVP ground-state correlator at fine times t = 0 … 7, in fine units and in coarse
-# units (× ratio), and the variational ground-state fraction of each basis operator. With
-# --coarse, the same for the coarse lattice at coarse times t = 0 … 3. A fine time t
-# corresponds to the coarse time t / ratio. Errors: delete-one jackknife over bins.
+# units (× ratio); the mass per fine step over the intervals 2j → 2j+2 (one mass per interval,
+# from C(2j)/C(2j+2), so correlated adjacent ratios are not combined); and the squared overlap
+# of each basis operator with the leading GEVP state of the window (not with the true glueball).
+# With --coarse, the same for the coarse lattice at coarse times t = 0 … 3, and a table of
+# matched intervals: the fine mass over 2j → 2j+2 against the coarse mass over j → j+1, per fine
+# step, with their difference (the ensembles are independent, so the errors add in quadrature).
+# Errors: delete-one jackknife over bins.
 
 using LatticeYM, Printf, LinearAlgebra
 
@@ -26,8 +30,9 @@ function operators(X, off, idx, T)
     return O
 end
 
-# effective masses of the GEVP ground state at t = 0 … tmax, then the ground-state fractions
-function masses(O, b, t0, tmax)
+# effective masses of the GEVP ground state at t = 0 … tmax, the masses per step over the
+# intervals lag·j → lag·(j+1) for j = 0 … jmax, then the squared overlaps with the GEVP state
+function masses(O, b, t0, tmax, lag, jmax)
     P, M = correlator_products(O)
     Pb, Mb = bin_means(P, b), bin_means(M, b)
     n, T = size(O, 2), size(O, 3)
@@ -38,17 +43,23 @@ function masses(O, b, t0, tmax)
         _, V = gevp(C, t0, t0 + 1)
         c = [V[:, 1]' * C[:, :, t] * V[:, 1] for t in 1:T]
         f, _ = ground_state_fractions(C, collect(1:n); t0)
-        return vcat(effective_masses(c)[1:tmax+1], f)
+        mk = [cosh_mass(c[lag*j+1] / c[lag*(j+1)+1], lag * j, T; lag) for j in 0:jmax]
+        return vcat(effective_masses(c)[1:tmax+1], mk, f)
     end
     return jackknife(derived, collect(1:size(Pb, 1)))
 end
 
-function report(est, err, tmax, ops, scale, unit, other)
+function report(est, err, tmax, jmax, lag, ops, scale, unit, other)
     row(label, s) = println(@sprintf("  %-30s", label), join([fmt(s * est[t+1], s * err[t+1]) for t in 0:tmax], " "))
     row("a m(t), $unit units, t = 0…$tmax", 1.0)
     row("the same in $other units", scale)
-    println(@sprintf("  %-30s", "ground-state fraction"),
-            join(["level $(ops[j]) " * fmt(est[tmax+1+j], err[tmax+1+j]) for j in eachindex(ops)], "   "))
+    if lag > 1
+        println(@sprintf("  %-30s", "per step over $(lag)j → $(lag)j+$lag"),
+                join([fmt(est[tmax+2+j], err[tmax+2+j]) for j in 0:jmax], " "))
+    end
+    o = tmax + jmax + 2
+    println(@sprintf("  %-30s", "overlap² with GEVP state"),
+            join(["level $(ops[j]) " * fmt(est[o+j], err[o+j]) for j in eachindex(ops)], "   "))
 end
 
 function main(args)
@@ -75,13 +86,16 @@ function main(args)
         error("fine rows have unexpected width $(size(Xf, 2))")
     idx = [findfirst(==(l), flev) for l in ops]
     tf = min(7, Tf ÷ 2 - 1)
+    jf = min(3, (Tf ÷ 2) ÷ 2 - 1)
+    matched = []
     println("fine: β = $(kf["beta"]), $(kf["L"])³ × $Tf blocked to $(kf["blocked"])³, $(size(Xf, 1)) configurations; ",
             "GEVP on stout levels $ops, t0 = $t0, bins of $b; a_c/a_f = $ratio")
     for (ia, α) in enumerate(alphas), (iv, var) in enumerate(variants)
         off = 1 + ((ia - 1) * length(variants) + iv - 1) * length(flev) * Tf
-        est, err = masses(operators(Xf, off, idx, Tf), b, t0, tf)
+        est, err = masses(operators(Xf, off, idx, Tf), b, t0, tf, 2, jf)
         println("\nα = $α, $var")
-        report(est, err, tf, ops, ratio, "fine", "coarse")
+        report(est, err, tf, jf, 2, ops, ratio, "fine", "coarse")
+        push!(matched, ("α = $α, $var", est[tf+2:tf+2+jf], err[tf+2:tf+2+jf]))
     end
 
     isempty(opt["coarse"]) && return
@@ -90,9 +104,20 @@ function main(args)
     clev, Tc = parse.(Int, split(kc["levels"], ",")), parse(Int, kc["T"])
     all(l -> l in clev, ops) || error("levels $ops must all be measured on the coarse lattice ($clev)")
     tc = min(3, Tc ÷ 2 - 1)
-    est, err = masses(operators(Xc, 1, [findfirst(==(l), clev) for l in ops], Tc), b, t0, tc)
+    jc = min(3, Tc ÷ 2 - 1)
+    est, err = masses(operators(Xc, 1, [findfirst(==(l), clev) for l in ops], Tc), b, t0, tc, 1, jc)
     println("\ncoarse: β = $(kc["beta"]), $(kc["L"])³ × $Tc, $(size(Xc, 1)) configurations")
-    report(est, err, tc, ops, 1 / ratio, "coarse", "fine")
+    report(est, err, tc, jc, 1, ops, 1 / ratio, "coarse", "fine")
+
+    J = min(jf, jc)
+    mc, ec = est[tc+2:tc+2+J] ./ ratio, err[tc+2:tc+2+J] ./ ratio
+    println("\nmatched intervals, mass per fine step (fine units): fine 2j → 2j+2 against coarse j → j+1")
+    println(@sprintf("  %-26s", "j"), join([rpad("$j", 26) for j in 0:J]))
+    println(@sprintf("  %-26s", "coarse"), join([rpad(fmt(mc[j+1], ec[j+1]), 26) for j in 0:J]))
+    for (label, mf, ef) in matched
+        cells = [rpad(fmt(mf[j+1], ef[j+1]) * " Δ " * fmt(mf[j+1] - mc[j+1], sqrt(ef[j+1]^2 + ec[j+1]^2)), 26) for j in 0:J]
+        println(@sprintf("  %-26s", label), join(cells))
+    end
 end
 
 main(ARGS)

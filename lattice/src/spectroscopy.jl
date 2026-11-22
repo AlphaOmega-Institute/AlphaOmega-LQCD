@@ -201,15 +201,16 @@ function transfer_residual(c::AbstractVector{<:Real})
 end
 
 """
-    cosh_mass(r, t, T)
+    cosh_mass(r, t, T; lag = 1)
 
-Solve r = cosh(m (t − T/2)) / cosh(m (t + 1 − T/2)) for m ≥ 0, the effective
-mass of a periodic correlator from the ratio C(t)/C(t+1). Returns NaN when the
-ratio admits no solution (r ≤ 1, noise).
+Solve r = cosh(m (t − T/2)) / cosh(m (t + lag − T/2)) for m ≥ 0: the effective mass, per
+lattice step, of a periodic correlator from the ratio C(t)/C(t+lag), for t + lag ≤ T/2.
+With lag > 1 it is one mass for the whole interval, which avoids combining correlated
+adjacent ratios. Returns NaN when the ratio admits no solution (r ≤ 1, noise).
 """
-function cosh_mass(r::Real, t::Real, T::Real)
+function cosh_mass(r::Real, t::Real, T::Real; lag::Real = 1)
     (isfinite(r) && r > 1) || return NaN
-    f(m) = cosh(m * (t - T / 2)) / cosh(m * (t + 1 - T / 2)) - r
+    f(m) = cosh(m * (t - T / 2)) / cosh(m * (t + lag - T / 2)) - r
     lo, hi = 0.0, 1.0
     while f(hi) < 0
         hi *= 2
