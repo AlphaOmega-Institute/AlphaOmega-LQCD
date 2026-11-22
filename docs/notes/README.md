@@ -109,7 +109,7 @@ eigenvalues of K_c are measured to ±0.005, and the fine lattice, at the same ph
 lags 0, 2, 4, should reach similar precision with a similar number of configurations. So the fine run can
 resolve the comparison if the mismatch is above about 0.02.
 
-Fine run (to be done on a faster machine): β = 6.054, where the Necco–Sommer interpolation gives
+Fine run: β = 6.054, where the Necco–Sommer interpolation gives
 a(5.7)/a(6.054) = 2.0015; 16³ × 32 blocked once to 8³ × 32; blocking parameters α = 0, 0.3, 0.6 on the
 same configurations; stout levels 4, 8, 16, 24. Each α is measured in two variants: the fixed blocking
 origin, and the zero-momentum projection (operator amplitudes averaged over the eight origins before the
@@ -176,6 +176,74 @@ the windows bounds the mismatch from below for every alignment, by Weyl's inequa
 `window_transfer.jl` ends with the fixed-origin minus zero-momentum differences of the mismatch, the bound, the defect and
 the departure from the aligned graph (below) for each α, with paired errors (same configurations and
 bins): how much the choice of blocking grid changes the conclusion.
+
+## Pilot at β = 6.054: 1000 configurations
+
+The fine run of 16³ × 32 at β = 6.054 (4 sweeps apart, 12 threads on an Apple M4 Max, 4.8 s per
+configuration, no projection fallbacks) reached its first 1000 configurations; the same chain is being
+extended to 3000. The output file will be added to `lattice/results/` with the full run. Coarse side:
+the committed β = 5.7 ensemble. Window: stout levels 4 and 8; bins of 10; jackknife errors over both
+ensembles.
+
+| α, blocking | ‖M − I‖ | ‖K_f V − V K_c‖ | spectral floor | defect | total departure |
+|---|---|---|---|---|---|
+| 0, fixed origin | 1.735(13) | 0.303(7) | 0.292 | 0.331(11) | 0.180(10) |
+| 0, zero momentum | 0.284(8) | 0.253(7) | 0.196 | 0.292(12) | 0.172(10) |
+| 0.3, fixed origin | 0.275(7) | 0.210(8) | 0.175 | 0.259(13) | 0.159(12) |
+| 0.3, zero momentum | 0.183(5) | 0.174(8) | 0.113 | 0.223(15) | 0.143(13) |
+| 0.6, fixed origin | 0.143(6) | 0.195(8) | 0.154 | 0.246(14) | 0.152(12) |
+| 0.6, zero momentum | 0.249(4) | 0.167(8) | 0.106 | 0.218(15) | 0.140(14) |
+| coarse with itself (control) | 0 | 0 | 0 | 0.122 | 0.122 |
+
+The spectral floor is the largest difference between matched eigenvalues of K_f and K_c; by Weyl's
+inequality ‖V*K_f V − K_c‖ cannot fall below it for any unitary V.
+
+- The in-window mismatch is far above the noise reference (0.024) for every recipe, and the window
+  {4, 8, 16, 24} gives the same picture (best 0.167(8), floor 0.087). The fine and coarse operators
+  that blocking pairs do not evolve alike over one matched interval, and no change of the pairing can
+  make them.
+- Most of the mismatch is spectral. The top eigenvalues, 0.339(5) coarse and 0.233(7) fine (α = 0.6,
+  zero momentum), are the decays of the GEVP ground-state correlators over the matched interval:
+  e^{−1.081} on the coarse lattice (t = 0 → 1) and e^{−(0.768 + 0.689)} on the fine one (t = 0 → 2).
+- Averaging over the eight blocking origins lowers the defect at every α, by 0.038(9), 0.036(9) and
+  0.029(8) (paired errors). α = 0.6 with zero momentum is the primary recipe; α = 0.3 is close enough
+  that a paired comparison of the two is needed before preferring either.
+- Neutrality and invariance rank the recipes in opposite order at α = 0.6: the fixed origin gives the
+  more nearly isometric raw map (‖M − I‖ 0.143 against 0.249), the zero-momentum average the more nearly
+  invariant polar graph (mismatch 0.195 against 0.167).
+- Evolution out of the windows (≈ 0.12) is the same as in the coarse self-comparison: the windows
+  capture the evolution equally well on both lattices, and the disagreement lies inside them.
+- The gap criterion is undecided. The best defect, 0.218(15), is within one error of the provisional
+  scale 0.23; some leakage eigenvalues come out negative, so the leakage-sensitive figures need a
+  bin-size check; and the omitted energy on the fine lattice is not measured here.
+
+The masses (`blocked_masses.jl`, GEVP on levels 4 and 8, effective masses in fine units; coarse values
+converted with a_c/a_f = 2.0015):
+
+| fine t | α = 0.6, zero momentum | α = 0.3, zero momentum | coarse at the same physical time |
+|---|---|---|---|
+| 0 | 0.768(13) | 0.794(13) | 0.540(7) (coarse t = 0) |
+| 1 | 0.689(22) | 0.695(23) | |
+| 2 | 0.656(40) | 0.666(42) | 0.486(17) (coarse t = 1) |
+| 3 | 0.563(77) | 0.567(81) | |
+| 4 | 0.529(133) | 0.534(139) | 0.457(44) (coarse t = 2) |
+
+Published reference (Athenodorou and Teper, arXiv:2007.06422, Table 1): a m₀ = 0.987(9) at β = 5.6924
+(10³ × 16), against our 0.973(35) at β = 5.7, and 0.7045(65) at β = 5.99, 0.6365(43) at β = 6.0625,
+interpolating to about 0.645 at β = 6.054 in larger boxes than ours. In units of the string tension
+their m₀/√σ rises from 2.47 at β = 5.6924 to 3.27 at β = 6.0625 (continuum 3.405(21)): the scalar dip of
+the Wilson action. At fine t = 2 the fine effective mass is 0.17(4) above the coarse value at the
+matched time and agrees with the benchmark; at t = 3 and 4 it falls to 0.56(8) and 0.53(13), consistent
+both with the benchmark and with the coarse mass. A finite-spacing shift of the scalar mass, which
+would account for most of the eigenvalue difference, is suggested but not established at 1000
+configurations; resolving t = 3–5 is what the extension to 3000 is for.
+
+Scope. The result concerns the tested blocked operators over one matched interval. A shift of the
+scalar mass between the two spacings would obstruct any map that pairs the two scalar ground states
+exactly, and leaves open how well other maps or other states transfer. If β = 5.7 lies in the scalar
+dip, a test of Corollary 3 needs both lattices in the scaling region; with the scale used here, a
+factor 2 from β = 6.054 means β ≈ 6.55 (β = 6.4 is only 1.66, and a 32³ box there would be 21% larger
+than the present one).
 
 ## The window map in the doubled space
 
@@ -309,7 +377,9 @@ measurement exposes that difference; Corollary 3 says why its size matters.
 
 ## Points for review, most important first
 
-This round: the doubled-space reading and `graph_departure` (the identity ‖[S, R]‖ = ‖S_fW − WS_c‖ and
+Newest: the pilot results at β = 6.054 ("Pilot at β = 6.054"): the spectral reading of the mismatch,
+the mass comparison and its interpretation, and the scope statement. Before that: the doubled-space
+reading and `graph_departure` (the identity ‖[S, R]‖ = ‖S_fW − WS_c‖ and
 the three departure formulas), and the related-work section, in particular the reading of
 arXiv:2606.19362.
 
