@@ -205,32 +205,53 @@ on the complement of the window.
 
 ## Related work
 
-Closest in structure: Faizal and Shabir, arXiv:2606.19362 (Fortschr. Phys. 74, 2026), use partial
-isometries V_k between successive scales with V_k Ω_{k+1} = Ω_k, an interlacing identity
-T_{k+1} = V_k* T_k^b V_k − D_k + E_k, the step inequality Δ_{k+1} ≥ Δ_k − ε_k and summable defects. They
-claim a construction of four-dimensional SU(N) Yang–Mills with a mass gap; we know of no independent
-assessment. On our reading of their Section 5, the step inequality bounds the gap of the coarser lattice
-by that of the finer one, whereas a continuum statement needs the reverse direction, a lower bound for
-ever finer lattices, with the defects beaten in units of the finest lattice spacing (our Corollary 3 and
-its uniform margin); this reading is offered for review. Identifications between different Hilbert
-spaces that control spectra are the subject of quasi-unitary equivalence (O. Post, Spectral Analysis on
-Graph-like Spaces, Lecture Notes in Math. 2039, 2012; Post and Simmer, arXiv:2503.22611): ‖M − I‖ and the
-window defect play the roles of near-unitarity and approximate intertwining there, and a detailed
-comparison is still to be made. Coarse-grained Hamiltonians induced by blocking through
-Osterwalder–Schrader reconstruction: Lang, Liegener and Thiemann, Hamiltonian renormalisation I–IX
-(arXiv:1711.05685 and sequels), analytic, for free and solvable models. Isometric scaling maps between
-lattice Hilbert spaces with an inductive limit: Morinelli, Morsella, Stottmeister and Tanimoto (Commun.
-Math. Phys. 2021), Stottmeister et al. (Phys. Rev. Lett. 127, 230601, 2021), and Brothier and
-Stottmeister for 1+1-dimensional Yang–Mills (arXiv:1907.05549). Effective transfer matrices on block
-variables estimated by Monte Carlo, with an overlap measure of quality, on one lattice: Hasenbusch, Pinn
-and Rummukainen (Phys. Rev. D 49, 495, 1994). Standard lattice practice compares blocked observables
-(Monte Carlo renormalization group, fixed-point actions, blocked and smeared glueball operators,
-gradient flow as a continuous blocking, e.g. Carosso, Hasenfratz and Neil, arXiv:1806.01385) but does
-not measure how well blocking intertwines the dynamics relative to the gap. Rigorous background:
-Bałaban's ultraviolet stability for lattice Yang–Mills (expounded by Dimock), the strong-coupling gap of
-Osterwalder and Seiler. What seems new here is the measurement: the exact defect from correlator
-matrices, the alignment induced by blocking, two lattice spacings of SU(3), against the gap. This rests
-on a web search and reading of the closest papers, not a systematic citation search.
+Closest in structure: Faizal and Shabir, arXiv:2606.19362 (Fortschr. Phys. 74, 2026), organize a
+construction of four-dimensional SU(N) Yang–Mills around block-spin maps: partial isometries V_k between
+successive scales (a_{k+1} = b a_k, the coarse space embedded in the fine one, V_k Ω_{k+1} = Ω_k), an
+interlacing identity T_{k+1} = V_k* T_k^b V_k − D_k + E_k, and summable defects. Their one-step estimate
+(Eqs. 5.33–5.36, in physical units) bounds the gap of the coarser lattice from below by that of the
+finer one. Corollary 3 runs the other way, a lower bound for ever finer lattices, and needs what theirs
+does not: a lower bound on the energy of the fine states that blocking omits. Without it the inference
+fails: with fine energies 0, ε, 1 and blocking retaining 0 and 1, the retained dynamics agree exactly
+at matched times while the fine gap is ε. Two steps do not hold as printed. Theorem 5.6 and Corollary
+D.5 conclude Δ₀ − Σε_j > 0 from the convergence of the sum, which needs the margin Σε_j < Δ₀ in
+addition; Corollary 3 requires such a margin uniformly as the finest spacing shrinks. The proof of
+Theorem 11.1 uses the lower operator bound (11.3) as an upper bound in (11.5).
+
+Parts of the measurement have precedents. The leakage matrix L = U*S²U − (U*SU)² of one lattice is,
+with the symmetric normalization β₁ = γ₁ = C(0)^{1/2}, the residual Δ₂ = A₁(2) − α₁α₁ after the first
+block-Lanczos iteration of Hackett and Wagman (Phys. Rev. D 112, 014514, 2025; arXiv:2412.04444,
+Eq. 21), used there for spectroscopy on one lattice; here one such matrix enters on each side of a
+blocking map. Two-lattice Monte Carlo renormalization group matching, a method of the 1980s, has been
+applied to SU(3) gauge theories (A. Hasenfratz, arXiv:0907.0919). The intertwining relation
+S_f W = W S_c has the form of the exact lumpability condition QC = Cq for Markov chains, whose
+approximate versions measure how far a coarse map preserves the dynamics (e.g. Ward, Timár and Simon,
+arXiv:2508.16304). Lang, Liegener and Thiemann (Hamiltonian renormalisation I–IX, arXiv:1711.05685 and
+sequels) derive the compression of the semigroup to the coarse space that blocking induces through
+Osterwalder–Schrader reconstruction, and when the embedded space is invariant; their work is analytic,
+for free and solvable models. Identifications between different Hilbert spaces that control spectra are
+the subject of quasi-unitary equivalence (O. Post, Spectral Analysis on Graph-like Spaces, Lecture
+Notes in Math. 2039, 2012; Post and Simmer, arXiv:2503.22611): ‖M − I‖ and the window defect play the
+roles of near-unitarity and approximate intertwining there, and a detailed comparison is still to be
+made. Isometric scaling maps between lattice Hilbert spaces with an inductive limit: Morinelli,
+Morsella, Stottmeister and Tanimoto (Commun. Math. Phys. 2021), Stottmeister et al. (Phys. Rev. Lett.
+127, 230601, 2021), Brothier and Stottmeister for 1+1-dimensional Yang–Mills (arXiv:1907.05549).
+Effective transfer matrices on block variables estimated by Monte Carlo, with an overlap measure of
+quality, on one lattice: Hasenbusch, Pinn and Rummukainen (Phys. Rev. D 49, 495, 1994). Standard
+practice also compares blocked observables through fixed-point actions, blocked and smeared glueball
+operators, and gradient flow as a continuous blocking (e.g. Carosso, Hasenfratz and Neil,
+arXiv:1806.01385). Rigorous background: Bałaban's ultraviolet stability for lattice Yang–Mills
+(expounded by Dimock) and the strong-coupling gap of Osterwalder and Seiler.
+
+What we put forward is the combination. Blocking fixes which coarse operator corresponds to which fine
+operator; the polar map aligns their normalizations; correlators measured independently at the two
+spacings then determine the full intertwining defect of that window map, including evolution out of
+either window, and show how much of the disagreement is already visible inside the paired windows. We
+found precedents for each ingredient, but not this measurement for SU(3), in the sources checked (a web
+search and the closest papers, not a systematic citation search). The physics question it answers: when
+two lattice spacings give compatible glueball masses, do the corresponding operators also evolve alike?
+Two operators can share the leading decay while weighting higher excitations differently, and the
+measurement exposes that difference; Corollary 3 says why its size matters.
 
 ## Status
 
