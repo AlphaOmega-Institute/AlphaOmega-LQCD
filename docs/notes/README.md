@@ -110,10 +110,14 @@ a(5.7)/a(6.054) = 2.0015; 16³ × 32 blocked once to 8³ × 32; blocking paramet
 same configurations; stout levels 4, 8, 16, 24. Each α is measured in two variants: the fixed blocking
 origin, and the zero-momentum projection (operator amplitudes averaged over the eight origins before the
 correlators are formed). Target 3000 configurations, with the first 1000 inspected as a pilot while the
-same chain continues; `--checkpoint`/`--resume` make an interrupted run continue exactly. Cost:
-the measurement now smears 24 blocked lattices per configuration (3 α × 8 origins) up to 24 stout
-steps, which costs more than the sweeps: well over 13 s per configuration on the four threads used here
-(being re-timed). Time it first on the machine that runs it, with `--confs 25`.
+same chain continues. With `--out`, `--checkpoint` and `--resume`, an interrupted run continues exactly,
+and the output file is first cut back to the checkpoint so that no line is duplicated. The analysis
+drops an incomplete last line, so the file can be analysed while it is being written. Cost: the
+measurement smears 24 blocked lattices per configuration (3 α × 8 origins) up to 24 stout steps, which
+costs more than the sweeps: 20 s per configuration on the four threads used here while other jobs ran
+(perhaps 13–15 s alone), against 4.5 s for the fixed-origin measurement alone. Time it first on the
+machine that runs it, with `--confs 25`. `--levels 4,8` (the primary window only) roughly halves the
+cost.
 
 ## Status
 
