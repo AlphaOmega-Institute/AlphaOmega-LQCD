@@ -496,7 +496,8 @@ What the map shows:
   with zero. Raw magnitudes at the common interval are not like for like: there the second pair's
   leading coarse eigenvalue is 0.117 against 0.339, its operators carrying more weight on higher states
   that have decayed by then. The raw mismatch at the common interval, 0.0408(56), is a quarter of the
-  first pair's (a factor 4.06), but relative to the leading coarse eigenvalue it is 0.350(44) against
+  first pair's (a factor 4.06) and about twice the noise reference at that interval (95th percentile
+  0.018, `noise_b6054_3000v1000_window48_lag2.txt`), but relative to the leading coarse eigenvalue it is 0.350(44) against
   0.488(14), a 28(9)% reduction; the angle (24.8(1.0)° to 12.8(2.3)°) is free of this scale. Operator
   choice matters directly: on the same coarse configurations at lag 2, levels {16, 24} give a leading
   eigenvalue of 0.2191(42) against 0.1165(36) for {4, 8}. At the first pair's physical interval (`--lag 2`) the angle is 12.8(2.3)°, the leading two

@@ -12,12 +12,14 @@
 #          --size2 n      configurations in the second one (default: the same as --size)
 #          --pairs 2000   number of resampled pairs
 #          --seed 1
+#          --lag 1        lag of the compressions compared (both resamples at the same lag)
 
 using LatticeYM, Printf, LinearAlgebra, Random
 
 function main(args)
     path = args[1]
-    opt = Dict("window" => "4,8", "bin" => "10", "size" => "3000", "size2" => "", "pairs" => "2000", "seed" => "1")
+    opt = Dict("window" => "4,8", "bin" => "10", "size" => "3000", "size2" => "", "pairs" => "2000", "seed" => "1",
+               "lag" => "1")
     i = 2
     while i <= length(args)
         key = lstrip(args[i], '-')
@@ -32,6 +34,7 @@ function main(args)
     w = [findfirst(==(l), levels) for l in wlev]
     b, nsize, npairs = parse.(Int, (opt["bin"], opt["size"], opt["pairs"]))
     nsize2 = isempty(opt["size2"]) ? nsize : parse(Int, opt["size2"])
+    lag = parse(Int, opt["lag"])
     O = zeros(size(X, 1), length(w), T)
     for (j, k) in enumerate(w), t in 1:T
         O[:, j, t] = X[:, 1 + (k - 1) * T + t]
@@ -45,8 +48,8 @@ function main(args)
                                     vec(sum(Mb[ix, :]; dims = 1)) ./ ndraw))
     mis = zeros(npairs)
     for p in 1:npairs
-        K1, _, G1 = window_compression(draw(nsize), 1)
-        K2, _, G2 = window_compression(draw(nsize2), 1)
+        K1, _, G1 = window_compression(draw(nsize), lag)
+        K2, _, G2 = window_compression(draw(nsize2), lag)
         V, _ = induced_alignment(G1, G2)
         mis[p] = opnorm(K1 * V - V * K2)
     end
@@ -54,6 +57,7 @@ function main(args)
     q(x) = mis[clamp(round(Int, x * npairs), 1, npairs)]
     @printf("window %s, %d pairs of resamples of %d and %d configurations (blocks of %d) from %d configurations\n",
             wlev, npairs, nsize, nsize2, b, size(X, 1))
+    lag == 1 || @printf("lag %d\n", lag)
     @printf("apparent mismatch with zero true mismatch: median %.4f, 90%% %.4f, 95%% %.4f, 99%% %.4f\n",
             q(0.5), q(0.9), q(0.95), q(0.99))
 end

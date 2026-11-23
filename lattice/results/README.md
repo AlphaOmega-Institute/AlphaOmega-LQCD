@@ -21,6 +21,7 @@ ignores.
 | `fine_b6546_masses.txt`, `_bin20` | `examples/blocked_masses.jl` with `--coarse coarse_b6054 --ratio 1.9997 --franges 4:16,8:16,4:2:16,2:8 --cranges 2:8,4:8,1:4`. |
 | `fine_b6546_masses_bin50.txt` | The same at bins of 50 without the short ranges (`--franges 4:16,8:16,4:2:16 --cranges 2:8,4:8`). |
 | `noise_b6054_3000v1000_window48.txt`, `_window4to24` | `examples/window_noise_floor.jl` on `coarse_b6054` with `--size 3000 --size2 1000`: the noise reference for the second pair. |
+| `noise_b6054_3000v1000_window48_lag2.txt` | The same at `--lag 2`, the noise reference at the first pair's physical interval. |
 
 The analysis outputs were first produced on the machine that ran the simulation (commit f3ade0c);
 rerun from the uploaded data on a different machine they were reproduced byte for byte. The files here
