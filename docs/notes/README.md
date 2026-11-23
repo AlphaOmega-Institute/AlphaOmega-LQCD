@@ -22,7 +22,7 @@ mass gap. Three pieces of work belong together:
 
 ## Reproduce
 
-    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 4553 tests
+    julia --project=lattice -t auto lattice/test/runtests.jl          # LatticeYM, 4703 tests
     julia --project=lattice lattice/test/runner_checks.jl              # the fine-run program, 19 checks
     julia docs/notes/check_spectral_transfer.jl                        # 6563 checks
     python3 hamiltonian/check_all.py                                   # NumPy and SciPy
@@ -540,12 +540,19 @@ readings of the printed numbers (`graph_departure`; all checked on exact models 
   ‖(I − P_c − P_f)SP₊‖ = λ_max((L_c + V*L_f V)/2)^{1/2}; the total departure ‖(I − P₊)SP₊‖ combines the
   two. A small in-window part with an appreciable outside part says the two descriptions agree on what
   the chosen operators retain while the operators miss part of the evolution.
+- Defect against departure. With δ = ‖[S, R]‖ the defect and h = ‖(I − P₊)SP₊‖ the departure,
+  δ/2 ≤ h ≤ δ, both constants attained (invariant windows with D ≠ 0 give h = δ/2; a leaking window
+  compared with itself gives h = δ). The sector sign J = diag(I, −I) commutes with S and exchanges the
+  two graphs, so R = P₊ − P₋ gives δ ≤ 2h; R = 2P₊ − P_w gives h ≤ (δ + λ_L)/2 with
+  λ_L = max(‖L_c‖, ‖L_f‖)^{1/2} ≤ δ. The two vanish together.
 
 Control: comparing the coarse ensemble with itself (levels 4, 8; V = I) gives 0 into the anti-aligned
 graph and 0.122 both out of the windows and in total, the square root of the largest coarse leakage
 eigenvalue 0.0149. The defect and the disagreement over window inputs are also 0.122 in this comparison: with
-D = 0 the window-input disagreement is λ_max(V*L_f V)^{1/2}, the fine evolution leaving the window, which
-for the primary recipe of the first pair would be 0.086(22) on its own. So a total departure, a defect or
+D = 0 the window-input disagreement is ‖L_f‖^{1/2}, the fine evolution leaving the window, and the defect
+max(‖L_c‖, ‖L_f‖)^{1/2}; if only the coarse window leaks, the window-input disagreement vanishes. For the
+primary recipe of the first pair the fine leakage alone would give 0.086(22); it combines with D inside
+one eigenvalue, so it is not to be subtracted from a measured disagreement. So a total departure, a defect or
 a window-input disagreement near 0.12 can coexist with perfect agreement; disagreement
 inside the window is read from ‖K_f V − V K_c‖, whose pilot-size noise reference is 0.024 (0.012 for the
 anti-aligned amplitude, its half). These are reference values, not calibrated thresholds for the fine

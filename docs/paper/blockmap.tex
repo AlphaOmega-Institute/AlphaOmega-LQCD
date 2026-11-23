@@ -135,9 +135,11 @@ to inputs in the coarse window the disagreement is
  \|(S_fW-WS_c)U_c\|=\lmax\bigl(D^*D+V^*L_fV\bigr)^{1/2},
 \end{equation}
 which is at most the defect. Neither maximization vanishes for an exact correspondence of windows that
-leak: with $D=0$ the window-input disagreement is $\lmax(V^*L_fV)^{1/2}$, from the part of the fine
-evolution that leaves the fine window, which $W$ cannot supply. Disagreement inside the windows is
-measured by $D$. The proof (Appendix~\ref{app:proofs}) uses the polar decompositions of the
+leak: when the compressed dynamics agree ($D=0$) the window-input disagreement is $\|L_f\|^{1/2}$, from
+the part of the fine evolution that leaves the fine window, which $W$ cannot supply, and the defect is
+$\max(\|L_c\|,\|L_f\|)^{1/2}$. If only the coarse window leaks, the window-input disagreement vanishes.
+Since $D^*D$ and $V^*L_fV$ combine inside one eigenvalue, a leakage floor is not to be subtracted from a
+measured disagreement; disagreement inside the windows is measured by $D$. The proof (Appendix~\ref{app:proofs}) uses the polar decompositions of the
 leakage maps $(I-U_iU_i^*)S_iU_i$. Three quantities have distinct meanings, though their norms do not add. The minimum
 of $\|V'^*K_fV'-K_c\|$ over all unitary $V'$ is the largest difference between matched sorted eigenvalues
 of $K_f$ and $K_c$ \cite{Bhatia}, a floor set by the spectra. The alignment $V$ selected by blocking gives
@@ -153,6 +155,8 @@ the defect measures how far evolution fails to commute with the operation that e
 coarse description with its fine partner. The departure of the aligned graph itself,
 $\|(I-P_+)SP_+\|$ with $P_+$ the projection onto it, is a different quantity: on the primary recipe of the
 first pair the commutator norm is $0.2030(125)$ and the departure $0.1258(109)$ (Table~\ref{tab:window}).
+The two lie within a sharp factor of two of each other, $\tfrac12\|[S,R]\|\le\|(I-P_+)SP_+\|\le\|[S,R]\|$
+(Appendix~\ref{app:doubled}), so they vanish together.
 The normalization $\|M-I\|$ measures how far the raw correspondence is from isometric, which is the
 near-neutrality of its graph for the form $\operatorname{diag}(I,-I)$; the defect measures the
 near-invariance of the polar graph (Appendix~\ref{app:doubled}).
@@ -312,7 +316,8 @@ each recipe. That is the increase of the maximum when the restriction on inputs 
 of the disagreement for external inputs: for inputs lying entirely outside the coarse window the maximum
 disagreement is $\sqrt{\|L_c\|}$, which is $0.122(17)$ on the primary recipe. Leakage enters even when
 the windows agree: the coarse window compared with itself gives $0.122(17)$ for both maximizations, and on
-the primary recipe the fine leakage alone, with $D=0$, would give $0.086(22)$ over window inputs.
+the primary recipe the fine leakage alone, with $D=0$, would give $0.086(22)$ over window inputs. It
+combines with the mismatch inside one eigenvalue and is not to be subtracted from $0.180$.
 Disagreement inside the windows is read from the in-window mismatch.
 
 \subsection{What the blocking map shows beyond the spectra}
@@ -455,19 +460,26 @@ $\pm1$ eigenspaces are the graphs $\Gamma_\pm=\{(x,\pm Wx):x\in\operatorname{Ran
 \]
 
 \emph{Commutators.} With $X=S_fW-WS_c$ and $S$ self-adjoint, $[S,R]=\begin{psmallmatrix}0&-X^*\\X&0
-\end{psmallmatrix}$, so $\|[S,R]\|=\|X\|$. The departure of the aligned graph is
-$\|(I-P_+)SP_+\|=\|[S,P_+]\|$, and $\|[S,P_w]\|=\max(\|L_c\|,\|L_f\|)^{1/2}=:\lambda_L$ is the leakage term of
-Proposition~\ref{prop:defect}. Because $R=2P_+-P_w$, $[S,R]=2[S,P_+]-[S,P_w]$, so
+\end{psmallmatrix}$, so the defect is $\delta=\|[S,R]\|=\|X\|$. The departure of the aligned graph is
+$h=\|(I-P_+)SP_+\|=\|[S,P_+]\|$. They are different commutators, but they lie within a factor of two of
+each other:
 \[
- \|[S,P_+]\|\le\tfrac12\bigl(\|X\|+\lambda_L\bigr),\qquad \|X\|\le2\|[S,P_+]\|+\lambda_L .
+ \tfrac12\delta\le h\le\delta .
 \]
-The defect and the departure are different commutators, which bound each other only up to the leakage
-term; on the primary recipe of the first pair they are $0.203$ and $0.126$, with $\lambda_L=0.122$.
+For the lower bound, the sector sign $J=\operatorname{diag}(I,-I)$ commutes with $S$ and exchanges $P_+$
+and $P_-$, so the anti-aligned graph has the same departure, and $R=P_+-P_-$ gives $\delta\le2h$. For the
+upper bound, $R=2P_+-P_w$ and $\|[S,P_w]\|=\max(\|L_c\|,\|L_f\|)^{1/2}=:\lambda_L$ give
+$h\le\tfrac12(\delta+\lambda_L)$, and each leakage block of the matrix in Proposition~\ref{prop:defect} has
+norm at most $\delta$, so $\lambda_L\le\delta$. Both constants are attained: invariant windows
+($L_c=L_f=0$) with $D\ne0$ give $h=\delta/2$, and a leaking window compared with itself gives $h=\delta$.
+The two diagnostics therefore vanish together, and without any leakage estimate their magnitudes differ
+by at most a factor of two. On the primary recipe of the first pair $\delta=0.203$ and $h=0.126$, with
+$\lambda_L=0.122$.
 
 \emph{Transfer of the aligned graph.} For a unit vector $g=2^{-1/2}(U_ca,U_fVa)$ of $\Gamma_+$, with
-$D'=K_c-V^*K_fV$,
+$D'=V^*K_fV-K_c$ as in Section~\ref{sec:framework},
 \[
- P_-Sg=2^{-3/2}\bigl(U_cD'a,\,-U_fVD'a\bigr),\qquad
+ P_-Sg=2^{-3/2}\bigl(-U_cD'a,\,U_fVD'a\bigr),\qquad
  (I-P_w)Sg=2^{-1/2}\bigl(Y_c\sqrt{L_c}\,a,\,Y_f\sqrt{L_f}\,Va\bigr),
 \]
 while $\langle g,Sg\rangle=\tfrac12\langle a,(K_c+V^*K_fV)a\rangle$: the graph's own evolution is the

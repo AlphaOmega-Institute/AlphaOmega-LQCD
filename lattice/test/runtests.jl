@@ -687,6 +687,10 @@ end
         x = svd(M).V
         @test opnorm(M - I) ≈ maximum(abs(norm(A * x[:, j]) - 1) for j in 1:k) rtol = 1e-10
         @test opnorm(M^2 - I) ≈ opnorm(A' * A - I) rtol = 1e-10
+        # defect δ against departure h: δ/2 ≤ h ≤ δ; the anti-aligned graph departs as much
+        δ = window_defect(Kf, Lf, Kc, Lc, V)
+        @test δ / 2 - 1e-10 <= tot <= δ + 1e-10
+        @test opnorm((I - Gm * Gm') * S * Gm) ≈ tot rtol = 1e-8
     end
     # complex Hermitian windows: the formalism allows them (lattice correlators are real)
     hpsd(n) = (A = randn(rng, ComplexF64, n, n); M = A * A'; Matrix(Hermitian(M / opnorm(M))))
@@ -708,6 +712,23 @@ end
         @test tot ≈ opnorm((I - Gp * Gp') * S * Gp) rtol = 1e-8
         @test window_defect(Kf, Lf, Kc, Lc, V) ≈ opnorm(Sf * W - W * Sc) rtol = 1e-8
         @test opnorm(S * R - R * S) ≈ opnorm(Sf * W - W * Sc) rtol = 1e-10
+        δ = window_defect(Kf, Lf, Kc, Lc, V)
+        @test δ / 2 - 1e-10 <= tot <= δ + 1e-10
+    end
+    # both constants attained: invariant windows with D ≠ 0 give h = δ/2, a leaking window compared
+    # with itself gives h = δ. With D = 0 the window inputs give ‖L_f‖^{1/2} and all inputs
+    # max(‖L_c‖, ‖L_f‖)^{1/2}; if only the coarse window leaks, the window inputs give zero
+    for _ in 1:10
+        k = 2
+        Kc, Kf = Matrix(Hermitian(randn(rng, ComplexF64, k, k))), Matrix(Hermitian(randn(rng, ComplexF64, k, k)))
+        V, Z, E = frame(k, k), zeros(k, k), Matrix(1.0I, k, k)
+        @test graph_departure(Kf, Z, Kc, Z, V)[3] ≈ window_defect(Kf, Z, Kc, Z, V) / 2 rtol = 1e-10
+        L = hpsd(k)
+        @test graph_departure(Kc, L, Kc, L, E)[3] ≈ window_defect(Kc, L, Kc, L, E) rtol = 1e-10
+        Lc, Lf, Kf0 = hpsd(k), hpsd(k), V * Kc * V'
+        @test window_defect_inputs(Kf0, Lf, Kc, V) ≈ sqrt(opnorm(Lf)) rtol = 1e-8
+        @test window_defect(Kf0, Lf, Kc, Lc, V) ≈ sqrt(max(opnorm(Lc), opnorm(Lf))) rtol = 1e-8
+        @test window_defect_inputs(Kf0, Z, Kc, V) < 1e-6
     end
 end
 
