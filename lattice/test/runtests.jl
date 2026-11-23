@@ -725,9 +725,12 @@ end
         @test graph_departure(Kf, Z, Kc, Z, V)[3] ≈ window_defect(Kf, Z, Kc, Z, V) / 2 rtol = 1e-10
         L = hpsd(k)
         @test graph_departure(Kc, L, Kc, L, E)[3] ≈ window_defect(Kc, L, Kc, L, E) rtol = 1e-10
-        Lc, Lf, Kf0 = hpsd(k), hpsd(k), V * Kc * V'
-        @test window_defect_inputs(Kf0, Lf, Kc, V) ≈ sqrt(opnorm(Lf)) rtol = 1e-8
-        @test window_defect(Kf0, Lf, Kc, Lc, V) ≈ sqrt(max(opnorm(Lc), opnorm(Lf))) rtol = 1e-8
+        Kf0 = V * Kc * V'
+        # unequal leakages (norms 1 and 1/4), with either lattice supplying the larger one
+        for (Lc, Lf) in ((hpsd(k), hpsd(k) / 4), (hpsd(k) / 4, hpsd(k)))
+            @test window_defect_inputs(Kf0, Lf, Kc, V) ≈ sqrt(opnorm(Lf)) rtol = 1e-8
+            @test window_defect(Kf0, Lf, Kc, Lc, V) ≈ sqrt(max(opnorm(Lc), opnorm(Lf))) rtol = 1e-8
+        end
         @test window_defect_inputs(Kf0, Z, Kc, V) < 1e-6
     end
 end
