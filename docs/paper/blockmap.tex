@@ -255,6 +255,16 @@ variational vector fixed on the full ensemble \cite{Michael1985,LuscherWolff1990
 code and analysis outputs are public (Appendix~\ref{app:data}); rerun from the published data on a second
 machine, the analyses reproduce the outputs of the first byte for byte.
 
+\emph{Use of AI tools.} Substantial assistance from Claude (Anthropic) and ChatGPT (OpenAI) was used in
+the study design, mathematical derivations, software development, numerical analysis, and manuscript
+preparation. The author directed the study, ran the production simulations and analysis scripts, and
+made the decisions about which comparisons and claims to retain. Claude wrote and tested the simulation
+and analysis code and drafted the manuscript. ChatGPT contributed derivations and diagnostic tests,
+reviewed the code and manuscript, and recomputed reported quantities from the archived measurements.
+Checks included comparisons with exactly calculable models and reproduction of numerical results across
+machines. [The author's own checks of the final manuscript: one sentence, to be added.] The author takes
+responsibility for the manuscript and its conclusions.
+
 \section{Results: \texorpdfstring{$\beta=5.7$}{beta = 5.7} against \texorpdfstring{$\beta=6.054$}{beta = 6.054}}\label{sec:pair1}
 
 \subsection{Masses}
@@ -270,7 +280,7 @@ difference of $0.171(29)$ in fine units, $m_f/m_c-1=0.354(68)$ with 90\% interva
 first interval removed (fine $[4,8]$ against coarse $[2,4]$) the central value persists at lower
 significance, $0.150(79)$. In units of the string tension the coarse scalar is near $m_0/\sqrt\sigma\approx2.4$
 and the fine one near $3.3$: the scalar dip of the Wilson action near $\beta\approx5.7$, where the scalar
-softens selectively \cite{BhanotCreutz1981,Heller1995,AthenodorouTeper2020}. Paired within each ensemble,
+softens selectively \cite{Bhanot1982,Heller1995,AthenodorouTeper2020}. Paired within each ensemble,
 the leading window eigenvalues differ by $0.1032(65)$ and the single-state decay factors of the fitted
 masses over the matched interval by $0.1100(181)$; observed minus predicted is $-0.0068(163)$. The
 individual window eigenvalues lie below their single-state predictions by $0.0404(120)$ (coarse) and
@@ -664,7 +674,8 @@ Code, data and analysis outputs are in the repository\\
 \url{https://github.com/AlphaOmega-Institute/AlphaOmega-LQCD}\\
 (\texttt{lattice/}, \texttt{lattice/results/}). [Version and archive identifiers to be added.]
 
-\emph{Use of AI assistance.} [Statement to be completed according to the venue's policy.]
+The archive holds the per-configuration measurements (operator time slices, plaquettes and Wilson
+loops) and the analysis outputs, not the gauge fields.
 
 \begin{thebibliography}{99}
 \bibitem{Wilson1974} K.~G. Wilson, Phys.\ Rev.\ D \textbf{10} (1974) 2445.
@@ -679,17 +690,18 @@ Code, data and analysis outputs are in the repository\\
 \bibitem{Blossier2009} B.~Blossier, M.~Della Morte, G.~von Hippel, T.~Mendes and R.~Sommer, JHEP \textbf{04} (2009) 094.
 \bibitem{NeccoSommer2002} S.~Necco and R.~Sommer, Nucl.\ Phys.\ B \textbf{622} (2002) 328.
 \bibitem{AthenodorouTeper2020} A.~Athenodorou and M.~Teper, JHEP \textbf{11} (2020) 172, arXiv:2007.06422.
-\bibitem{BhanotCreutz1981} G.~Bhanot and M.~Creutz, Phys.\ Rev.\ D \textbf{24} (1981) 3212.
-\bibitem{Heller1995} U.~M. Heller, arXiv:hep-lat/9508009.
+\bibitem{Bhanot1982} G.~Bhanot, Phys.\ Lett.\ B \textbf{108} (1982) 337.
+\bibitem{Heller1995} U.~M. Heller, Phys.\ Lett.\ B \textbf{362} (1995) 123, arXiv:hep-lat/9508009.
 \bibitem{Mackenzie1984} P.~B. Mackenzie, Monte Carlo renormalization group calculations for SU(2) lattice gauge theory, FERMILAB-Conf-84/48-T (1984).
 \bibitem{Swendsen1981} R.~H. Swendsen, Phys.\ Rev.\ Lett.\ \textbf{47} (1981) 1775.
-\bibitem{Hasenfratz2009} A.~Hasenfratz, arXiv:0907.0919.
+\bibitem{Hasenfratz2009} A.~Hasenfratz, Phys.\ Rev.\ D \textbf{80} (2009) 034505, arXiv:0907.0919.
 \bibitem{HPR1994} M.~Hasenbusch, K.~Pinn and K.~Rummukainen, Phys.\ Rev.\ D \textbf{49} (1994) 495.
 \bibitem{HackettWagman2025} D.~C. Hackett and M.~L. Wagman, Phys.\ Rev.\ D \textbf{112} (2025) 014514, arXiv:2412.04444.
 \bibitem{FaizalShabir2026} M.~Faizal and A.~Shabir, Fortschr.\ Phys.\ \textbf{74} (2026) e70097, arXiv:2606.19362.
 \bibitem{Post2012} O.~Post, \emph{Spectral Analysis on Graph-like Spaces}, Lecture Notes in Math.\ 2039, Springer (2012).
-\bibitem{PostSimmer} O.~Post and J.~Simmer, arXiv:2503.22611.
-\bibitem{Bhatia} R.~Bhatia, \emph{Matrix Analysis}, Springer (1997).
+\bibitem{PostSimmer} O.~Post and J.~Simmer, Rev.\ Roumaine Math.\ Pures Appl.\ \textbf{64} (2019) 373,
+arXiv:2503.22611.
+\bibitem{Bhatia} R.~Bhatia, \emph{Matrix Analysis}, Graduate Texts in Mathematics 169, Springer (1997).
 \end{thebibliography}
 
 \end{document}
