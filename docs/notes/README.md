@@ -483,8 +483,9 @@ Scoring against the record:
   fell by a factor 3.4 but stays well above the illustrative single-state value 0.003, as the recorded
   caveat about weight on higher states allowed. Four-operator window: 0.0091(66) (first pair 0.0886(66)).
 - Masses: unresolved. Bins of 20: −0.061(147), [−0.303, 0.181]. Bins of 50: the 13-point fit is
-  ill-conditioned (κ 2 × 10³, χ²/dof 3.7), as anticipated with 20 blocks; the 7-point even-time fit gives
-  0.392(244), [−0.009, 0.793], unresolved. Delayed start and even times at bins of 10: unresolved. Short
+  ill-conditioned (κ 2 × 10³, χ²/dof 3.71), as anticipated with 20 blocks for 13 times, and gives
+  0.346(154), [0.092, 0.600], beyond ±5%; the 7-point even-time fit gives 0.392(244), [−0.009, 0.793],
+  unresolved. The primary verdict, at bins of 10, stays unresolved. Delayed start and even times at bins of 10: unresolved. Short
   ranges (fine [2, 8] against coarse [1, 4]): 0.242(73), beyond ±5%, the influence of early times. The
   {4, 8} fits lie above the published ground state (coarse 0.832(62) in its units against about 0.645):
   on these lattices, of half the spacing, the same smearing steps cover half the physical distance.
@@ -495,10 +496,12 @@ What the map shows:
   with zero. Raw magnitudes at the common interval are not like for like: there the second pair's
   leading coarse eigenvalue is 0.117 against 0.339, its operators carrying more weight on higher states
   that have decayed by then. The raw mismatch at the common interval, 0.0408(56), is a quarter of the
-  first pair's, but relative to the leading coarse eigenvalue it is 0.350(44) against 0.488(14); the
-  angle is free of this scale. At the first pair's physical interval (`--lag 2`) the angle is 12.8(2.3)°, the leading two
+  first pair's (a factor 4.06), but relative to the leading coarse eigenvalue it is 0.350(44) against
+  0.488(14), a 28(9)% reduction; the angle (24.8(1.0)° to 12.8(2.3)°) is free of this scale. Operator
+  choice matters directly: on the same coarse configurations at lag 2, levels {16, 24} give a leading
+  eigenvalue of 0.2191(42) against 0.1165(36) for {4, 8}. At the first pair's physical interval (`--lag 2`) the angle is 12.8(2.3)°, the leading two
   coarse eigenvalues 0.117 and 0.016 (well separated), ε₊ 0.0026(55).
-- Both maximizations sit at their D = 0 values: ‖L_f‖^{1/2} = 0.160(14) and
+- Both maximizations lie close to their D = 0 values: ‖L_f‖^{1/2} = 0.160(14) and
   max(‖L_c‖, ‖L_f‖)^{1/2} = 0.177(9). The windows leak more on the finer lattices, and the in-window
   mismatch, four times the noise, lies in directions that barely raise the maximum. On this pair the
   defect measures the windows, not the map; the mismatch, the angle and ε₊ carry the comparison.
@@ -507,7 +510,7 @@ What the map shows:
 - Recipes: averaging over origins again lowers the mismatch, defect and departure (0.0210(26),
   0.0279(65), 0.0120(37) at α = 0.6), and the fixed origin is again more nearly isometric at α = 0.6
   (‖M − I‖ 0.048 against 0.201); the reversal of ε₊ is not resolved (−0.0075(53)).
-- Checks: bins of 20 and 50 change no central value; headline errors grow by at most 6% (largest in the
+- Checks: bins of 20 and 50 change no central value of the window quantities; headline errors grow by at most 6% (largest in the
   output 28%, the positivity floor).
 - Exploratory, chosen after the data: with the operators {16, 24} the coarse fit gives 0.696(32) in its
   units and the matched fits 0.127(79), [−0.003, 0.257], unresolved; the same operators give 0.356(71),

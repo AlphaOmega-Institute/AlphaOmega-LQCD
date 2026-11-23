@@ -37,10 +37,11 @@ evolution, and again by the symmetric and the one-sided discrepancy. We state a 
 criterion for a gap and show what correlators determine and what they cannot (an upper bound on slow
 states the chosen operators do not see). A second pair, $\beta=6.054$ against $6.546$, with predictions
 recorded before its fine data were examined, tests the scalar-dip reading. There the leading spectral
-separation falls from $0.103$ to $0.030(6)$, at the recorded tolerance; the rotation falls to
-$11.8(1.0)^\circ$ and the one-sided discrepancy to $0.008(5)$, consistent with zero. The in-window mismatch
-halves but stays four times the noise, the defect is now set by evolution out of the windows, and with
-1000 fine configurations the mass comparison is unresolved.
+separation falls from $0.103$ to $0.030(6)$, at the recorded tolerance. Over the same physical interval
+the rotation falls from $24.8(1.0)^\circ$ to $12.8(2.3)^\circ$ and the in-window mismatch, relative to the
+surviving signal, by $28(9)\%$, though it stays above noise; in the primary two-operator window the
+one-sided discrepancy is $0.008(5)$, consistent with zero. The defect is now dominated by evolution out of
+the windows, and with 1000 fine configurations the mass comparison is unresolved.
 \end{abstract}
 
 \section{Introduction}
@@ -66,8 +67,8 @@ evolution decays more slowly than the coarse one: the blocking-paired preparatio
 signed discrepancy has normalized one-step autocorrelation $0.101(6)$ on the coarse lattice and $0.146(5)$
 on the fine one. This coexists with a heavier fitted fine glueball, because the paired preparation is not
 the ground state of either lattice. A comparison of masses, or of spectra, cannot see it. On a second
-pair, with both lattices in the scaling region, the rotation halves and the one-sided discrepancy is no
-longer resolved.
+pair, with both lattices in the scaling region, the rotation halves and, in the primary two-operator
+window, the one-sided discrepancy is no longer resolved.
 
 The question has been seen before. Monte Carlo renormalization-group matching between two lattice
 spacings was developed in the 1980s; glueball correlations were considered as matching observables but
@@ -365,7 +366,8 @@ lattice came from replacing a matrix by its norm.
 
 \subsection{Checks}
 
-Bins of 20 and 50 change no central value; the headline errors grow by at most about 8\%, and the
+Bins of 20 and 50 change no central value of the window quantities; the headline errors grow by at
+most about 8\%, and the
 largest growth in the full output is 23\%. The four-operator window reproduces the reversal of $\eps_+$
 ($0.056(6)$ with zero momentum against $0.014(6)$ and $0.007(5)$ with the fixed origin); its estimated
 leakage matrices have negative eigenvalues within errors, which the estimator sets to zero.
@@ -426,24 +428,32 @@ $\alpha=0.6$ with zero momentum the two maximizations would be $0.160$ and $0.17
 \toprule
  & $\beta=5.7$ against $6.054$ & $\beta=6.054$ against $6.546$ \\
 \midrule
+\multicolumn{3}{@{}l}{\emph{one coarse step of each pair}} \\
 leading window eigenvalues, coarse / fine & 0.339 / 0.236 & 0.294 / 0.264 \\
 their separation & 0.103(7) & 0.030(6) \\
 in-window mismatch (noise reference) & 0.166(6) (0.017) & 0.077(5) (0.017) \\
-mismatch / leading coarse eigenvalue & 0.488(14) & 0.261(17) \\
 angle of leading directions & $24.8(1.0)^\circ$ & $11.8(1.0)^\circ$ \\
 $\eps_+$ & 0.045(6) & 0.008(5) \\
 largest leakage eigenvalues, $L_c$ / $L_f$ & 0.015 / 0.007 & 0.031 / 0.026 \\
 window inputs (value at $D=0$) & 0.180(11) (0.086) & 0.163(14) (0.160) \\
 defect (value at $D=0$) & 0.203(13) (0.122) & 0.184(8) (0.177) \\
-defect$/(1-s)$, common interval & 0.278(17) & 0.174(19) \\
-$\eps_+/(1-s)$, common interval & 0.061(8) & 0.004(8) \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{the first pair's physical interval}} \\
+leading coarse eigenvalue & 0.339(5) & 0.117(4) \\
+in-window mismatch & 0.166(6) & 0.041(6) \\
+mismatch / leading coarse eigenvalue & 0.488(14) & 0.350(44) \\
+angle of leading directions & $24.8(1.0)^\circ$ & $12.8(2.3)^\circ$ \\
+defect$/(1-s)$ & 0.278(17) & 0.174(19) \\
+$\eps_+/(1-s)$ & 0.061(8) & 0.004(8) \\
+\midrule
 mass endpoint $m_f/m_c-1$ & 0.354(68) & $-0.064(138)$ \\
 \bottomrule
 \end{tabular}
-\caption{The primary recipe ($\alpha=0.6$, zero momentum, window $\{4,8\}$) on both pairs, at one coarse
-step. ``Common interval'': the first pair at one coarse step against the second at two, both relative to
-the reference gap $1-s$ with $s=e^{-1.31}$, the same physical mass; raw magnitudes there also reflect how
-far each window has decayed (see text). Mass endpoints: fine $[2,8]$ against
+\caption{The primary recipe ($\alpha=0.6$, zero momentum, window $\{4,8\}$) on both pairs. Upper block:
+one coarse step of each pair. Middle block: the first pair's physical interval, one coarse step of the
+first pair against two of the second, with $s=e^{-1.31}$, the same physical mass, for both; raw
+magnitudes there also reflect how much of each window's signal survives, which the normalized mismatch
+and the angle do not (see text). Mass endpoints: fine $[2,8]$ against
 coarse $[1,4]$ on the first pair, fine $[4,16]$ against coarse $[2,8]$ on the second, the same physical
 range.}
 \label{tab:cross}
@@ -459,8 +469,10 @@ the separation is $0.0091(66)$ (first pair $0.0886(66)$).
 
 \emph{Masses.} The recorded endpoint is unresolved: fits over fine $[4,16]$ against coarse $[2,8]$ give
 $m_f/m_c-1=-0.064(138)$, with 90\% interval $[-0.291,0.163]$, and bins of 20 give $-0.061(147)$. At bins of
-50 the fine ensemble has 20 blocks and the 13-point fit is ill-conditioned (condition number
-$2\times10^3$), as anticipated; the seven-point even-time fit gives $0.39(24)$, also unresolved. The
+50 the principal fit gives $0.346(154)$, with 90\% interval $[0.092,0.600]$, beyond 5\%, but with
+$\chi^2/\mathrm{dof}=3.71$ and a 13-point covariance estimated from only 20 fine blocks (condition number
+$2\times10^3$), the ill-conditioning anticipated in the plan; the seven-point even-time fit at the same
+binning gives $0.39(24)$, unresolved. The primary verdict, at bins of ten, remains unresolved. The
 delayed-start and even-time checks at bins of ten are unresolved too, while the short ranges (fine
 $[2,8]$ against coarse $[1,4]$) give $0.242(73)$, beyond 5\%, the influence of early times. The fitted
 masses lie above the published ground state: the coarse fit gives $0.832(62)$ in its own units against
@@ -475,22 +487,25 @@ percentile of $0.017$ for pairs of resamples of 3000 and 1000 configurations of 
 rotation of the leading direction is $11.8(1.0)^\circ$ (first pair $24.8(1.0)^\circ$), and the one-sided
 error is $\eps_+=0.0075(53)$, consistent with zero (first pair $0.045(6)$). At the first pair's physical
 interval (coarse lag 2, fine lag 4) the angle is $12.8(2.3)^\circ$, with the two leading eigenvalues well
-separated ($0.117$ and $0.016$ on the coarse lattice), and $\eps_+=0.0026(55)$. Relative to a reference gap
-with the same physical mass and interval for both pairs, the defect falls from $0.278(17)$ to $0.174(19)$
-and $\eps_+$ from $0.061(8)$ to $0.004(8)$. Raw magnitudes at the common interval are not like for like,
-however: there the second pair's leading coarse eigenvalue is $0.117$, against $0.339$ on the first pair,
-because its operators carry more weight on higher states, which have decayed by then. Relative to the
-leading coarse eigenvalue the in-window mismatch is $0.488(14)$ on the first pair, against $0.261(17)$ at
-one coarse step and $0.350(44)$ at the common interval on the second; the angle carries no such scale.
+separated ($0.117$ and $0.016$ on the coarse lattice), and $\eps_+=0.0026(55)$. Raw magnitudes at this
+interval are not like for like: the second pair's leading coarse eigenvalue is $0.1165(36)$, against
+$0.3392(49)$ on the first pair, consistent with greater weight of its operators on higher states, which
+have decayed by then. Operator choice matters directly: on the same coarse configurations at the same lag,
+the levels $\{16,24\}$ give $0.2191(42)$. The raw mismatch falls by a factor of $4.06$, from $0.1657(60)$
+to $0.0408(56)$; relative to the leading coarse eigenvalue it falls from $0.488(14)$ to $0.350(44)$, by
+$28(9)\%$, and the angle, which carries no such scale, from $24.8(1.0)^\circ$ to $12.8(2.3)^\circ$. Relative to
+a reference gap with the same physical mass for both pairs, the defect falls from $0.278(17)$ to
+$0.174(19)$ and $\eps_+$ from $0.061(8)$ to $0.004(8)$, with the same caveat. At one coarse step of each
+pair the normalized mismatch is $0.261(17)$.
 
-\emph{Leakage sets the defect.} The two maximizations barely move: $0.163(14)$ over window inputs and
-$0.184(8)$ over all inputs (first pair $0.180(11)$ and $0.203(13)$). Both now lie at the values they would
-take if the compressed dynamics agreed exactly, $\|L_f\|^{1/2}=0.160(14)$ and
-$\max(\|L_c\|,\|L_f\|)^{1/2}=0.177(9)$, which they exceed by $0.0029(16)$ and $0.0070(30)$ (paired errors;
-first pair $0.094(20)$ and $0.081(16)$). The windows leak more on the finer lattices (largest leakage
+\emph{Leakage dominates the defect.} The two maximizations barely move: $0.163(14)$ over window inputs
+and $0.184(8)$ over all inputs (first pair $0.180(11)$ and $0.203(13)$). Both now lie close to the values
+they would take if the compressed dynamics agreed exactly, $\|L_f\|^{1/2}=0.160(14)$ and
+$\max(\|L_c\|,\|L_f\|)^{1/2}=0.177(9)$, which they exceed by $0.0029(16)$ and $0.0070(30)$ (paired errors,
+the second about 2.3 standard errors; first pair $0.094(20)$ and $0.081(16)$). The windows leak more on the finer lattices (largest leakage
 eigenvalues $0.031$ and $0.026$, against $0.015$ and $0.007$), and the in-window mismatch, although four
 times the noise, lies in directions that barely raise the maximum. On this pair the full defect
-therefore measures how much of the evolution the windows capture, a property of each window, and the
+therefore mostly measures how much of the evolution the windows capture, a property of each window, and the
 in-window mismatch, the angle and $\eps_+$ carry the comparison of the map. The four-operator window
 gives the same picture: mismatch $0.0749(54)$ against a noise reference of $0.022$, $\eps_+=0.016(5)$
 (first pair $0.056(6)$), angle $6.0(0.8)^\circ$, and both maximizations within $0.005$ of their values at
@@ -501,7 +516,8 @@ $0.0210(26)$, $0.0279(65)$ and $0.0120(37)$ at $\alpha=0.6$, and at $\alpha=0.6$
 the more nearly isometric raw correspondence ($\|M-I\|=0.048$ against $0.201$). The reversal of the
 one-sided error is not resolved: $\eps_+(\text{fixed})-\eps_+(\text{zero})=-0.0075(53)$.
 
-\emph{Checks.} Bins of 20 and 50 change no central value; the headline errors grow by at most 6\%, and
+\emph{Checks.} Bins of 20 and 50 change no central value of the window quantities; the headline errors
+grow by at most 6\%, and
 the largest growth in the full output is 28\%, in the positivity floor.
 
 \emph{Exploratory, chosen after the data were seen.} With the more strongly smeared operators $\{16,24\}$,
@@ -517,10 +533,12 @@ method separates two features. The fitted scalar masses, which show a known fini
 reproduce the leading spectral separation within uncertainty. The rotation of the leading direction under the blocking-fixed pairing, and the
 one-sided discrepancy it produces, are properties of the map. On the second pair, with both lattices in
 the scaling region, the leading spectral separation shrinks by a factor of $3.4$, to the recorded
-tolerance, and the properties of the map shrink with it: the rotation and the in-window mismatch halve,
-and the one-sided discrepancy is no longer resolved, though the mismatch stays four times the noise. The
-second pair also exposes a limitation of the recipe: the windows leak more on the finer lattices, enough
-that the full defect is set by evolution out of the windows. A fixed number of smearing steps smooths
+tolerance, and the properties of the map shrink with it: over the same physical interval the rotation
+halves and the in-window mismatch, relative to the surviving signal, falls by $28(9)\%$, and in the primary
+two-operator window the one-sided discrepancy is no longer resolved (the four-operator window gives
+$0.016(5)$); the mismatch stays above noise. The second pair also exposes a limitation of the recipe: the
+windows leak more on the finer lattices, enough that evolution out of the windows dominates the full
+defect. A fixed number of smearing steps smooths
 over less physical distance as the spacing shrinks; operators smeared over a fixed physical radius are
 the natural next recipe.
 
@@ -545,8 +563,9 @@ through its defect, estimated from correlators through an identity exact for vac
 $\beta=5.7$ against $6.054$ it reveals a rotation of the leading window direction and a one-sided
 discrepancy that the spectra hide, beside a spectral separation that the fitted scalar masses reproduce
 within uncertainty. On $\beta=6.054$ against $6.546$, where both lattices scale, the spectral separation
-and the rotation shrink and the one-sided discrepancy is no longer resolved; what remains is an
-in-window mismatch above noise and a defect set by evolution out of the windows. The one-sided criterion
+and the rotation shrink, the in-window mismatch falls relative to the surviving signal, and in the
+primary two-operator window the one-sided discrepancy is no longer resolved; what remains is an in-window
+mismatch above noise and a defect dominated by evolution out of the windows. The one-sided criterion
 states what such measurements can establish for a gap, and what they cannot.
 
 \appendix
