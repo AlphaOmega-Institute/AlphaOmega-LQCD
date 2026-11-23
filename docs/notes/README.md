@@ -472,6 +472,8 @@ Primary recipe (α = 0.6, zero momentum, window {4, 8}, one coarse step), agains
 | defect, and above its D = 0 value | 0.203(13), 0.081(16) | 0.184(8), 0.0070(30) |
 | defect / (1 − s), common interval, s = e^{−1.31} | 0.278(17) | 0.174(19) |
 | ε₊ / (1 − s), common interval | 0.061(8) | 0.004(8) |
+| mismatch / leading coarse eigenvalue, one coarse step | 0.488(14) | 0.261(17) |
+| the same at the common interval | 0.488(14) | 0.350(44) |
 | mass endpoint m_f/m_c − 1 (90% interval) | 0.354(68) [0.242, 0.466] | −0.064(138) [−0.291, 0.163] |
 
 Scoring against the record:
@@ -490,7 +492,11 @@ Scoring against the record:
 What the map shows:
 
 - Inside the windows the tracking improves: the mismatch and the rotation halve and ε₊ is consistent
-  with zero. At the first pair's physical interval (`--lag 2`) the angle is 12.8(2.3)°, the leading two
+  with zero. Raw magnitudes at the common interval are not like for like: there the second pair's
+  leading coarse eigenvalue is 0.117 against 0.339, its operators carrying more weight on higher states
+  that have decayed by then. The raw mismatch at the common interval, 0.0408(56), is a quarter of the
+  first pair's, but relative to the leading coarse eigenvalue it is 0.350(44) against 0.488(14); the
+  angle is free of this scale. At the first pair's physical interval (`--lag 2`) the angle is 12.8(2.3)°, the leading two
   coarse eigenvalues 0.117 and 0.016 (well separated), ε₊ 0.0026(55).
 - Both maximizations sit at their D = 0 values: ‖L_f‖^{1/2} = 0.160(14) and
   max(‖L_c‖, ‖L_f‖)^{1/2} = 0.177(9). The windows leak more on the finer lattices, and the in-window
