@@ -1,0 +1,2 @@
+window [4, 8, 16, 24], 2000 pairs of resamples of 3000 and 1000 configurations (blocks of 10) from 3000 configurations
+apparent mismatch with zero true mismatch: median 0.0146, 90% 0.0200, 95% 0.0217, 99% 0.0250

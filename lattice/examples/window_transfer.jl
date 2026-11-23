@@ -47,6 +47,10 @@
 # computed from the same fine bins, so they are resampled together. When both variants
 # are present, the differences fixed − zero of the mismatch, the bound, the defect, the total
 # departure and ε₊ are reported for each α with paired errors (same configurations, same bins).
+# Last, how far each maximization lies above the value it would take if the compressed dynamics
+# agreed (D = 0): ‖L_f‖^{1/2} over coarse-window inputs, max(‖L_c‖, ‖L_f‖)^{1/2} over all inputs, with
+# paired errors. Near zero, the maximum is set by evolution out of the windows, a property of each
+# window, and the in-window quantities carry the comparison. (Added after the second pair's data.)
 
 using LatticeYM, Printf, LinearAlgebra
 
@@ -88,7 +92,8 @@ function window_quantities(Cc, Cf, sref, qgrid, lag)
                  opnorm(M^2 - I), anti, out, tot],
                 [dl[end], dl[1], εp, leakage_q_floor(Kf, Lf), s, q_needed(s, kd, ℓ2), q_needed(s, kc, ℓ2)],
                 [one_sided_bound(kd, ℓ2, q) for q in qgrid], [one_sided_bound(kc, ℓ2, q) for q in qgrid],
-                [θ, km, q_needed(s, km, ℓ2), qmd, qmc], rel, [din])
+                [θ, km, q_needed(s, km, ℓ2), qmd, qmc], rel,
+                [din, din - sqrt(max(maximum(λf), 0.0)), def - leak])
 end
 
 function two_sample_jackknife(f, nc, nf)
@@ -155,7 +160,7 @@ function main(args)
 
     n = length(wlev)
     ng = length(qgrid)
-    per = 4n + 24 + 2ng
+    per = 4n + 26 + 2ng
     paired = variants == ["fixed", "zero"]
     pix = [4n+2, 4n+4, 4n+5, 4n+9, 4n+12]  # mismatch, bound, defect, total departure, ε₊
     function f(ic, jf)
@@ -204,6 +209,8 @@ function main(args)
         line("  q needed, matrix form, coarse", [fmt(est[o+5], err[o+5])])
         line("  defect / (1 − s), ε₊ / (1 − s)", [fmt(est[o+6], err[o+6]), fmt(est[o+7], err[o+7])])
         line("defect, coarse-window inputs only", [fmt(est[o+8], err[o+8])])
+        line("  above its D = 0 value ‖L_f‖^{1/2}", [fmt(est[o+9], err[o+9])])
+        line("defect above its D = 0 value", [fmt(est[o+10], err[o+10])])
     end
     if paired
         println("\nfixed origin − zero momentum (paired errors: same configurations and bins)")

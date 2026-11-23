@@ -448,6 +448,68 @@ Commands (time each first with a few configurations):
           --therm 1000 --skip 8 --alphas 0.3,0.6 --levels 4,8,16,24 --seed 6546 --confs 1000 \
           --out fine_b6546.txt --checkpoint fine_b6546.ckpt
 
+
+## Second pair: results (β = 6.054 against β = 6.546)
+
+Both runs finished without projection fallbacks: the coarse ensemble (3000 configurations, 4 sweeps
+apart, seed 60540) and the fine one (1000 configurations, 8 sweeps apart, seed 6546), run at commit
+675f3ee on 12 threads of an Apple M4 Max, about 65 s per fine configuration. Outputs are in
+`lattice/results/` (`fine_b6546_*`, `noise_b6054_*`, and the first pair's `fine_b6054_window48_mref1311_bin10.txt`).
+All recorded analyses were run as written; the "above its D = 0 value" lines of `window_transfer.jl`
+were added after these data were seen.
+
+Primary recipe (α = 0.6, zero momentum, window {4, 8}, one coarse step), against the first pair:
+
+| | β = 5.7 against 6.054 | β = 6.054 against 6.546 |
+|---|---|---|
+| leading window eigenvalues, coarse / fine | 0.339 / 0.236 | 0.2942(34) / 0.2640(48) |
+| their separation | 0.1032(65) | 0.0302(58) |
+| in-window mismatch (noise, 95th percentile) | 0.166(6) (0.017) | 0.0768(53) (0.017, resamples of 3000 and 1000) |
+| angle of leading directions | 24.8(1.0)° | 11.8(1.0)° |
+| ε₊ | 0.045(6) | 0.0075(53) |
+| largest leakage eigenvalues, L_c / L_f | 0.0149 / 0.0073 | 0.0313 / 0.0255 |
+| window inputs, and above its D = 0 value | 0.180(11), 0.094(20) | 0.163(14), 0.0029(16) |
+| defect, and above its D = 0 value | 0.203(13), 0.081(16) | 0.184(8), 0.0070(30) |
+| defect / (1 − s), common interval, s = e^{−1.31} | 0.278(17) | 0.174(19) |
+| ε₊ / (1 − s), common interval | 0.061(8) | 0.004(8) |
+| mass endpoint m_f/m_c − 1 (90% interval) | 0.354(68) [0.242, 0.466] | −0.064(138) [−0.291, 0.163] |
+
+Scoring against the record:
+
+- Leading eigenvalues "within about 0.03": 0.0302(58), 90% interval [0.021, 0.040]. The central value
+  sits at the tolerance and the interval straddles it, so neither met nor missed clearly; the separation
+  fell by a factor 3.4 but stays well above the illustrative single-state value 0.003, as the recorded
+  caveat about weight on higher states allowed. Four-operator window: 0.0091(66) (first pair 0.0886(66)).
+- Masses: unresolved. Bins of 20: −0.061(147), [−0.303, 0.181]. Bins of 50: the 13-point fit is
+  ill-conditioned (κ 2 × 10³, χ²/dof 3.7), as anticipated with 20 blocks; the 7-point even-time fit gives
+  0.392(244), [−0.009, 0.793], unresolved. Delayed start and even times at bins of 10: unresolved. Short
+  ranges (fine [2, 8] against coarse [1, 4]): 0.242(73), beyond ±5%, the influence of early times. The
+  {4, 8} fits lie above the published ground state (coarse 0.832(62) in its units against about 0.645):
+  on these lattices, of half the spacing, the same smearing steps cover half the physical distance.
+
+What the map shows:
+
+- Inside the windows the tracking improves: the mismatch and the rotation halve and ε₊ is consistent
+  with zero. At the first pair's physical interval (`--lag 2`) the angle is 12.8(2.3)°, the leading two
+  coarse eigenvalues 0.117 and 0.016 (well separated), ε₊ 0.0026(55).
+- Both maximizations sit at their D = 0 values: ‖L_f‖^{1/2} = 0.160(14) and
+  max(‖L_c‖, ‖L_f‖)^{1/2} = 0.177(9). The windows leak more on the finer lattices, and the in-window
+  mismatch, four times the noise, lies in directions that barely raise the maximum. On this pair the
+  defect measures the windows, not the map; the mismatch, the angle and ε₊ carry the comparison.
+- Four-operator window: mismatch 0.0749(54) against a noise reference of 0.022, ε₊ 0.016(5) (first pair
+  0.056(6)), angle 6.0(0.8)°, both maximizations within 0.005 of their D = 0 values.
+- Recipes: averaging over origins again lowers the mismatch, defect and departure (0.0210(26),
+  0.0279(65), 0.0120(37) at α = 0.6), and the fixed origin is again more nearly isometric at α = 0.6
+  (‖M − I‖ 0.048 against 0.201); the reversal of ε₊ is not resolved (−0.0075(53)).
+- Checks: bins of 20 and 50 change no central value; headline errors grow by at most 6% (largest in the
+  output 28%, the positivity floor).
+- Exploratory, chosen after the data: with the operators {16, 24} the coarse fit gives 0.696(32) in its
+  units and the matched fits 0.127(79), [−0.003, 0.257], unresolved; the same operators give 0.356(71),
+  [0.240, 0.473], on the first pair.
+
+Next step suggested by the data: operators smeared over a fixed physical radius, so that the windows
+capture as much of the evolution on the finer lattice as on the coarser one.
+
 ## One-sided bound
 
 For a lower bound on the fine gap only one direction of disagreement matters: whether the fine

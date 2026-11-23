@@ -30,6 +30,8 @@ window: stout levels [4, 8, 16, 24] (ρ = 0.1), bins of 10; centered excitations
     q needed, matrix form, coarse     -0.1102(1471)
     defect / (1 − s), ε₊ / (1 − s)    0.5350(140)  0.0000(0)
   defect, coarse-window inputs only   0.3194(70)
+    above its D = 0 value ‖L_f‖^{1/2} 0.1977(109)
+  defect above its D = 0 value        0.2111(126)
 
 α = 0.0, zero
   eig K_c (coarse lag 1)  0.3520(48)  0.0878(46)  0.0237(45)  0.0054(46)
@@ -60,6 +62,8 @@ window: stout levels [4, 8, 16, 24] (ρ = 0.1), bins of 10; centered excitations
     q needed, matrix form, coarse     -0.2044(1858)
     defect / (1 − s), ε₊ / (1 − s)    0.4458(162)  0.0551(92)
   defect, coarse-window inputs only   0.2635(80)
+    above its D = 0 value ‖L_f‖^{1/2} 0.1272(123)
+  defect above its D = 0 value        0.1410(141)
 
 α = 0.3, fixed
   eig K_c (coarse lag 1)  0.3520(48)  0.0878(46)  0.0237(45)  0.0054(46)
@@ -90,6 +94,8 @@ window: stout levels [4, 8, 16, 24] (ρ = 0.1), bins of 10; centered excitations
     q needed, matrix form, coarse     -0.1758(1644)
     defect / (1 − s), ε₊ / (1 − s)    0.3992(166)  0.0116(87)
   defect, coarse-window inputs only   0.2340(84)
+    above its D = 0 value ‖L_f‖^{1/2} 0.1115(113)
+  defect above its D = 0 value        0.1258(139)
 
 α = 0.3, zero
   eig K_c (coarse lag 1)  0.3520(48)  0.0878(46)  0.0237(45)  0.0054(46)
@@ -120,6 +126,8 @@ window: stout levels [4, 8, 16, 24] (ρ = 0.1), bins of 10; centered excitations
     q needed, matrix form, coarse     0.1570(2273)
     defect / (1 − s), ε₊ / (1 − s)    0.3257(204)  0.0901(101)
   defect, coarse-window inputs only   0.1833(102)
+    above its D = 0 value ‖L_f‖^{1/2} 0.1186(207)
+  defect above its D = 0 value        0.0975(177)
 
 α = 0.6, fixed
   eig K_c (coarse lag 1)  0.3520(48)  0.0878(46)  0.0237(45)  0.0054(46)
@@ -150,6 +158,8 @@ window: stout levels [4, 8, 16, 24] (ρ = 0.1), bins of 10; centered excitations
     q needed, matrix form, coarse     -0.1705(1735)
     defect / (1 − s), ε₊ / (1 − s)    0.3795(171)  0.0231(98)
   defect, coarse-window inputs only   0.2216(87)
+    above its D = 0 value ‖L_f‖^{1/2} 0.1050(111)
+  defect above its D = 0 value        0.1194(140)
 
 α = 0.6, zero
   eig K_c (coarse lag 1)  0.3520(48)  0.0878(46)  0.0237(45)  0.0054(46)
@@ -180,6 +190,8 @@ window: stout levels [4, 8, 16, 24] (ρ = 0.1), bins of 10; centered excitations
     q needed, matrix form, coarse     0.1793(2230)
     defect / (1 − s), ε₊ / (1 − s)    0.3161(207)  0.0895(101)
   defect, coarse-window inputs only   0.1768(106)
+    above its D = 0 value ‖L_f‖^{1/2} 0.1117(196)
+  defect above its D = 0 value        0.0915(176)
 
 fixed origin − zero momentum (paired errors: same configurations and bins)
   α = 0.0   Δ‖K_f V − V K_c‖ 0.0542(39)   Δbound 0.0397(155)   Δdefect 0.0555(68)   Δdeparture 0.0258(59)   Δε₊ -0.0343(57)

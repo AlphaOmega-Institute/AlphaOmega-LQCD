@@ -81,7 +81,8 @@ the slow states the chosen operators do not see.
 
 - The prediction and analysis plan, as written before the fine data; the results at one coarse step
   and at the first pair's physical interval; whether the angle, ε₊ and the leakage shrink with the
-  spectral separation.
+  spectral separation. Drafted: separation 0.030(6) at the tolerance, masses unresolved, angle and
+  mismatch halved, ε₊ consistent with zero, defect at its leakage floor.
 
 ## 6. Discussion
 
